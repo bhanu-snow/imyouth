@@ -18,7 +18,7 @@ export default function FAQ({ data }: FaqProps) {
             <h2 className='text-4xl lg:text-6xl font-semibold text-center text-white'>{data.title}</h2>
             <div className="w-full px-4 pt-16">
                 {data.QAs.map((qa) => (
-                <div className="mx-auto w-full max-w-5xl rounded-2xl bg-white py-8 px-6 mb-5">
+                <div key={qa.guid} className="mx-auto w-full max-w-5xl rounded-2xl bg-white py-8 px-6 mb-5">
                     <Disclosure>
                         {({ open }) => (
                             <>
