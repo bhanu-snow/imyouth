@@ -1,6 +1,12 @@
 // app/lib/data.ts
+import { headers } from 'next/headers';
+
 export async function getData() {
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+  // Use the request host in production, fallback to dev URL
+  const headersList = headers();
+  const host = headersList.get('host');
+  const protocol = process.env.NODE_ENV === 'production' ? 'https' : 'http';
+  const baseUrl = host ? `${protocol}://${host}` : 'http://localhost:3000';
   const fetchUrl = `${baseUrl}/data.json`;
   console.log('Fetching data from:', fetchUrl);
 
