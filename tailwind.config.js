@@ -59,7 +59,12 @@ module.exports = {
       '65xl': ['65px', { lineHeight: '1' }],
       '80xl': ['80px', { lineHeight: '6rem' }],
     },
-    extend: {},
+    extend: {
+      colors: {
+        'iuml-green': '#006600',
+        'iuml-blue': '#22409A' // Custom IUML green (adjust hex if needed)
+      },
+    },
   },
   plugins: [],
 }

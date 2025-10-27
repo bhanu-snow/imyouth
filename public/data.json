@@ -1,0 +1,687 @@
+{
+  "ViMission": 
+  { 
+    "title":"IUML | Muslim Youth League",
+    "Sections":
+    [
+      {      
+      "guid": "550e8400-e29b-41d4-a716-446655440009",
+      "name":"MISSION",
+      "content_en": "The Indian Union Muslim League (IUML) is dedicated to fostering unity, promoting social justice, and empowering communities in Uttar Pradesh through education and civic engagement.",
+      "content_hi": "इंडियन यूनियन मुस्लिम लीग (IUML) उत्तर प्रदेश में एकता को बढ़ावा देने, सामाजिक न्याय को प्रोत्साहित करने और शिक्षा और नागरिक भागीदारी के माध्यम से समुदायों को सशक्त बनाने के लिए समर्पित है।",
+      "imgSrc":"/images/aboutus/imgOne.svg",
+      "link": "Learn more"
+    },
+    {
+      "guid": "550e8400-e29b-41d4-a716-446655440010",
+      "name":"VISION",
+      "content_en": "To create an inclusive society in Uttar Pradesh where every individual has access to opportunities and can contribute to the state's progress.",
+      "content_hi": "उत्तर प्रदेश में एक समावेशी समाज बनाने के लिए जहां प्रत्येक व्यक्ति को अवसर प्राप्त हों और वह राज्य की प्रगति में योगदान दे सके।",
+      "imgSrc":"/images/aboutus/imgTwo.svg",
+      "link": "Learn more"
+    }]}
+    ,
+    "about":
+    {
+      "guid": "550e8400-e29b-41d4-a716-446655440011",
+      "title":"About IUML",
+      "content_en": "Founded in 1948, IUML has a rich history of advocating for minority rights and community development. In Uttar Pradesh, we focus on grassroots initiatives and historical preservation. IUML Main Body Structure: IUML operates on a hierarchical structure with national, state, district, and primary levels. The national level includes office bearers like the President (currently K. M. Kader Mohideen since 2017), General Secretary (P. K. Kunhalikutty), Organising Secretary (E. T. Mohammed Basheer), Treasurer (P. V. Abdul Wahab), and a Political Advisory Committee (PAC) chaired by Sayyid Sadiq Ali Shihab Thangal. The National Executive is the principal executive body. State committees, such as the Muslim League Kerala State Committee (MLKSC), handle regional operations and have maintained steady parliamentary representation since 1952. District and primary units focus on grassroots mobilization. The party currently has 4 MPs in Parliament (3 in Lok Sabha, 1 in Rajya Sabha) and 19 MLAs in state assemblies (mainly Kerala and Tamil Nadu). Associated Wings: IUML has several frontal organizations including Muslim Students Federation (MSF), Muslim Youth League (MYL), Muslim Women's League (MWL), Swathanthra Thozhilali Union (STU), Kerala School Teachers Union (KSTU), Kerala Higher Secondary Teachers Union (KHSTU), Swathanthra Karshaka Sangam, a Lawyers Forum, and the international Kerala Muslim Cultural Centre (KMCC).",
+      "content_hi": "1948 में स्थापित, IUML का अल्पसंख्यक अधिकारों और समुदाय विकास के लिए वकालत करने का एक समृद्ध इतिहास है। उत्तर प्रदेश में, हम जमीनी स्तर की पहल और ऐतिहासिक संरक्षण पर ध्यान केंद्रित करते हैं। IUML मुख्य निकाय संरचना: IUML राष्ट्रीय, राज्य, जिला और प्राथमिक स्तरों के साथ एक पदानुक्रमित संरचना पर काम करती है। राष्ट्रीय स्तर पर पदाधिकारियों में अध्यक्ष (वर्तमान में 2017 से के. एम. कादर मोहिद्दीन), महासचिव (पी. के. कुनहालीकुट्टी), संगठन सचिव (ई. टी. मुहम्मद बशीर), कोषाध्यक्ष (पी. वी. अब्दुल वहाब), और सैयद सादिक अली शिहाब थंगल की अध्यक्षता में राजनीतिक सलाहकार समिति (PAC) शामिल हैं। राष्ट्रीय कार्यकारिणी प्रमुख कार्यकारी निकाय है। राज्य समितियां, जैसे मुस्लिम लीग केरल राज्य समिति (MLKSC), क्षेत्रीय संचालन संभालती हैं और 1952 से स्थिर संसदीय प्रतिनिधित्व बनाए रखी हैं। जिला और प्राथमिक इकाइयां जमीनी स्तर पर मोबिलाइजेशन पर ध्यान केंद्रित करती हैं। पार्टी के पास वर्तमान में संसद में 4 सांसद (3 लोकसभा में, 1 राज्यसभा में) और राज्य विधानसभाओं में 19 विधायक (मुख्य रूप से केरल और तमिलनाडु) हैं। संबद्ध विंग: IUML के पास कई फ्रंटल संगठन हैं जिनमें मुस्लिम स्टूडेंट्स फेडरेशन (MSF), मुस्लिम यूथ लीग (MYL), मुस्लिम विमेंस लीग (MWL), स्वतंत्र थोझिलाली यूनियन (STU), केरल स्कूल टीचर्स यूनियन (KSTU), केरल हायर सेकेंडरी टीचर्स यूनियन (KHSTU), स्वतंत्र कार्षका संघम, एक वकील फोरम, और अंतर्राष्ट्रीय केरल मुस्लिम कल्चरल सेंटर (KMCC) शामिल हैं।"      
+    },
+
+  "leaders": [
+    {
+      "guid": "550e8400-e29b-41d4-a716-446655440012",
+      "year": "1948–1972",
+      "name": "M. Muhammad Ismail Sahib",
+      "post": "National President",
+      "contribution_en": "Founded IUML post-Partition; advocated for Muslim Personal Law and minority rights in the Constitution; led early parliamentary representation.",
+      "contribution_hi": "विभाजन के बाद IUML की स्थापना; संविधान में मुस्लिम पर्सनल लॉ और अल्पसंख्यक अधिकारों की वकालत; प्रारंभिक संसदीय प्रतिनिधित्व का नेतृत्व।"
+    },
+    {
+      "guid": "550e8400-e29b-41d4-a716-446655440013",
+      "year": "1972–1973",
+      "name": "Bafaqy Thangal",
+      "post": "National President",
+      "contribution_en": "Consolidated party in Kerala after Ismail's tenure.",
+      "contribution_hi": "इस्माइल के कार्यकाल के बाद केरल में पार्टी को मजबूत किया।"
+    },
+    {
+      "guid": "550e8400-e29b-41d4-a716-446655440014",
+      "year": "1973–1994",
+      "name": "Ebrahim Sulaiman Sait",
+      "post": "National President",
+      "contribution_en": "Strengthened alliances, including with Congress in 1976; expanded electoral base in Kerala and beyond.",
+      "contribution_hi": "गठबंधनों को मजबूत किया, जिसमें 1976 में कांग्रेस के साथ शामिल; केरल और उससे आगे चुनावी आधार का विस्तार।"
+    },
+    {
+      "guid": "550e8400-e29b-41d4-a716-446655440015",
+      "year": "1994–2008",
+      "name": "G. M. Banatwalla",
+      "post": "National President",
+      "contribution_en": "Emphasized national parliamentary roles; advocated for Muslim issues like Babri Masjid.",
+      "contribution_hi": "राष्ट्रीय संसदीय भूमिकाओं पर जोर; बाबरी मस्जिद जैसे मुस्लिम मुद्दों की वकालत।"
+    },
+    {
+      "guid": "550e8400-e29b-41d4-a716-446655440016",
+      "year": "2008–2017",
+      "name": "E. Ahamed",
+      "post": "National President",
+      "contribution_en": "First IUML national minister; bridged Kerala and national politics; authored books on policy.",
+      "contribution_hi": "पहला IUML राष्ट्रीय मंत्री; केरल और राष्ट्रीय राजनीति को जोड़ा; नीति पर पुस्तकें लिखीं।"
+    },
+    {
+      "guid": "550e8400-e29b-41d4-a716-446655440017",
+      "year": "2017–2025",
+      "name": "K. M. Kader Mohideen",
+      "post": "National President",
+      "contribution_en": "Focused on UDF alliances in Kerala, SPA in Tamil Nadu, and INDIA bloc nationally; expanded party infrastructure, including new Delhi headquarters in 2024.",
+      "contribution_hi": "केरल में UDF गठबंधनों, तमिलनाडु में SPA, और राष्ट्रीय स्तर पर INDIA ब्लॉक पर ध्यान; पार्टी बुनियादी ढांचे का विस्तार, जिसमें 2024 में नया दिल्ली मुख्यालय शामिल।"
+    }
+  ],
+  "faq": 
+  {
+    "title":"IUML: Your Questions Answered",
+    "QAs":
+    [
+        {
+        "guid": "550e8400-e29b-41d4-a716-446655440018",
+        "question_en": "What is IUML and its main goals?",
+        "answer_en": "IUML is a secular political party founded in 1948 to ensure the honorable existence of Muslims in independent India. Its goals include protecting minority rights, promoting education, welfare, and unity among all communities while upholding the Constitution.",
+        "question_hi": "IUML क्या है और इसके मुख्य लक्ष्य क्या हैं?",
+        "answer_hi": "IUML एक धर्मनिरपेक्ष राजनीतिक पार्टी है जो 1948 में स्वतंत्र भारत में मुसलमानों के सम्मानजनक अस्तित्व को सुनिश्चित करने के लिए स्थापित की गई। इसके लक्ष्यों में अल्पसंख्यक अधिकारों की रक्षा, शिक्षा, कल्याण को बढ़ावा देना और संविधान का समर्थन करते हुए सभी समुदायों में एकता शामिल है।"
+        },
+        {
+        "guid": "550e8400-e29b-41d4-a716-446655440019",
+        "question_en": "Is IUML related to Jinnah's All-India Muslim League that supported Pakistan?",
+        "answer_en": "IUML is the Indian remnant of the pre-Partition Muslim League but reoriented itself post-1947 to fully commit to Indian secularism and nationalism, rejecting any separatist ideas.",
+        "question_hi": "क्या IUML जिन्नाह की ऑल-इंडिया मुस्लिम लीग से संबंधित है जो पाकिस्तान का समर्थन करती थी?",
+        "answer_hi": "IUML पूर्व-विभाजन मुस्लिम लीग का भारतीय अवशेष है लेकिन 1947 के बाद खुद को पूरी तरह से भारतीय धर्मनिरपेक्षता और राष्ट्रवाद के लिए पुनर्निर्देशित किया, किसी भी अलगाववादी विचारों को अस्वीकार करते हुए।"
+        },
+        {
+        "guid": "550e8400-e29b-41d4-a716-446655440020",
+        "question_en": "How is IUML different from and against the ideology of Indo-Pak division (two-nation theory)?",
+        "answer_en": "Unlike the pre-Partition League's two-nation theory (which saw Hindus and Muslims as separate nations leading to Pakistan), IUML opposes division, promotes pluralism, and works for Muslim integration in a united, secular India, countering extremism and fostering harmony.",
+        "question_hi": "IUML इंडो-पाक विभाजन (दो-राष्ट्र सिद्धांत) की विचारधारा से कैसे अलग और विरोधी है?",
+        "answer_hi": "पूर्व-विभाजन लीग के दो-राष्ट्र सिद्धांत (जो हिंदुओं और मुसलमानों को अलग राष्ट्र मानता था जिससे पाकिस्तान बना) के विपरीत, IUML विभाजन का विरोध करता है, बहुलवाद को बढ़ावा देता है, और एकजुट, धर्मनिरपेक्ष भारत में मुसलमानों के एकीकरण के लिए काम करता है, अतिवाद का मुकाबला करता है और सद्भाव को बढ़ावा देता है।"
+        },
+        {
+        "guid": "550e8400-e29b-41d4-a716-446655440021",
+        "question_en": "Which parties has IUML formed governments or alliances with in various states?",
+        "answer_en": "In Kerala, IUML is a key UDF partner with Congress (INC) since 1976; it supported CPI(M)-led government in 1969 for Malappuram district; C.H. Mohammed Koya was CM in 1979. In Tamil Nadu, it allies with DMK-led SPA. Nationally, it joined UPA (2004) and INDIA bloc.",
+        "question_hi": "IUML ने विभिन्न राज्यों में किन पार्टियों के साथ सरकारें या गठबंधन बनाए हैं?",
+        "answer_hi": "केरल में, IUML 1976 से कांग्रेस (INC) के साथ UDF का प्रमुख भागीदार है; इसने 1969 में मलप्पुरम जिले के लिए CPI(M)-नीत सरकार का समर्थन किया; सी.एच. मुहम्मद कोया 1979 में सीएम थे। तमिलनाडु में, यह DMK-नीत SPA के साथ गठबंधन करता है। राष्ट्रीय स्तर पर, यह UPA (2004) और INDIA ब्लॉक में शामिल हुआ।"
+        },
+        {
+        "guid": "550e8400-e29b-41d4-a716-446655440022",
+        "question_en": "Is IUML only for Muslims, or can non-Muslims join?",
+        "answer_en": "IUML is open to all; non-Muslims can join and have held positions, like MLA U.C. Raman (non-Muslim). It promotes secularism and includes a Hindu woman in national leadership.",
+        "question_hi": "क्या IUML केवल मुसलमानों के लिए है, या गैर-मुस्लिम शामिल हो सकते हैं?",
+        "answer_hi": "IUML सभी के लिए खुला है; गैर-मुस्लिम शामिल हो सकते हैं और पद धारण कर चुके हैं, जैसे विधायक यू.सी. रमन (गैर-मुस्लिम)। यह धर्मनिरपेक्षता को बढ़ावा देता है और राष्ट्रीय नेतृत्व में एक हिंदू महिला शामिल है।"
+        },
+        {
+        "guid": "550e8400-e29b-41d4-a716-446655440023",
+        "question_en": "What is IUML's role in North India, like Uttar Pradesh?",
+        "answer_en": "IUML is expanding in North India, considering contests in UP and other states. It aims to provide a moderate, secular platform for Muslims, differing from North India's reactionary politics, and focuses on community upliftment.",
+        "question_hi": "उत्तर भारत में IUML की भूमिका क्या है, जैसे उत्तर प्रदेश में?",
+        "answer_hi": "IUML उत्तर भारत में विस्तार कर रहा है, UP और अन्य राज्यों में चुनाव लड़ने पर विचार कर रहा है। यह मुसलमानों के लिए मध्यम, धर्मनिरपेक्ष मंच प्रदान करने का लक्ष्य रखता है, उत्तर भारत की प्रतिक्रियावादी राजनीति से अलग, और समुदाय उत्थान पर ध्यान केंद्रित करता है।"
+        },
+        {
+        "guid": "550e8400-e29b-41d4-a716-446655440024",
+        "question_en": "Is IUML a communal or secular party?",
+        "answer_en": "IUML is secular, allied with non-communal parties like Congress and DMK, and promotes pluralism. It resists extremism and has non-Muslim members, making it a model for moderate Muslim politics.",
+        "question_hi": "क्या IUML सांप्रदायिक या धर्मनिरपेक्ष पार्टी है?",
+        "answer_hi": "IUML धर्मनिरपेक्ष है, कांग्रेस और DMK जैसी गैर-सांप्रदायिक पार्टियों के साथ गठबंधन करता है, और बहुलवाद को बढ़ावा देता है। यह अतिवाद का प्रतिरोध करता है और गैर-मुस्लिम सदस्य रखता है, जो इसे मध्यम मुस्लिम राजनीति का मॉडल बनाता है।"
+        },
+        {
+        "guid": "550e8400-e29b-41d4-a716-446655440025",
+        "question_en": "How does IUML support education and welfare in North India?",
+        "answer_en": "Through wings like MSF and MYL, IUML runs scholarships, skill programs, and relief for backward sections. In North India, it focuses on minority institutions and anti-discrimination advocacy.",
+        "question_hi": "IUML उत्तर भारत में शिक्षा और कल्याण का कैसे समर्थन करता है?",
+        "answer_hi": "MSF और MYL जैसे विंगों के माध्यम से, IUML छात्रवृत्तियां, कौशल कार्यक्रम, और पिछड़े वर्गों के लिए राहत चलाता है। उत्तर भारत में, यह अल्पसंख्यक संस्थानों और भेदभाव विरोधी वकालत पर ध्यान केंद्रित करता है।"
+        },
+        {
+        "guid": "550e8400-e29b-41d4-a716-446655440026",
+        "question_en": "What is IUML's stance on extremism and communal violence?",
+        "answer_en": "IUML strongly opposes extremism (internal or external) and communal violence, promoting harmony and resisting anti-Muslim campaigns while upholding constitutional values.",
+        "question_hi": "अतिवाद और सांप्रदायिक हिंसा पर IUML का रुख क्या है?",
+        "answer_hi": "IUML अतिवाद (आंतरिक या बाहरी) और सांप्रदायिक हिंसा का कड़ा विरोध करता है, सद्भाव को बढ़ावा देता है और मुस्लिम विरोधी अभियानों का प्रतिरोध करता है जबकि संवैधानिक मूल्यों का समर्थन करता है।"
+        },
+        {
+        "guid": "550e8400-e29b-41d4-a716-446655440027",
+        "question_en": "How can I join IUML or MYL in North India?",
+        "answer_en": "Contact local units via IUML's website, social media (e.g., IUML Kanpur Facebook), or state committees. Youth can join MYL for political and welfare activities; non-Muslims are welcome.",
+        "question_hi": "उत्तर भारत में IUML या MYL में कैसे शामिल हो सकता हूँ?",
+        "answer_hi": "IUML की वेबसाइट, सोशल मीडिया (जैसे IUML कानपुर फेसबुक) या राज्य समितियों के माध्यम से स्थानीय इकाइयों से संपर्क करें। युवा MYL में राजनीतिक और कल्याणकारी गतिविधियों के लिए शामिल हो सकते हैं; गैर-मुस्लिम स्वागत हैं।"
+        }
+  ]
+},
+  
+"persons": [
+{
+"name": "Ashfaqulla Khan",
+"birth": "1900-10-22",
+"death": "1927-12-19",
+"birth_place": "Shahjahanpur, Uttar Pradesh, India",
+"death_place": "Faizabad Jail, Faizabad, Uttar Pradesh, India",
+"origin_country": "India",
+"about": "Muslim freedom fighter and Urdu poet (pen name Hasrat); co-founded Hindustan Republican Association; key in Kakori Train Robbery (1925) to fund revolutionary activities; executed for his role, symbolizing Hindu-Muslim unity.",
+"type": "Freedom Fighter",
+"category": "General History"
+},
+{
+"name": "B.R. Ambedkar",
+"birth": "1891-04-14",
+"death": "1956-12-06",
+"birth_place": "Mhow, Madhya Pradesh, India",
+"death_place": "Delhi, India",
+"origin_country": "India",
+"about": "Dalit leader, jurist, and social reformer; architect of India’s Constitution, shaping democratic framework; fought for Dalit rights and equality.",
+"type": "Social Reformer and Jurist",
+"category": "General History"
+},
+{
+"name": "Maulana Abul Kalam Azad",
+"birth": "1888-11-11",
+"death": "1958-02-22",
+"birth_place": "Mecca, Ottoman Empire (now Saudi Arabia)",
+"death_place": "New Delhi, India",
+"origin_country": "India (raised in India)",
+"about": "Muslim scholar, freedom fighter, and first Education Minister of India; promoted education for all and contributed to democratic institutions.",
+"type": "Freedom Fighter and Educator",
+"category": "General History"
+},
+{
+"name": "Khan Abdul Ghaffar Khan",
+"birth": "1890-02-06",
+"death": "1988-01-20",
+"birth_place": "Utmanzai, Hashtnagar, North-West Frontier Province (now Pakistan)",
+"death_place": "Jalalabad, Afghanistan",
+"origin_country": "Pakistan (born in British India)",
+"about": "Muslim non-violent activist, 'Frontier Gandhi'; founded Khudai Khidmatgar to promote independence and unity in India/Pakistan border regions.",
+"type": "Freedom Fighter",
+"category": "General History"
+},
+{
+"name": "Bhagat Singh",
+"birth": "1907-09-28",
+"death": "1931-03-23",
+"birth_place": "Banga, Lyallpur District, Punjab (now Pakistan)",
+"death_place": "Lahore Central Jail, Lahore (now Pakistan)",
+"origin_country": "India (born in British India)",
+"about": "Sikh revolutionary; executed for revolutionary activities against British rule; inspired youth with his courage and sacrifice.",
+"type": "Revolutionary",
+"category": "General History"
+},
+{
+"name": "Savitribai Phule",
+"birth": "1831-01-03",
+"death": "1897-03-10",
+"birth_place": "Naigaon, Satara District, Maharashtra, India",
+"death_place": "Pune, Maharashtra, India",
+"origin_country": "India",
+"about": "Dalit social reformer and educator; pioneered women’s education in India with Jyotirao Phule; fought caste and gender oppression.",
+"type": "Social Reformer and Educator",
+"category": "General History"
+},
+{
+"name": "Jyotirao Phule",
+"birth": "1827-04-11",
+"death": "1890-11-28",
+"birth_place": "Katgaon, Satara District, Maharashtra, India",
+"death_place": "Pune, Maharashtra, India",
+"origin_country": "India",
+"about": "Dalit social reformer; fought caste discrimination and promoted education for marginalized communities.",
+"type": "Social Reformer",
+"category": "General History"
+},
+{
+"name": "A.P.J. Abdul Kalam",
+"birth": "1931-10-15",
+"death": "2015-07-27",
+"birth_place": "Rameswaram, Tamil Nadu, India",
+"death_place": "Shillong, Meghalaya, India",
+"origin_country": "India",
+"about": "Muslim scientist and President of India; advanced missile technology and promoted education.",
+"type": "Scientist and Politician",
+"category": "General History"
+},
+{
+"name": "Abdus Salam",
+"birth": "1926-01-29",
+"death": "1996-11-21",
+"birth_place": "Jhang, Punjab (now Pakistan)",
+"death_place": "Oxford, United Kingdom",
+"origin_country": "Pakistan",
+"about": "Muslim physicist (Pakistan); Nobel Prize in Physics 1979 for electroweak theory; contributed to quantum field theory.",
+"type": "Scientist",
+"category": "Global Muslim Contributors"
+},
+{
+"name": "Ahmed Zewail",
+"birth": "1946-02-26",
+"death": "2016-08-02",
+"birth_place": "Damanhur, Egypt",
+"death_place": "Pasadena, California, USA",
+"origin_country": "Egypt",
+"about": "Muslim chemist (Egypt/USA); Nobel Prize in Chemistry 1999 for femtochemistry, studying chemical reactions at atomic timescales.",
+"type": "Scientist",
+"category": "Global Muslim Contributors"
+},
+{
+"name": "Muhammad Yunus",
+"birth": "1940-06-28",
+"death": null,
+"birth_place": "Chittagong, Bangladesh",
+"death_place": "N/A",
+"origin_country": "Bangladesh",
+"about": "Muslim economist (Bangladesh); Nobel Peace Prize 2006 for microfinance and poverty alleviation through Grameen Bank.",
+"type": "Economist",
+"category": "Global Muslim Contributors"
+},
+{
+"name": "Malala Yousafzai",
+"birth": "1997-07-12",
+"death": null,
+"birth_place": "Mingora, Swat Valley, Pakistan",
+"death_place": "N/A",
+"origin_country": "Pakistan",
+"about": "Muslim activist (Pakistan); Nobel Peace Prize 2014 for advocating girls’ education rights.",
+"type": "Activist",
+"category": "Global Muslim Contributors"
+},
+{
+"name": "Naguib Mahfouz",
+"birth": "1911-12-11",
+"death": "2006-08-30",
+"birth_place": "Cairo, Egypt",
+"death_place": "Cairo, Egypt",
+"origin_country": "Egypt",
+"about": "Muslim writer (Egypt); Nobel Prize in Literature 1988 for novels depicting Arab life and culture.",
+"type": "Writer",
+"category": "Global Muslim Contributors"
+},
+{
+"name": "Anwar Sadat",
+"birth": "1918-12-25",
+"death": "1981-10-06",
+"birth_place": "Mit Abu al-Kum, Egypt",
+"death_place": "Cairo, Egypt",
+"origin_country": "Egypt",
+"about": "Muslim leader (Egypt); Nobel Peace Prize 1978 for Camp David Accords, promoting peace.",
+"type": "Politician",
+"category": "Global Muslim Contributors"
+},
+{
+"name": "Al-Khwarizmi",
+"birth": "c. 780",
+"death": "c. 850",
+"birth_place": "Khwarezm (now Uzbekistan)",
+"death_place": "Baghdad, Iraq",
+"origin_country": "Persia (historical)",
+"about": "Muslim mathematician (Persia); father of algebra; developed algorithms and influenced modern computing.",
+"type": "Mathematician",
+"category": "Global Muslim Contributors"
+},
+{
+"name": "Ibn Sina (Avicenna)",
+"birth": "980-08",
+"death": "1037-06",
+"birth_place": "Afshana, near Bukhara (now Uzbekistan)",
+"death_place": "Hamadan, Iran",
+"origin_country": "Persia (historical)",
+"about": "Muslim polymath (Persia); wrote Canon of Medicine, a foundational medical text; advanced philosophy and science.",
+"type": "Polymath",
+"category": "Global Muslim Contributors"
+},
+{
+"name": "Ibn al-Haytham",
+"birth": "c. 965",
+"death": "c. 1040",
+"birth_place": "Basra, Iraq",
+"death_place": "Cairo, Egypt",
+"origin_country": "Iraq (historical)",
+"about": "Muslim scientist (Iraq); pioneered optics and scientific method; known as the father of modern optics.",
+"type": "Scientist",
+"category": "Global Muslim Contributors"
+},
+{
+"name": "Jabir ibn Hayyan",
+"birth": "c. 721",
+"death": "c. 815",
+"birth_place": "Tus, Khorasan (now Iran)",
+"death_place": "Kufa, Iraq",
+"origin_country": "Persia (historical)",
+"about": "Muslim chemist (Iraq); pioneer of alchemy; developed early chemical processes.",
+"type": "Chemist",
+"category": "Global Muslim Contributors"
+},
+{
+"name": "Al-Jazari",
+"birth": "c. 1136",
+"death": "c. 1206",
+"birth_place": "Jazirat ibn Umar (now Cizre, Turkey)",
+"death_place": "Cizre, Turkey",
+"origin_country": "Turkey (historical Mesopotamia)",
+"about": "Muslim engineer (Mesopotamia); invented mechanical devices and automata, laying groundwork for robotics.",
+"type": "Engineer",
+"category": "Global Muslim Contributors"
+},
+{
+"name": "Ibn Khaldun",
+"birth": "1332-05-27",
+"death": "1406-03-17",
+"birth_place": "Tunis, Tunisia",
+"death_place": "Cairo, Egypt",
+"origin_country": "Tunisia",
+"about": "Muslim historian (Tunisia); father of sociology and historiography; wrote Muqaddimah on social sciences.",
+"type": "Historian",
+"category": "Global Muslim Contributors"
+},
+{
+"name": "Kartar Singh Sarabha",
+"birth": "1896-05-24",
+"death": "1915-11-16",
+"birth_place": "Sarabha, Ludhiana District, Punjab (now India)",
+"death_place": "Lahore Central Jail, Lahore (now Pakistan)",
+"origin_country": "India (born in British India)",
+"about": "Sikh freedom fighter; involved in Ghadar Movement to overthrow British rule.",
+"type": "Freedom Fighter",
+"category": "General History"
+},
+{
+"name": "Udham Singh",
+"birth": "1899-12-26",
+"death": "1940-07-31",
+"birth_place": "Sunam, Punjab (now India)",
+"death_place": "Pentonville Prison, London, UK",
+"origin_country": "India",
+"about": "Sikh revolutionary; avenged Jallianwala Bagh massacre by assassinating Michael O’Dwyer.",
+"type": "Revolutionary",
+"category": "General History"
+},
+{
+"name": "Ram Prasad Bismil",
+"birth": "1897-06-11",
+"death": "1927-12-19",
+"birth_place": "Shahjahanpur, Uttar Pradesh, India",
+"death_place": "Gorakhpur Jail, Gorakhpur, Uttar Pradesh, India",
+"origin_country": "India",
+"about": "Freedom fighter and poet; led Kakori Conspiracy; symbol of Hindu-Muslim unity with Ashfaqulla Khan.",
+"type": "Freedom Fighter",
+"category": "General History"
+},
+{
+"name": "Ayyankali",
+"birth": "1863-08-28",
+"death": "1941-06-18",
+"birth_place": "Venganoor, Thiruvananthapuram, Kerala, India",
+"death_place": "Venganoor, Kerala, India",
+"origin_country": "India",
+"about": "Dalit activist; fought for untouchables’ rights in Kerala, securing education and land access.",
+"type": "Social Activist",
+"category": "General History"
+},
+{
+"name": "Hakim Ajmal Khan",
+"birth": "1863-02-11",
+"death": "1927-12-29",
+"birth_place": "Delhi, India",
+"death_place": "Delhi, India",
+"origin_country": "India",
+"about": "Muslim freedom fighter and physician; founded Tibbia College, supported education and Khilafat Movement.",
+"type": "Freedom Fighter and Physician",
+"category": "General History"
+},
+{
+"name": "Abid Hasan Safrani",
+"birth": "1911-04-11",
+"death": "1984-04-09",
+"birth_place": "Hyderabad, India",
+"death_place": "Hyderabad, India",
+"origin_country": "India",
+"about": "Muslim freedom fighter; INA officer under Subhas Chandra Bose; symbolized Hindu-Muslim unity.",
+"type": "Freedom Fighter",
+"category": "General History"
+},
+{
+"name": "Badruddin Tyabji",
+"birth": "1844-10-10",
+"death": "1906-08-19",
+"birth_place": "Bombay (now Mumbai), India",
+"death_place": "London, UK",
+"origin_country": "India",
+"about": "Muslim freedom fighter; first Muslim INC President; advocated democratic reforms and unity.",
+"type": "Freedom Fighter and Politician",
+"category": "General History"
+},
+{
+"name": "Rajendra Prasad",
+"birth": "1884-12-03",
+"death": "1963-02-28",
+"birth_place": "Ziradei, Siwan, Bihar, India",
+"death_place": "Patna, Bihar, India",
+"origin_country": "India",
+"about": "Freedom fighter and first President of India; key in establishing democratic governance.",
+"type": "Freedom Fighter and Politician",
+"category": "General History"
+},
+{
+"name": "Sardar Vallabhbhai Patel",
+"birth": "1875-10-31",
+"death": "1950-12-15",
+"birth_place": "Nadiad, Gujarat, India",
+"death_place": "Bombay (now Mumbai), India",
+"origin_country": "India",
+"about": "Freedom fighter and statesman; unified India’s princely states, strengthening democracy.",
+"type": "Freedom Fighter and Politician",
+"category": "General History"
+},
+{
+"name": "Aziz Sancar",
+"birth": "1946-09-08",
+"death": null,
+"birth_place": "Savur, Mardin Province, Turkey",
+"death_place": "N/A",
+"origin_country": "Turkey",
+"about": "Muslim biochemist (Turkey); Nobel Prize in Chemistry 2015 for DNA repair mechanisms.",
+"type": "Scientist",
+"category": "Global Muslim Contributors"
+},
+{
+"name": "Matangini Hazra",
+"birth": "1869-10-19",
+"death": "1942-09-29",
+"birth_place": "Hogla village, Tamluk, Midnapore, West Bengal, India",
+"death_place": "Tamluk, West Bengal, India",
+"origin_country": "India",
+"about": "Forgotten female freedom fighter; died leading Quit India Movement protest.",
+"type": "Freedom Fighter",
+"category": "General History"
+},
+{
+"name": "M. Muhammad Ismail",
+"birth": "1896-06-05",
+"death": "1972-04-05",
+"birth_place": "Pettai, Tirunelveli, Tamil Nadu, India",
+"death_place": "Chennai, Tamil Nadu, India",
+"origin_country": "India",
+"about": "Founder and first President of the Indian Union Muslim League (IUML); led its formation post-partition; served in Indian Parliament and advocated for Muslim rights.",
+"type": "Politician",
+"category": "IUML History"
+},
+{
+"name": "C. H. Mohammed Koya",
+"birth": "1927-07-15",
+"death": "1983-09-28",
+"birth_place": "Atholi, Kerala, India",
+"death_place": "Hyderabad, India",
+"origin_country": "India",
+"about": "Prominent IUML leader; first Muslim Chief Minister of Kerala (1979); served as Education Minister and promoted secular education for backward communities.",
+"type": "Politician",
+"category": "IUML History"
+},
+{
+"name": "E. Ahamed",
+"birth": "1938-04-29",
+"death": "2017-02-01",
+"birth_place": "Kannur, Kerala, India",
+"death_place": "Delhi, India",
+"origin_country": "India",
+"about": "National President of IUML (2008-2017); first IUML Union Minister in India; served in External Affairs and other portfolios.",
+"type": "Politician",
+"category": "IUML History"
+},
+{
+"name": "Panakkad Mohammedali Shihab Thangal",
+"birth": "1936-05-04",
+"death": "2009-08-01",
+"birth_place": "Tirurangadi, Malappuram, Kerala, India",
+"death_place": "Malappuram, Kerala, India",
+"origin_country": "India",
+"about": "Influential IUML leader and Islamic scholar; President of Kerala state committee of IUML (1975-2009); known for bridging communities.",
+"type": "Politician and Scholar",
+"category": "IUML History"
+},
+{
+"name": "P. K. Kunhalikutty",
+"birth": "1951-06-01",
+"death": null,
+"birth_place": "Oorakam, Melmuri, Malappuram, Kerala, India",
+"death_place": "N/A",
+"origin_country": "India",
+"about": "National General Secretary of IUML; served as Kerala Minister for Industries multiple times; key figure in UDF alliance.",
+"type": "Politician",
+"category": "IUML History"
+},
+{
+"name": "Sayyid Sadiq Ali Shihab Thangal",
+"birth": "1964-05-25",
+"death": null,
+"birth_place": "Malappuram, Kerala, India",
+"death_place": "N/A",
+"origin_country": "India",
+"about": "Current President of IUML Kerala state committee; Chairman of Political Advisory Committee; Islamic leader and politician.",
+"type": "Politician",
+"category": "IUML History"
+},
+{
+"name": "K. M. Kader Mohideen",
+"birth": "1940-01-05",
+"death": null,
+"birth_place": "Thirunallur, Pudukkottai, Tamil Nadu, India",
+"death_place": "N/A",
+"origin_country": "India",
+"about": "Current National President of IUML (since 2017); former Lok Sabha member from Vellore; advocate for Muslim community issues.",
+"type": "Politician",
+"category": "IUML History"
+}
+],
+"events": [
+{
+"name": "Kakori Train Robbery",
+"date": "1925-08-09",
+"about": "Revolutionary act by Hindustan Republican Association, led by Ashfaqulla Khan and Ram Prasad Bismil, to loot British government funds for arms and independence activities.",
+"type": "Revolutionary Act",
+"category": "General History"
+},
+{
+"name": "Jallianwala Bagh Massacre",
+"date": "1919-04-13",
+"about": "British forces fired on unarmed crowd in Amritsar, killing hundreds; victims included Sikhs, Muslims, Hindus; spurred resistance, avenged by Udham Singh.",
+"type": "Massacre",
+"category": "General History"
+},
+{
+"name": "Quit India Movement Launch",
+"date": "1942-08-08",
+"about": "Mass movement initiated by Mahatma Gandhi demanding British exit; involved diverse activists like Matangini Hazra, who died protesting.",
+"type": "Independence Movement",
+"category": "General History"
+},
+{
+"name": "Chauri Chaura Incident",
+"date": "1922-02-04",
+"about": "Violent clash in Uttar Pradesh led to Gandhi suspending Non-Cooperation Movement; involved local activists, often forgotten.",
+"type": "Incident",
+"category": "General History"
+},
+{
+"name": "India’s Independence",
+"date": "1947-08-15",
+"about": "Culmination of freedom struggle; contributions from all communities, including Muslims, Dalits, Sikhs, and Christians.",
+"type": "Independence",
+"category": "General History"
+},
+{
+"name": "Republic Day",
+"date": "1950-01-26",
+"about": "India’s Constitution came into effect, drafted significantly by B.R. Ambedkar; marked establishment of democratic republic.",
+"type": "Constitutional Event",
+"category": "General History"
+},
+{
+"name": "First Council of IUML",
+"date": "1948-03-10",
+"about": "Formation of the Indian segment of the All-India Muslim League post-partition, with M. Muhammad Ismail as convener.",
+"type": "Party Formation",
+"category": "IUML History"
+},
+{
+"name": "Adoption of IUML Constitution",
+"date": "1951-09-01",
+"about": "Renaming to Indian Union Muslim League and adoption of new constitution in Madras.",
+"type": "Organizational Event",
+"category": "IUML History"
+},
+{
+"name": "Merger of Travancore and Malabar Leagues",
+"date": "1956-11-01",
+"about": "Merger strengthening IUML's base in Kerala.",
+"type": "Organizational Merger",
+"category": "IUML History"
+},
+{
+"name": "IUML First Ministry in Kerala",
+"date": "1967-03-01",
+"about": "IUML joins CPI(M)-led United Front government in Kerala, marking its first participation in state ministry.",
+"type": "Political Milestone",
+"category": "IUML History"
+},
+{
+"name": "C.H. Mohammed Koya Becomes CM of Kerala",
+"date": "1979-10-12",
+"about": "First IUML leader to become Chief Minister of Kerala, though short-tenured.",
+"type": "Political Leadership",
+"category": "IUML History"
+},
+{
+"name": "IUML Wins First Assembly Seat in Uttar Pradesh",
+"date": "1974-03-01",
+"about": "IUML secures its first MLA seat from Firozabad, marking expansion in Uttar Pradesh.",
+"type": "Electoral Victory",
+"category": "IUML History"
+},
+{
+"name": "Babri Masjid Demolition",
+"date": "1992-12-06",
+"about": "Demolition of Babri Masjid in Ayodhya, which IUML strongly condemned, highlighting communal issues in its political agenda.",
+"type": "Communal Event",
+"category": "IUML History"
+},
+{
+"name": "E. Ahamed Becomes Union Minister",
+"date": "2004-05-23",
+"about": "First IUML leader to hold a national ministry position as Minister of State for External Affairs.",
+"type": "Political Milestone",
+"category": "IUML History"
+},
+{
+"name": "Inauguration of IUML National Headquarters in Delhi",
+"date": "2025-08-25",
+"about": "Opening of national office in Delhi, symbolizing IUML's national expansion and empowerment of communities.",
+"type": "Organizational Milestone",
+"category": "IUML History"
+}
+]
+}

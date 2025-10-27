@@ -84,8 +84,8 @@ const Contactusform = () => {
 
                                     <div className="py-8 lg:py-8 px-4 mx-auto max-w-screen-md">
                                         <div className="flex flex-shrink-0 items-center justify-center">
-                                            <Link href="/" className='text-2xl sm:text-4xl font-semibold text-black'>
-                                                Desgy Solutions
+                                            <Link href="/" className='text-2xl sm:text-4xl font-semibold text-iuml-green'>
+                                                Muslim Youth League
                                             </Link>
                                         </div>
                                         <p className="mb-8 lg:mb-16 mt-8 font-light text-center text-gray-500 dark:text-gray-400 sm:text-xl">Contact us now? Want to send us a feedback?</p>
@@ -138,12 +138,6 @@ const Contactusform = () => {
                                         </form>
 
                                     </div>
-
-                                    {/* <div className='flex justify-end'>
-                                        <button type="button"
-                                            onClick={closeModal}
-                                            className="py-3 px-5 mt-2 text-sm font-medium w-50 text-center text-white rounded-lg bg-red hover:bg-primary-800 focus:ring-4 focus:outline-none focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">Close</button>
-                                    </div> */}
 
                                 </Dialog.Panel>
                             </Transition.Child>

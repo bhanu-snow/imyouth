@@ -14,9 +14,9 @@ interface NavigationItem {
 }
 
 const navigation: NavigationItem[] = [
-    { name: 'About Us', href: '#aboutus-section', current: false },
-    { name: 'Services', href: '#services-section', current: false },
-    { name: 'FAQ', href: '#faq-section', current: false },
+    { name: 'About Us', href: 'about', current: true },
+    { name: 'Leaders', href: 'leaders', current: false },
+    { name: 'FAQ', href: 'home#faq-section', current: false },
     { name: 'Blog', href: '#blog-section', current: false },
     { name: 'Testimonial', href: '#testimonial-section', current: false },
 ]
@@ -39,8 +39,8 @@ const Navbar = () => {
                             {/* LOGO */}
 
                             <div className="flex flex-shrink-0 items-center border-right">
-                                <Link href="/" className='text-2xl sm:text-4xl font-semibold text-black'>
-                                    Desgy Solutions
+                                <Link href="/" className='text-2xl sm:text-4xl font-semibold text-iuml-green'>
+                                    Muslim Youth League
                                 </Link>
                             </div>
 
@@ -53,7 +53,7 @@ const Navbar = () => {
                                             key={item.name}
                                             href={item.href}
                                             className={classNames(
-                                                item.current ? 'bg-gray-900' : 'navlinks hover:text-black',
+                                                item.current ? 'bg-gray-900' : 'navlinks hover:text-iuml-green',
                                                 'px-3 py-4 rounded-md text-lg font-normal'
                                             )}
                                             aria-current={item.href ? 'page' : undefined}
