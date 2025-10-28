@@ -5,52 +5,21 @@ import Image from "next/image";
 
 // CAROUSEL DATA
 
-interface DataType {
-    profession: string;
-    name: string;
-    imgSrc: string;
+interface LeaderProps {
+    data: 
+    {
+        guid: string;
+        name: string;
+        post: string;
+        committee: string;
+        photo: string;
+        contact: string;       
+    }[];
 }
 
-const postData: DataType[] = [
-    {
-        profession: 'Co-founder',
-        name: 'John Doe',
-        imgSrc: '/images/wework/avatar.svg',
-    },
-    {
-        profession: 'Co-founder',
-        name: 'John Doe',
-        imgSrc: '/images/wework/avatar3.svg',
-    },
-    {
-        profession: 'Co-founder',
-        name: 'John Doe',
-        imgSrc: '/images/wework/avatar4.svg',
-    },
-    {
-        profession: 'Co-founder',
-        name: 'John Doe',
-        imgSrc: '/images/wework/avatar.svg',
-    },
-    {
-        profession: 'Co-founder',
-        name: 'John Doe',
-        imgSrc: '/images/wework/avatar3.svg',
-    },
-    {
-        profession: 'Co-founder',
-        name: 'John Doe',
-        imgSrc: '/images/wework/avatar4.svg',
-    },
-]
 
 // CAROUSEL SETTINGS
-
-
-export default class MultipleItems extends Component {
-
-    render() {
-        const settings = {
+const settings = {
             dots: false,
             infinite: true,
             slidesToShow: 5,
@@ -92,30 +61,32 @@ export default class MultipleItems extends Component {
             ]
         };
 
-
+export default function Leaders({ data }: LeaderProps) {
+    console.log('Leadrs received data:', data);
         return (
             <div className="bg-wework py-32">
 
                 <div className='mx-auto max-w-2xl lg:max-w-7xl sm:py-4 lg:px-8 '>
 
                     <div className="text-center">
-                        <h3 className="text-4xl sm:text-6xl font-bold text-black my-2">We work in several verticals.</h3>
-                        <h3 className="text-4xl sm:text-6xl font-bold text-black opacity-50 lg:mr-48 my-2">We work in several verticals.</h3>
-                        <h3 className="text-4xl sm:text-6xl font-bold text-black opacity-25 lg:-mr-32 my-2">We work in several verticals.</h3>
+                        <h3 className="text-4xl sm:text-6xl font-bold text-black my-2">Muslim Youth League Leaders</h3>
+                        <h3 className="text-4xl sm:text-6xl font-bold text-iuml-green opacity-50 lg:mr-48 my-2">National Committee</h3>
+                        <h3 className="text-4xl sm:text-6xl font-bold text-iuml-blue opacity-25 lg:-mr-32 my-2">State Committee</h3>
                     </div>
 
                 </div>
 
                 <Slider {...settings}>
-                    {postData.map((items, i) => (
+                    {data.map((items, i) => (
                         <div key={i}>
                             <div className='bg-white m-3 py-14 my-10 text-center shadow-xl rounded-3xl'>
                                 <div className='relative'>
-                                    <Image src={items.imgSrc} alt="gaby" width={182} height={182} className="inline-block m-auto" />
-                                    <Image src={'/images/wework/linkedin.svg'} alt="greenbg" width={120} height={120} className=" absolute inline-block position-linkedin" />
+                                    <Image src={items.photo} alt={items.name || items.post} width={182} height={182} className="inline-block m-auto" />
+                                    <Image src={'/images/leaders/linkedin.svg'} alt="greenbg" width={120} height={120} className=" absolute inline-block position-linkedin" />
                                 </div>
-                                <h4 className='text-4xl font-bold pt-14'>{items.name}</h4>
-                                <h3 className='text-2xl font-normal pt-4 pb-2 opacity-50'>{items.profession}</h3>
+                                <h4 className='text-3xl font-bold pt-10'>{items.name}</h4>
+                                <h3 className='text-2xl font-normal pt-4 pb-2 opacity-80'>{items.post}</h3>
+                                <h2 className='text-2xl font-normal pt-4 pb-2 opacity-60'>{items.contact}</h2>
                             </div>
                         </div>
                     ))}
@@ -125,4 +96,4 @@ export default class MultipleItems extends Component {
 
         );
     }
-}
+

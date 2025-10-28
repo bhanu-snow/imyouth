@@ -163,13 +163,13 @@ html {
 }
 
 .bg-wework {
-  background-image: url('/images/wework/elipse.svg'), url('/images/wework/vector.svg');
+  background-image: url('/images/leaders/elipse.svg'), url('/images/leaders/vector.svg');
   background-repeat: no-repeat, no-repeat;
   background-position: bottom, top right;
 }
 
 .bg-featured {
-  background-image: url('/images/wework/vector.svg');
+  background-image: url('/images/leaders/vector.svg');
   background-repeat: no-repeat;
   background-position: 100% 35%;
 }
@@ -195,7 +195,7 @@ html {
 }
 
 .bg-testimonial {
-  background-image: url('/images/wework/elipse.svg'), url('/images/testimonial/boy.svg'), url('/images/testimonial/girl.svg');
+  background-image: url('/images/leaders/elipse.svg'), url('/images/testimonial/boy.svg'), url('/images/testimonial/girl.svg');
   background-repeat: no-repeat, no-repeat, no-repeat;
   background-position: 55%, 84% 26%, 12% 18%;
 }

@@ -29,56 +29,182 @@
       "content_hi": "1948 में स्थापित, IUML का अल्पसंख्यक अधिकारों और समुदाय विकास के लिए वकालत करने का एक समृद्ध इतिहास है। उत्तर प्रदेश में, हम जमीनी स्तर की पहल और ऐतिहासिक संरक्षण पर ध्यान केंद्रित करते हैं। IUML मुख्य निकाय संरचना: IUML राष्ट्रीय, राज्य, जिला और प्राथमिक स्तरों के साथ एक पदानुक्रमित संरचना पर काम करती है। राष्ट्रीय स्तर पर पदाधिकारियों में अध्यक्ष (वर्तमान में 2017 से के. एम. कादर मोहिद्दीन), महासचिव (पी. के. कुनहालीकुट्टी), संगठन सचिव (ई. टी. मुहम्मद बशीर), कोषाध्यक्ष (पी. वी. अब्दुल वहाब), और सैयद सादिक अली शिहाब थंगल की अध्यक्षता में राजनीतिक सलाहकार समिति (PAC) शामिल हैं। राष्ट्रीय कार्यकारिणी प्रमुख कार्यकारी निकाय है। राज्य समितियां, जैसे मुस्लिम लीग केरल राज्य समिति (MLKSC), क्षेत्रीय संचालन संभालती हैं और 1952 से स्थिर संसदीय प्रतिनिधित्व बनाए रखी हैं। जिला और प्राथमिक इकाइयां जमीनी स्तर पर मोबिलाइजेशन पर ध्यान केंद्रित करती हैं। पार्टी के पास वर्तमान में संसद में 4 सांसद (3 लोकसभा में, 1 राज्यसभा में) और राज्य विधानसभाओं में 19 विधायक (मुख्य रूप से केरल और तमिलनाडु) हैं। संबद्ध विंग: IUML के पास कई फ्रंटल संगठन हैं जिनमें मुस्लिम स्टूडेंट्स फेडरेशन (MSF), मुस्लिम यूथ लीग (MYL), मुस्लिम विमेंस लीग (MWL), स्वतंत्र थोझिलाली यूनियन (STU), केरल स्कूल टीचर्स यूनियन (KSTU), केरल हायर सेकेंडरी टीचर्स यूनियन (KHSTU), स्वतंत्र कार्षका संघम, एक वकील फोरम, और अंतर्राष्ट्रीय केरल मुस्लिम कल्चरल सेंटर (KMCC) शामिल हैं।"      
     },
 
-  "leaders": [
-    {
-      "guid": "550e8400-e29b-41d4-a716-446655440012",
-      "year": "1948–1972",
-      "name": "M. Muhammad Ismail Sahib",
-      "post": "National President",
-      "contribution_en": "Founded IUML post-Partition; advocated for Muslim Personal Law and minority rights in the Constitution; led early parliamentary representation.",
-      "contribution_hi": "विभाजन के बाद IUML की स्थापना; संविधान में मुस्लिम पर्सनल लॉ और अल्पसंख्यक अधिकारों की वकालत; प्रारंभिक संसदीय प्रतिनिधित्व का नेतृत्व।"
-    },
-    {
-      "guid": "550e8400-e29b-41d4-a716-446655440013",
-      "year": "1972–1973",
-      "name": "Bafaqy Thangal",
-      "post": "National President",
-      "contribution_en": "Consolidated party in Kerala after Ismail's tenure.",
-      "contribution_hi": "इस्माइल के कार्यकाल के बाद केरल में पार्टी को मजबूत किया।"
-    },
-    {
-      "guid": "550e8400-e29b-41d4-a716-446655440014",
-      "year": "1973–1994",
-      "name": "Ebrahim Sulaiman Sait",
-      "post": "National President",
-      "contribution_en": "Strengthened alliances, including with Congress in 1976; expanded electoral base in Kerala and beyond.",
-      "contribution_hi": "गठबंधनों को मजबूत किया, जिसमें 1976 में कांग्रेस के साथ शामिल; केरल और उससे आगे चुनावी आधार का विस्तार।"
-    },
-    {
-      "guid": "550e8400-e29b-41d4-a716-446655440015",
-      "year": "1994–2008",
-      "name": "G. M. Banatwalla",
-      "post": "National President",
-      "contribution_en": "Emphasized national parliamentary roles; advocated for Muslim issues like Babri Masjid.",
-      "contribution_hi": "राष्ट्रीय संसदीय भूमिकाओं पर जोर; बाबरी मस्जिद जैसे मुस्लिम मुद्दों की वकालत।"
-    },
-    {
-      "guid": "550e8400-e29b-41d4-a716-446655440016",
-      "year": "2008–2017",
-      "name": "E. Ahamed",
-      "post": "National President",
-      "contribution_en": "First IUML national minister; bridged Kerala and national politics; authored books on policy.",
-      "contribution_hi": "पहला IUML राष्ट्रीय मंत्री; केरल और राष्ट्रीय राजनीति को जोड़ा; नीति पर पुस्तकें लिखीं।"
-    },
-    {
-      "guid": "550e8400-e29b-41d4-a716-446655440017",
-      "year": "2017–2025",
-      "name": "K. M. Kader Mohideen",
-      "post": "National President",
-      "contribution_en": "Focused on UDF alliances in Kerala, SPA in Tamil Nadu, and INDIA bloc nationally; expanded party infrastructure, including new Delhi headquarters in 2024.",
-      "contribution_hi": "केरल में UDF गठबंधनों, तमिलनाडु में SPA, और राष्ट्रीय स्तर पर INDIA ब्लॉक पर ध्यान; पार्टी बुनियादी ढांचे का विस्तार, जिसमें 2024 में नया दिल्ली मुख्यालय शामिल।"
-    }
-  ],
+  "leaders": 
+  { "MYL" :
+    [
+      {
+        "guid": "550e8400-e29b-41d4-a716-446655440051",
+        "name": "Adv. Sarfaraz Ghazi",
+        "post": "National President",
+        "committee": "National",
+        "state": "U.P.",
+        "photo": "/images/leaders/avatar.svg",
+        "contact": "",
+        "profession": "Advocate",
+        "contribution_en": "",
+        "contribution_hi": ""
+      },
+      {
+        "guid": "550e8400-e29b-41d4-a716-446655440052",
+        "name": "T.P. Ashraf Ali",
+        "post": "National Gen. Secretary",
+        "committee": "National",
+        "state": "Kerala",
+        "photo": "/images/leaders/avatar3.svg",
+        "contact": "",
+        "profession": "Politician",
+        "contribution_en": "",
+        "contribution_hi": ""
+      },
+      {
+        "guid": "550e8400-e29b-41d4-a716-446655440053",
+        "name": "Adv. sheebu Meeran",
+        "post": "National Org. Secretary",
+        "committee": "National",
+        "state": "Kerala",
+        "photo": "/images/leaders/avatar.svg",
+        "contact": "",
+        "profession": "Advocate",
+        "contribution_en": "",
+        "contribution_hi": ""
+      },
+      {
+        "guid": "550e8400-e29b-41d4-a716-446655440054",
+        "name": "C.K. Shakir",
+        "post": "National Secretary",
+        "committee": "National",
+        "state": "Kerala",
+        "photo": "/images/leaders/avatar3.svg",
+        "contact": "",
+        "profession": "",
+        "contribution_en": "",
+        "contribution_hi": ""
+      },
+      {
+        "guid": "550e8400-e29b-41d4-a716-446655440055",
+        "name": "ansari Madaar",
+        "post": "National Treasurer",
+        "committee": "National",
+        "state": "Tamilnadu",
+        "photo": "/images/leaders/avatar4.svg",
+        "contact": "",
+        "profession": "",
+        "contribution_en": "",
+        "contribution_hi": ""
+      },
+      {
+        "guid": "550e8400-e29b-41d4-a716-446655440061",
+        "name": "Adv. Kumail Ansari",
+        "post": "President (U.P.)",
+        "committee": "State",
+        "state": "Kanpur (U.P.)",
+        "photo": "/images/leaders/avatar3.svg",
+        "contact": "90268 54044",
+        "profession": "Advocate",
+        "contribution_en": "",
+        "contribution_hi": ""
+      },
+      {
+        "guid": "550e8400-e29b-41d4-a716-446655440062",
+        "name": "Rizwan Ali Khan",
+        "post": "Vice President (U.P.)",
+        "committee": "State",
+        "state": "Kanpur (U.P.)",
+        "photo": "/images/leaders/avatar.svg",
+        "contact": "98898 82257",
+        "profession": "Businessman",
+        "contribution_en": "",
+        "contribution_hi": ""
+      },
+      {
+        "guid": "550e8400-e29b-41d4-a716-446655440063",
+        "name": "Ashiq Elahi",
+        "post": "Gen. Secretary (U.P.)",
+        "committee": "State",
+        "state": "Meerut (U.P.)",
+        "photo": "/images/leaders/avatar3.svg",
+        "contact": "87560 70068",
+        "profession": "IT Professional",
+        "contribution_en": "",
+        "contribution_hi": ""
+      },
+      {
+        "guid": "550e8400-e29b-41d4-a716-446655440064",
+        "name": "B.P. Singh",
+        "post": "Secretary (U.P.)",
+        "committee": "State",
+        "state": "Lucknow (U.P.)",
+        "photo": "/images/leaders/avatar4.svg",
+        "contact": "87560 70068",
+        "profession": "IT Professional",
+        "contribution_en": "",
+        "contribution_hi": ""
+      }
+    ],
+    "IUML" : 
+    [
+      {
+        "guid": "550e8400-e29b-41d4-a716-446655440012",
+        "year": "1948–1972",
+        "name": "M. Muhammad Ismail Sahib",
+        "post": "National President",
+        "contribution_en": "Founded IUML post-Partition; advocated for Muslim Personal Law and minority rights in the Constitution; led early parliamentary representation.",
+        "contribution_hi": "विभाजन के बाद IUML की स्थापना; संविधान में मुस्लिम पर्सनल लॉ और अल्पसंख्यक अधिकारों की वकालत; प्रारंभिक संसदीय प्रतिनिधित्व का नेतृत्व।",
+        "committee" : "National",
+        "slogan":""
+      },
+      {
+        "guid": "550e8400-e29b-41d4-a716-446655440013",
+        "year": "1972–1973",
+        "name": "Bafaqy Thangal",
+        "post": "National President",
+        "contribution_en": "Consolidated party in Kerala after Quaid Ismail Sahib's tenure.",
+        "contribution_hi": "Quaid-e-Millath इस्माइल sahib के कार्यकाल के बाद केरल में पार्टी को मजबूत किया।",
+        "committee" : "National",
+        "slogan":""
+      },
+      {
+        "guid": "550e8400-e29b-41d4-a716-446655440014",
+        "year": "1973–1994",
+        "name": "Ebrahim Sulaiman Sait",
+        "post": "National President",
+        "contribution_en": "Strengthened alliances, including with Congress in 1976; expanded electoral base in Kerala and beyond.",
+        "contribution_hi": "गठबंधनों को मजबूत किया, जिसमें 1976 में कांग्रेस के साथ शामिल; केरल और उससे आगे चुनावी आधार का विस्तार।",
+        "committee" : "National",
+        "slogan":""
+      },
+      {
+        "guid": "550e8400-e29b-41d4-a716-446655440015",
+        "year": "1994–2008",
+        "name": "G. M. Banatwalla",
+        "post": "National President",
+        "contribution_en": "Emphasized national parliamentary roles; advocated for Muslim issues like Babri Masjid.",
+        "contribution_hi": "राष्ट्रीय संसदीय भूमिकाओं पर जोर; बाबरी मस्जिद जैसे मुस्लिम मुद्दों की वकालत।",
+        "committee" : "National",
+        "slogan":""
+      },
+      {
+        "guid": "550e8400-e29b-41d4-a716-446655440016",
+        "year": "2008–2017",
+        "name": "E. Ahamed",
+        "post": "National President",
+        "contribution_en": "First IUML national minister; bridged Kerala and national politics; authored books on policy.",
+        "contribution_hi": "पहला IUML राष्ट्रीय मंत्री; केरल और राष्ट्रीय राजनीति को जोड़ा; नीति पर पुस्तकें लिखीं।",
+        "committee" : "National",
+        "slogan":""
+      },
+      {
+        "guid": "550e8400-e29b-41d4-a716-446655440017",
+        "year": "2017–2025",
+        "name": "K. M. Kader Mohideen",
+        "post": "National President",
+        "contribution_en": "Focused on UDF alliances in Kerala, SPA in Tamil Nadu, and INDIA bloc nationally; expanded party infrastructure, including new Delhi headquarters in 2024.",
+        "contribution_hi": "केरल में UDF गठबंधनों, तमिलनाडु में SPA, और राष्ट्रीय स्तर पर INDIA ब्लॉक पर ध्यान; पार्टी बुनियादी ढांचे का विस्तार, जिसमें 2024-25 में नया दिल्ली मुख्यालय शामिल।",
+        "committee" : "National",
+        "slogan":""
+      }
+    ]
+  },
   "faq": 
   {
     "title":"IUML: Your Questions Answered",

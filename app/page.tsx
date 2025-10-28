@@ -2,7 +2,7 @@ import Banner from './components/Banner/index';
 import Dedicated from './components/Dedicated/index';
 import Digital from './components/Digital/index';
 import ViMission from './components/ViMission/index';
-import Wework from './components/Wework/index';
+import Leaders from './components/Leaders/index';
 import Ourteam from './components/Ourteam/index';
 import Featured from './components/Featured/index';
 import Manage from './components/Manage/index';
@@ -25,7 +25,7 @@ export default async function Home() {
       <ViMission data={data.ViMission} />
       <Dedicated />
       <Digital />      
-      <Wework />
+      <Leaders data={data.leaders.MYL} />
       <Ourteam />
       <Featured />
       <Manage />
