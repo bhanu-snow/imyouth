@@ -19,14 +19,41 @@
       "content_hi": "उत्तर प्रदेश में एक समावेशी समाज बनाने के लिए जहां प्रत्येक व्यक्ति को अवसर प्राप्त हों और वह राज्य की प्रगति में योगदान दे सके।",
       "imgSrc":"/images/aboutus/imgTwo.svg",
       "link": "Learn more"
-    }]}
+    }]
+  },
+  "inspiration":
+  { "title":"Our Inspirations \n हमारे प्रेरणास्रोत",
+    "people":[
+      {
+        "name": "Quaid e Millath Muhammed Ismail sahib",
+        "year": "1896-1972",
+        "post": "Founder President of Indian Union Muslim League",
+        "quote_en":"We are true sons of the Indian soil. Our religions may be different, but our country is one.",
+        "quote_hi":"हम हिंदुस्तान की मिट्टी के सच्चे बेटे हैं। हमारा धर्म अलग हो सकता है, लेकिन हमारा वतन एक है। -लोकसभा, 1952",
+        "displayOnHome":true
+      },
+      {
+        "name": "K M Seethi Sahib",
+        "year": "1899-1961",
+        "post": "Former speaker of Kerala Legislative Assembly",
+        "quote_en":"India's diversity is our strength - Hindus, Muslims, all together will build the nation.",
+        "quote_hi":"भारत की विविधता हमारी ताकत है - हिंदू, मुस्लिम, सभी एक साथ मिलकर ही राष्ट्र का निर्माण करेंगे। (1957)",
+        "displayOnHome":true
+      }
+    ]
+  },
+  "whoweare":{
+    "title" : "WHO WE ARE ? ",
+    "content_en":"MYL: Not just for Muslims - \n open to every Indian youth who stands for justice, equality & progress. \n Secular. National. Unstoppable.\n From Kerala’s UDF to UP, Bihar, Delhi. \n -- Your energy + our platform = real change.",
+    "content_hi":"एमवाईएल: सिर्फ मुस्लिमों के लिए नहीं - \n हर भारतीय युवा के लिए जो न्याय, समानता और प्रगति में यकीन रखता है! \n 'धर्मनिरपेक्ष। राष्ट्रीय। अजेय।' \n केरल के यूडीएफ से यूपी, बिहार, दिल्ली तक| \n .. आपकी ऊर्जा + हमारा मंच = असली बदलाव।"
+  }
     ,
     "about":
     {
       "guid": "550e8400-e29b-41d4-a716-446655440011",
       "title":"About IUML",
-      "content_en": "Founded in 1948, IUML has a rich history of advocating for minority rights and community development. In Uttar Pradesh, we focus on grassroots initiatives and historical preservation. IUML Main Body Structure: IUML operates on a hierarchical structure with national, state, district, and primary levels. The national level includes office bearers like the President (currently K. M. Kader Mohideen since 2017), General Secretary (P. K. Kunhalikutty), Organising Secretary (E. T. Mohammed Basheer), Treasurer (P. V. Abdul Wahab), and a Political Advisory Committee (PAC) chaired by Sayyid Sadiq Ali Shihab Thangal. The National Executive is the principal executive body. State committees, such as the Muslim League Kerala State Committee (MLKSC), handle regional operations and have maintained steady parliamentary representation since 1952. District and primary units focus on grassroots mobilization. The party currently has 4 MPs in Parliament (3 in Lok Sabha, 1 in Rajya Sabha) and 19 MLAs in state assemblies (mainly Kerala and Tamil Nadu). Associated Wings: IUML has several frontal organizations including Muslim Students Federation (MSF), Muslim Youth League (MYL), Muslim Women's League (MWL), Swathanthra Thozhilali Union (STU), Kerala School Teachers Union (KSTU), Kerala Higher Secondary Teachers Union (KHSTU), Swathanthra Karshaka Sangam, a Lawyers Forum, and the international Kerala Muslim Cultural Centre (KMCC).",
-      "content_hi": "1948 में स्थापित, IUML का अल्पसंख्यक अधिकारों और समुदाय विकास के लिए वकालत करने का एक समृद्ध इतिहास है। उत्तर प्रदेश में, हम जमीनी स्तर की पहल और ऐतिहासिक संरक्षण पर ध्यान केंद्रित करते हैं। IUML मुख्य निकाय संरचना: IUML राष्ट्रीय, राज्य, जिला और प्राथमिक स्तरों के साथ एक पदानुक्रमित संरचना पर काम करती है। राष्ट्रीय स्तर पर पदाधिकारियों में अध्यक्ष (वर्तमान में 2017 से के. एम. कादर मोहिद्दीन), महासचिव (पी. के. कुनहालीकुट्टी), संगठन सचिव (ई. टी. मुहम्मद बशीर), कोषाध्यक्ष (पी. वी. अब्दुल वहाब), और सैयद सादिक अली शिहाब थंगल की अध्यक्षता में राजनीतिक सलाहकार समिति (PAC) शामिल हैं। राष्ट्रीय कार्यकारिणी प्रमुख कार्यकारी निकाय है। राज्य समितियां, जैसे मुस्लिम लीग केरल राज्य समिति (MLKSC), क्षेत्रीय संचालन संभालती हैं और 1952 से स्थिर संसदीय प्रतिनिधित्व बनाए रखी हैं। जिला और प्राथमिक इकाइयां जमीनी स्तर पर मोबिलाइजेशन पर ध्यान केंद्रित करती हैं। पार्टी के पास वर्तमान में संसद में 4 सांसद (3 लोकसभा में, 1 राज्यसभा में) और राज्य विधानसभाओं में 19 विधायक (मुख्य रूप से केरल और तमिलनाडु) हैं। संबद्ध विंग: IUML के पास कई फ्रंटल संगठन हैं जिनमें मुस्लिम स्टूडेंट्स फेडरेशन (MSF), मुस्लिम यूथ लीग (MYL), मुस्लिम विमेंस लीग (MWL), स्वतंत्र थोझिलाली यूनियन (STU), केरल स्कूल टीचर्स यूनियन (KSTU), केरल हायर सेकेंडरी टीचर्स यूनियन (KHSTU), स्वतंत्र कार्षका संघम, एक वकील फोरम, और अंतर्राष्ट्रीय केरल मुस्लिम कल्चरल सेंटर (KMCC) शामिल हैं।"      
+      "content_en": "Founded in 1948, IUML has a rich history of advocating for minority rights and community development.\nIn Uttar Pradesh, we focus on grassroots initiatives and historical preservation.\n\nIUML Main Body Structure: \nIUML operates on a hierarchical structure with national, state, district, and primary levels. \n\nThe national level includes office bearers like the President (currently K. M. Kader Mohideen since 2017), General Secretary (P. K. Kunhalikutty), Organising Secretary (E. T. Mohammed Basheer), Treasurer (P. V. Abdul Wahab), and a Political Advisory Committee (PAC) chaired by Sayyid Sadiq Ali Shihab Thangal. \n\nThe National Executive is the principal executive body. State committees, such as the Muslim League Kerala State Committee (MLKSC), handle regional operations and have maintained steady parliamentary representation since 1952. District and primary units focus on grassroots mobilization. The party currently has 4 MPs in Parliament (3 in Lok Sabha, 1 in Rajya Sabha) and 19 MLAs in state assemblies (mainly Kerala and Tamil Nadu). \n\nAssociated Wings: \nIUML has several frontal organizations including \nMuslim Students Federation (MSF), \nMuslim Youth League (MYL), \nMuslim Women's League (MWL), \nSwathanthra Thozhilali Union (STU), \nKerala School Teachers Union (KSTU), \nKerala Higher Secondary Teachers Union (KHSTU), \nSwathanthra Karshaka Sangam, \na Lawyers Forum, and the international Kerala Muslim Cultural Centre (KMCC).",
+      "content_hi": "1948 में स्थापित, IUML का अल्पसंख्यक अधिकारों और समुदाय विकास के लिए वकालत करने का एक समृद्ध इतिहास है।\nउत्तर प्रदेश में, हम जमीनी स्तर की पहल और ऐतिहासिक संरक्षण पर ध्यान केंद्रित करते हैं। \n\nIUML मुख्य निकाय संरचना: \nIUML राष्ट्रीय, राज्य, जिला और प्राथमिक स्तरों के साथ एक पदानुक्रमित संरचना पर काम करती है। \n\nराष्ट्रीय स्तर पर पदाधिकारियों में अध्यक्ष (वर्तमान में 2017 से के. एम. कादर मोहिद्दीन), महासचिव (पी. के. कुनहालीकुट्टी), संगठन सचिव (ई. टी. मुहम्मद बशीर), कोषाध्यक्ष (पी. वी. अब्दुल वहाब), और सैयद सादिक अली शिहाब थंगल की अध्यक्षता में राजनीतिक सलाहकार समिति (PAC) शामिल हैं। \n\nराष्ट्रीय कार्यकारिणी प्रमुख कार्यकारी निकाय है। राज्य समितियां, जैसे मुस्लिम लीग केरल राज्य समिति (MLKSC), क्षेत्रीय संचालन संभालती हैं और 1952 से स्थिर संसदीय प्रतिनिधित्व बनाए रखी हैं। जिला और प्राथमिक इकाइयां जमीनी स्तर पर मोबिलाइजेशन पर ध्यान केंद्रित करती हैं। \nपार्टी के पास वर्तमान में संसद में 4 सांसद (3 लोकसभा में, 1 राज्यसभा में) और राज्य विधानसभाओं में 19 विधायक (मुख्य रूप से केरल और तमिलनाडु) हैं। \n\nसंबद्ध विंग: \nIUML के पास कई फ्रंटल संगठन हैं जिनमें \nमुस्लिम स्टूडेंट्स फेडरेशन (MSF), \nमुस्लिम यूथ लीग (MYL), \nमुस्लिम विमेंस लीग (MWL), \nस्वतंत्र थोझिलाली यूनियन (STU), \nकेरल स्कूल टीचर्स यूनियन (KSTU), \nकेरल हायर सेकेंडरी टीचर्स यूनियन (KHSTU), \nस्वतंत्र कार्षका संघम, \nएक वकील फोरम, और अंतर्राष्ट्रीय केरल मुस्लिम कल्चरल सेंटर (KMCC) शामिल हैं।"      
     },
 
   "leaders": 
@@ -151,7 +178,8 @@
         "contribution_en": "Founded IUML post-Partition; advocated for Muslim Personal Law and minority rights in the Constitution; led early parliamentary representation.",
         "contribution_hi": "विभाजन के बाद IUML की स्थापना; संविधान में मुस्लिम पर्सनल लॉ और अल्पसंख्यक अधिकारों की वकालत; प्रारंभिक संसदीय प्रतिनिधित्व का नेतृत्व।",
         "committee" : "National",
-        "slogan":""
+        "slogan_en":"We are true sons of the Indian soil. Our religions may be different, but our country is one.",
+        "slogan_hi":"हम हिंदुस्तान की मिट्टी के सच्चे बेटे हैं। हमारा धर्म अलग हो सकता है, लेकिन हमारा वतन एक है। <br /> - कायद-ए-मिल्लत मुहम्मद इस्माइल साहब, लोकसभा, 1952"
       },
       {
         "guid": "550e8400-e29b-41d4-a716-446655440013",

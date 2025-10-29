@@ -22,14 +22,14 @@ export default function FAQ({ data }: FaqProps) {
                     <Disclosure>
                         {({ open }) => (
                             <>
-                                <Disclosure.Button className="flex w-full justify-between rounded-lg px-4 py-2 text-left text-2xl font-medium">
+                                <Disclosure.Button className="flex w-full justify-between rounded-lg px-4 py-2 text-left text-xl font-medium">
                                     <span>{qa.question_en} <br /> {qa.question_hi}</span>
                                     <ChevronUpIcon
                                         className={`${open ? 'rotate-180 transform' : ''
                                             } h-5 w-5 text-purple-500`}
                                     />
                                 </Disclosure.Button>
-                                <Disclosure.Panel className="px-8 pt-8 pb-2 text-base text-iuml-green font-normal opacity-100">
+                                <Disclosure.Panel className="px-12 pt-8 pb-2 text-base text-iuml-green font-normal">
                                     {qa.answer_en} <br /> <br /> {qa.answer_hi}
                                 </Disclosure.Panel>
                             </>

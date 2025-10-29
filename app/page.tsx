@@ -1,6 +1,6 @@
 import Banner from './components/Banner/index';
-import Dedicated from './components/Dedicated/index';
-import Digital from './components/Digital/index';
+import Inspiration from './components/Inspiration/index';
+import WhoWeAre from './components/WhoWeAre/index';
 import ViMission from './components/ViMission/index';
 import Leaders from './components/Leaders/index';
 import Ourteam from './components/Ourteam/index';
@@ -23,15 +23,15 @@ export default async function Home() {
     <main>
       {/* <Banner /> */}
       <ViMission data={data.ViMission} />
-      <Dedicated />
-      <Digital />      
+      <Inspiration data={data.inspiration} />
+      <WhoWeAre data={data.whoweare} />      
       <Leaders data={data.leaders.MYL} />
       <Ourteam />
-      <Featured />
-      <Manage />
+      {/* <Featured />
+      <Manage /> */}
       <FAQ data={data.faq}/>
-      <Testimonials />
-      <Articles />
+      {/* <Testimonials />
+      <Articles /> */}
       <Joinus />
       <Insta />
     </main>
