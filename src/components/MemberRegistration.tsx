@@ -14,14 +14,6 @@ interface Props {
   onMemberRegistered?: () => void;
 }
 
-const SAMPLE_AVATARS = [
-  'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=250',
-  'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=250',
-  'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=250',
-  'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=250',
-  'https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&q=80&w=250',
-];
-
 export const MemberRegistration: React.FC<Props> = ({ lang, currentUser, onMemberRegistered }) => {
   const [members, setMembers] = useState<Member[]>([]);
   const [currentMember, setCurrentMember] = useState<Member | null>(null);
@@ -47,10 +39,9 @@ export const MemberRegistration: React.FC<Props> = ({ lang, currentUser, onMembe
   const [subDistrict, setSubDistrict] = useState('');
   const [wing, setWing] = useState<YouthWing>('myl_cadre');
   const [designation, setDesignation] = useState('Active Youth Volunteer');
-  const [communityBackground, setCommunityBackground] = useState('Dalit / Ambedkarite Samaj');
-  const [bloodGroup, setBloodGroup] = useState('O+');
-  const [education, setEducation] = useState('Graduate');
-  const [avatarUrl, setAvatarUrl] = useState(SAMPLE_AVATARS[0]);
+  const [communityBackground, setCommunityBackground] = useState('');
+  const [bloodGroup, setBloodGroup] = useState('');
+  const [education, setEducation] = useState('');
   const [submitError, setSubmitError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const canViewDirectory = ['superadmin', 'state_president', 'state_admin', 'district_incharge'].includes(currentUser.role);
@@ -110,19 +101,6 @@ export const MemberRegistration: React.FC<Props> = ({ lang, currentUser, onMembe
     );
     return () => { cancelled = true; };
   }, [districtId]);
-
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        if (typeof reader.result === 'string') {
-          setAvatarUrl(reader.result);
-        }
-      };
-      reader.readAsDataURL(file);
-    }
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -386,36 +364,9 @@ export const MemberRegistration: React.FC<Props> = ({ lang, currentUser, onMembe
                       onChange={(e) => setCommunityBackground(e.target.value)}
                       className="w-full px-2.5 py-2 border border-stone-300 rounded bg-white text-blue-900 font-semibold"
                     >
+                      <option value="">{lang === 'hi' ? 'वैकल्पिक — चयन न करें' : 'Optional — prefer not to say'}</option>
                       {communityOptions.map((item) => <option key={item.id} value={item.name_en}>{lang === 'hi' && item.name_hi ? item.name_hi : item.name_en}</option>)}
                     </select>
-                  </div>
-                </div>
-
-                {/* Avatar Selection */}
-                <div>
-                  <label className="block font-semibold text-stone-700 mb-2">
-                    {lang === 'hi' ? 'पहचान पत्र फोटो चुनें या अपलोड करें' : 'Choose or Upload Cadre Photo'}
-                  </label>
-                  <div className="flex items-center gap-3">
-                    <div className="flex items-center gap-1.5">
-                      {SAMPLE_AVATARS.map((url, i) => (
-                        <button
-                          key={i}
-                          type="button"
-                          onClick={() => setAvatarUrl(url)}
-                          className={`w-9 h-9 rounded-full overflow-hidden border-2 transition-all ${
-                            avatarUrl === url ? 'border-blue-900 scale-105 ring-2 ring-blue-200' : 'border-stone-200 opacity-60'
-                          }`}
-                        >
-                          <img src={url} alt={`Avatar ${i}`} className="w-full h-full object-cover" />
-                        </button>
-                      ))}
-                    </div>
-                    <span className="text-stone-400">or</span>
-                    <label className="px-3 py-1.5 bg-stone-100 hover:bg-stone-200 text-stone-700 rounded text-xs font-semibold cursor-pointer">
-                      <span>Upload Photo</span>
-                      <input type="file" accept="image/*" onChange={handleFileUpload} className="hidden" />
-                    </label>
                   </div>
                 </div>
 
