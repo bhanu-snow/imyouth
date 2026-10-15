@@ -99,17 +99,18 @@ export const MemberRegistration: React.FC<Props> = ({ lang, currentUser, onMembe
       return;
     }
     let cancelled = false;
-    void referenceDataService.subDistricts(districtId)
-      .then((rows) => {
+    void referenceDataService.subDistricts(districtId).then(
+      (rows) => {
         if (cancelled) return;
         setSubDistrictOptions(rows);
         const first = rows[0];
         setSubDistrictId(first?.id || '');
         setSubDistrict(first?.name_en || '');
-      })
-      .catch((error: unknown) => {
+      },
+      (error: unknown) => {
         if (!cancelled) setLookupError(error instanceof Error ? error.message : 'Could not load sub-districts.');
-      });
+      },
+    );
     return () => { cancelled = true; };
   }, [districtId]);
 
