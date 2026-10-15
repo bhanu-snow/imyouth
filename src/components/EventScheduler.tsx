@@ -16,6 +16,7 @@ import { PartyEvent, Language, EventCategory, AuthUser } from '../types';
 import { storageService } from '../services/storageService';
 import { TranslateButton } from './common/TranslateButton';
 import { translateEnglishToHindi } from '../utils/translationService';
+import { referenceDataService, type DistrictOption, type LookupOption } from '../services/referenceDataService';
 
 interface Props {
   lang: Language;
@@ -44,6 +45,10 @@ export const EventScheduler: React.FC<Props> = ({
   const [locationEn, setLocationEn] = useState('');
   const [locationHi, setLocationHi] = useState('');
   const [district, setDistrict] = useState(currentUser.district || 'Moradabad');
+  const [districtId, setDistrictId] = useState('');
+  const [districtOptions, setDistrictOptions] = useState<DistrictOption[]>([]);
+  const [categoryOptions, setCategoryOptions] = useState<LookupOption[]>([]);
+  const [lookupError, setLookupError] = useState('');
   const [state] = useState('Uttar Pradesh');
   const [coordinatorName, setCoordinatorName] = useState(currentUser.name || 'Adv. Sarfaraz Ahmed');
   const [coordinatorPhone, setCoordinatorPhone] = useState(currentUser.phone || '+91 98370 00112');
@@ -53,7 +58,27 @@ export const EventScheduler: React.FC<Props> = ({
   useEffect(() => {
     const list = storageService.getEvents();
     setEvents(list);
-  }, []);
+
+    let cancelled = false;
+    void Promise.all([referenceDataService.districts(), referenceDataService.eventCategories()])
+      .then(([districtRows, categoryRows]) => {
+        if (cancelled) return;
+        setDistrictOptions(districtRows);
+        setCategoryOptions(categoryRows);
+        const initialDistrict = districtRows.find((item) => item.name_en.toLowerCase() === (currentUser.district || 'Moradabad').toLowerCase())
+          || districtRows.find((item) => item.code === 'moradabad')
+          || districtRows[0];
+        if (initialDistrict) {
+          setDistrictId(initialDistrict.id);
+          setDistrict(initialDistrict.name_en);
+        }
+        setLookupError('');
+      })
+      .catch((error: unknown) => {
+        if (!cancelled) setLookupError(error instanceof Error ? error.message : 'Could not load reference data from Supabase.');
+      });
+    return () => { cancelled = true; };
+  }, [currentUser.district]);
 
   const handleToggleRsvp = (eventId: string, rsvpType: 'going' | 'maybe') => {
     const updated = storageService.toggleRsvp(eventId, rsvpType);
@@ -83,6 +108,8 @@ export const EventScheduler: React.FC<Props> = ({
     setLocationEn(ev.location.en);
     setLocationHi(ev.location.hi);
     setDistrict(ev.district);
+    const matchingDistrict = districtOptions.find((item) => item.name_en.toLowerCase() === ev.district.toLowerCase());
+    setDistrictId(matchingDistrict?.id || '');
     setCoordinatorName(ev.coordinator.name);
     setCoordinatorPhone(ev.coordinator.phone);
     setShowAddModal(true);
@@ -201,10 +228,10 @@ END:VCALENDAR`;
       <div className="flex items-center gap-2 overflow-x-auto pb-2">
         {[
           { key: 'all', label: { en: 'All Events', hi: 'सभी कार्यक्रम' } },
-          { key: 'career_conclave', label: { en: 'Life Lift Conclaves', hi: 'लाइफ लिफ्ट करियर' } },
-          { key: 'campus_drive', label: { en: 'MSF Student Drives', hi: 'MSF छात्र सभा' } },
-          { key: 'relief_seva', label: { en: 'White Guard Seva', hi: 'सेवा व राहत' } },
-          { key: 'rally', label: { en: 'Youth Conferences', hi: 'युवा सम्मेलन' } },
+          ...categoryOptions.map((item) => ({
+            key: item.code,
+            label: { en: item.name_en, hi: item.name_hi || item.name_en },
+          })),
         ].map((item) => (
           <button
             key={item.key}
@@ -412,26 +439,33 @@ END:VCALENDAR`;
                 <div>
                   <label className="block font-semibold text-stone-700 mb-1">Category</label>
                   <select
+                    required
                     value={category}
                     onChange={(e) => setCategory(e.target.value as EventCategory)}
-                    className="w-full p-2 border border-stone-300 rounded bg-white"
+                    disabled={categoryOptions.length === 0}
+                    className="w-full p-2 border border-stone-300 rounded bg-white disabled:bg-stone-100"
                   >
-                    <option value="career_conclave">Life Lift Conclave (करियर सम्मेलन)</option>
-                    <option value="campus_drive">MSF Campus Drive (छात्र सभा)</option>
-                    <option value="relief_seva">White Guard Seva (सेवा शिविर)</option>
-                    <option value="rally">Youth Conference (विशाल सम्मेलन)</option>
+                    <option value="">{lang === 'hi' ? 'श्रेणी चुनें' : 'Select category'}</option>
+                    {categoryOptions.map((item) => <option key={item.id} value={item.code}>{lang === 'hi' && item.name_hi ? item.name_hi : item.name_en}</option>)}
                   </select>
                 </div>
                 <div>
                   <label className="block font-semibold text-stone-700 mb-1">District (UP)</label>
-                  <input
-                    type="text"
+                  <select
                     required
-                    placeholder="e.g. Sambhal, Moradabad"
-                    value={district}
-                    onChange={(e) => setDistrict(e.target.value)}
-                    className="w-full p-2 border border-stone-300 rounded focus:border-emerald-700 focus:outline-none"
-                  />
+                    value={districtId}
+                    onChange={(e) => {
+                      const selected = districtOptions.find((item) => item.id === e.target.value);
+                      setDistrictId(e.target.value);
+                      setDistrict(selected?.name_en || '');
+                    }}
+                    disabled={districtOptions.length === 0}
+                    className="w-full p-2 border border-stone-300 rounded bg-white focus:border-emerald-700 focus:outline-none disabled:bg-stone-100"
+                  >
+                    <option value="">{lang === 'hi' ? 'ज़िला चुनें' : 'Select district'}</option>
+                    {districtOptions.map((item) => <option key={item.id} value={item.id}>{lang === 'hi' && item.name_hi ? item.name_hi : item.name_en}</option>)}
+                  </select>
+                  {lookupError && <p role="alert" className="mt-1 text-rose-700 text-[11px]">{lookupError}</p>}
                 </div>
               </div>
 
