@@ -43,9 +43,10 @@ export const CadreApprovalsQueue: React.FC<Props> = ({
 
   useEffect(() => {
     let cancelled = false;
-    void referenceDataService.districts()
-      .then((rows) => { if (!cancelled) { setDistrictOptions(rows); setLookupError(''); } })
-      .catch((error: unknown) => { if (!cancelled) setLookupError(error instanceof Error ? error.message : 'Could not load district reference data.'); });
+    void referenceDataService.districts().then(
+      (rows) => { if (!cancelled) { setDistrictOptions(rows); setLookupError(''); } },
+      (error: unknown) => { if (!cancelled) setLookupError(error instanceof Error ? error.message : 'Could not load district reference data.'); },
+    );
     return () => { cancelled = true; };
   }, []);
 
