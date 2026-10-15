@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { Building2, Search, Users, MapPin, Phone, Mail, CalendarDays, RefreshCw, Plus, Trash2, ShieldCheck, AlertCircle } from 'lucide-react';
+import { Building2, Search, Users, MapPin, CalendarDays, RefreshCw, Plus, Trash2, ShieldCheck, AlertCircle } from 'lucide-react';
 import type { AuthUser, Language } from '../types';
 import { sangathanService, type SangathanDistrict, type SangathanTenure } from '../services/sangathanService';
 
@@ -200,7 +200,6 @@ export const SangathanPage: React.FC<Props> = ({ lang, currentUser }) => {
               {selected.inChargeName && <div className="mt-4 border-t border-stone-100 pt-4">
                 <div className="text-xs font-bold text-stone-500 mb-1">{hi ? 'ज़िला प्रभारी' : 'District in-charge'}</div>
                 <div className="font-bold text-stone-900">{selected.inChargeName}</div>
-                {selected.inChargePhone && <a href={`tel:${selected.inChargePhone}`} className="mt-1 inline-flex items-center gap-2 text-sm text-emerald-800"><Phone className="w-4 h-4" />{selected.inChargePhone}</a>}
               </div>}
               {selected.updatedAt && <p className="text-[11px] text-stone-400 mt-4">{hi ? 'अंतिम अपडेट' : 'Last updated'}: {dateLabel(selected.updatedAt, lang)}</p>}
             </div>
@@ -237,8 +236,6 @@ export const SangathanPage: React.FC<Props> = ({ lang, currentUser }) => {
                     <div className="flex items-center gap-2 flex-wrap"><span className="font-extrabold text-stone-900">{hi ? item.leaderNameHi || item.leaderNameEn : item.leaderNameEn}</span><span className="rounded-full bg-emerald-100 text-emerald-800 px-2 py-0.5 text-[10px] font-bold">{item.status === 'acting' ? (hi ? 'कार्यवाहक' : 'Acting') : (hi ? 'वर्तमान' : 'Current')}</span></div>
                     <div className="text-sm text-emerald-800 font-semibold mt-1">{hi ? item.postTitleHi || item.postTitleEn : item.postTitleEn}</div>
                     <div className="text-xs text-stone-500 mt-2 flex items-center gap-1"><CalendarDays className="w-3.5 h-3.5" />{dateLabel(item.tenureStart, lang)}{item.tenureEnd ? ` – ${dateLabel(item.tenureEnd, lang)}` : ''}</div>
-                    {item.contactPhone && <a href={`tel:${item.contactPhone}`} className="mt-2 inline-flex items-center gap-1.5 text-xs text-stone-600"><Phone className="w-3.5 h-3.5" />{item.contactPhone}</a>}
-                    {item.email && <a href={`mailto:${item.email}`} className="ml-3 mt-2 inline-flex items-center gap-1.5 text-xs text-stone-600"><Mail className="w-3.5 h-3.5" />{item.email}</a>}
                   </div>
                   {canManage(currentUser.role) && <button onClick={() => void removeAppointment(item)} aria-label={hi ? 'रिकॉर्ड हटाएं' : 'Delete record'} className="self-start rounded-lg border border-rose-200 p-2 text-rose-700 hover:bg-rose-50"><Trash2 className="w-4 h-4" /></button>}
                 </article>)}
