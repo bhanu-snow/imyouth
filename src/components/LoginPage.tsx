@@ -14,7 +14,7 @@ import {
   Users
 } from 'lucide-react';
 import { AuthUser, Language } from '../types';
-import { storageService, DEMO_USERS } from '../services/storageService';
+import { authService } from '../services/authService';
 import { LadderSymbolIcon } from './PartySymbol';
 
 interface Props {
@@ -34,40 +34,28 @@ export const LoginPage: React.FC<Props> = ({
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleLoginSubmit = (e: React.FormEvent) => {
+  const handleLoginSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg(null);
-    if (!identifier.trim() || !password) {
-      setErrorMsg(lang === 'hi' ? 'कृपया ईमेल/फोन और पासवर्ड दर्ज करें।' : 'Please enter your email/phone and password.');
+    const email = identifier.trim();
+    if (!email || !password) {
+      setErrorMsg(lang === 'hi' ? 'कृपया ईमेल और पासवर्ड दर्ज करें।' : 'Please enter your email and password.');
+      return;
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      setErrorMsg(lang === 'hi' ? 'कृपया मान्य ईमेल पता दर्ज करें।' : 'Enter the email address assigned to your account.');
       return;
     }
 
     setIsLoading(true);
-    setTimeout(() => {
-      const result = storageService.authenticateWithPassword(identifier.trim(), password);
+    try {
+      const user = await authService.signIn(email, password);
+      onLoginSuccess(user);
+    } catch (error) {
+      setErrorMsg(error instanceof Error ? error.message : (lang === 'hi' ? 'लॉगिन विफल।' : 'Sign-in failed.'));
+    } finally {
       setIsLoading(false);
-      if (result.success && result.user) {
-        onLoginSuccess(result.user);
-      } else {
-        setErrorMsg(result.error || (lang === 'hi' ? 'अमान्य क्रेडेंशियल्स।' : 'Invalid credentials.'));
-      }
-    }, 300);
-  };
-
-  const handleQuickPresetLogin = (user: AuthUser) => {
-    setIdentifier(user.email || user.phone);
-    setPassword(user.password || 'admin123');
-    setErrorMsg(null);
-    
-    // Auto submit after a brief animation
-    setIsLoading(true);
-    setTimeout(() => {
-      const result = storageService.authenticateWithPassword(user.email || user.phone, user.password || 'admin123');
-      setIsLoading(false);
-      if (result.success && result.user) {
-        onLoginSuccess(result.user);
-      }
-    }, 250);
+    }
   };
 
   return (
@@ -86,8 +74,8 @@ export const LoginPage: React.FC<Props> = ({
           </h1>
           <p className="text-xs text-stone-500 max-w-sm mx-auto">
             {lang === 'hi' 
-              ? 'सुरक्षित पासवर्ड प्रमाणीकरण। किसी सशुल्क OTP की आवश्यकता नहीं है।' 
-              : 'Secure password authentication. Zero SMS costs or paid OTP requirements.'}
+              ? 'Supabase Auth आपके क्रेडेंशियल सत्यापित करता है। एडमिन द्वारा खाता सक्रिय होना आवश्यक है।' 
+              : 'Supabase Auth verifies your credentials. Your account must be enabled by an administrator.'}
           </p>
         </div>
 
@@ -103,14 +91,14 @@ export const LoginPage: React.FC<Props> = ({
         <form onSubmit={handleLoginSubmit} className="space-y-4 text-xs">
           <div>
             <label className="block font-bold text-stone-700 mb-1">
-              {lang === 'hi' ? 'यूज़रनेम, ईमेल या मोबाइल नंबर' : 'Username, Email or Mobile Number'}
+              {lang === 'hi' ? 'ईमेल पता' : 'Email Address'}
             </label>
             <div className="relative">
               <Mail className="w-4 h-4 text-stone-400 absolute left-3 top-3" />
               <input
                 type="text"
                 required
-                placeholder="e.g. superadmin or president@mylup.org"
+                placeholder="name@example.com"
                 value={identifier}
                 onChange={(e) => setIdentifier(e.target.value)}
                 className="w-full pl-9 pr-3 py-2.5 border border-stone-300 rounded-xl focus:border-emerald-700 focus:outline-none font-medium"
