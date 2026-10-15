@@ -37,83 +37,13 @@ export const PUBLIC_USER: AuthUser = {
   name: 'Public Citizen',
   email: 'guest@mylup.org',
   phone: '',
-  password: '',
   role: 'public',
   designation: 'Public Visitor',
   createdAt: '2026-10-15',
 };
 
-export const DEMO_USERS: AuthUser[] = [
-  {
-    id: 'user-superadmin',
-    name: 'superadmin',
-    email: 'superadmin@mylup.org',
-    phone: '+91 98370 00111',
-    password: 'SuperAdmin@2026',
-    role: 'superadmin',
-    designation: 'Super Administrator',
-    createdAt: '2024-01-01',
-    lastLogin: '2026-10-15',
-  },
-  {
-    id: 'user-president-1',
-    name: 'Dr. Masood Alam',
-    email: 'president@mylup.org',
-    phone: '+91 98370 00112',
-    password: 'president123',
-    role: 'state_president',
-    designation: 'State President (MYL Uttar Pradesh)',
-    createdAt: '2024-01-10',
-    lastLogin: '2026-10-15',
-  },
-  {
-    id: 'user-press-1',
-    name: 'Mohd. Irfan',
-    email: 'press@mylup.org',
-    phone: '+91 98370 22334',
-    password: 'press123',
-    role: 'press_release',
-    designation: 'State Media In-Charge & Official Spokesperson',
-    createdAt: '2024-02-01',
-    lastLogin: '2026-10-15',
-  },
-  {
-    id: 'user-content-1',
-    name: 'Ziaur Rahman',
-    email: 'content@mylup.org',
-    phone: '+91 98370 33445',
-    password: 'content123',
-    role: 'content_manager',
-    designation: 'Ideology & Parliamentary Archives Editor',
-    createdAt: '2024-02-05',
-    lastLogin: '2026-10-15',
-  },
-  {
-    id: 'user-dist-1',
-    name: 'Adv. Zeeshan Farooqui',
-    email: 'moradabad@mylup.org',
-    phone: '+91 98370 12345',
-    password: 'dist123',
-    role: 'district_incharge',
-    district: 'Moradabad',
-    designation: 'District President (MYL Moradabad)',
-    createdAt: '2024-02-10',
-    lastLogin: '2026-10-14',
-  },
-  {
-    id: 'user-cadre-1',
-    name: 'Shadab Ahmad Khan',
-    email: 'volunteer@mylup.org',
-    phone: '+91 94150 99887',
-    password: 'cadre123',
-    role: 'cadre_volunteer',
-    district: 'Aligarh',
-    designation: 'MSF State Vice President / AMU Unit',
-    createdAt: '2024-03-15',
-    lastLogin: '2026-10-12',
-  },
-  PUBLIC_USER,
-];
+export const DEMO_USERS: AuthUser[] = []; // Demo credentials removed; use Supabase Auth.
+
 
 const INITIAL_MEMBERS: Member[] = [
   {
@@ -864,42 +794,19 @@ export const storageService = {
   },
 
   getAllUsers(): AuthUser[] {
+    // Legacy localStorage accounts are not authentication identities. Never expose stored passwords.
     try {
       const data = localStorage.getItem(STORAGE_KEYS.ALL_USERS);
-      if (data) return JSON.parse(data);
+      if (data) {
+        const users = JSON.parse(data) as AuthUser[];
+        return users.map(({ password: _password, ...user }) => user);
+      }
     } catch {}
-    return DEMO_USERS;
+    return [];
   },
 
-  authenticateWithPassword(identifier: string, passwordAttempt: string): { success: boolean; user?: AuthUser; error?: string } {
-    const users = this.getAllUsers();
-    const cleanId = identifier.trim().toLowerCase();
-    const found = users.find((u) => 
-      u.name.toLowerCase() === cleanId || 
-      u.email?.toLowerCase() === cleanId || 
-      (u.phone && u.phone.replace(/[\s\-\+]/g, '').includes(cleanId.replace(/[\s\-\+]/g, '')))
-    );
-
-    if (!found) {
-      return { success: false, error: 'User account not found. Please verify username or email.' };
-    }
-
-    if (found.password && found.password !== passwordAttempt) {
-      return { success: false, error: 'Incorrect password. Please try again.' };
-    }
-
-    const updatedUser: AuthUser = { 
-      ...found, 
-      lastLogin: new Date().toISOString().slice(0, 10) 
-    };
-    this.setCurrentUser(updatedUser);
-
-    const updatedList = users.map((u) => u.id === found.id ? updatedUser : u);
-    try {
-      localStorage.setItem(STORAGE_KEYS.ALL_USERS, JSON.stringify(updatedList));
-    } catch {}
-
-    return { success: true, user: updatedUser };
+  authenticateWithPassword(_identifier: string, _passwordAttempt: string): { success: boolean; user?: AuthUser; error?: string } {
+    return { success: false, error: 'Password authentication is handled by Supabase Auth.' };
   },
 
   updateUserRole(userId: string, newRole: UserRole, district?: string, designation?: string): AuthUser[] {
@@ -925,23 +832,8 @@ export const storageService = {
     return updated;
   },
 
-  createUserAccount(userData: Omit<AuthUser, 'id'>): { success: boolean; user?: AuthUser; error?: string } {
-    const users = this.getAllUsers();
-    if (userData.email && users.some((u) => u.email?.toLowerCase() === userData.email?.toLowerCase())) {
-      return { success: false, error: 'An account with this email already exists.' };
-    }
-    const newId = `user-cadre-${Date.now()}`;
-    const newUser: AuthUser = {
-      ...userData,
-      id: newId,
-      createdAt: new Date().toISOString().slice(0, 10),
-      lastLogin: new Date().toISOString().slice(0, 10),
-    };
-    const updated = [...users, newUser];
-    try {
-      localStorage.setItem(STORAGE_KEYS.ALL_USERS, JSON.stringify(updated));
-    } catch {}
-    return { success: true, user: newUser };
+  createUserAccount(_userData: Omit<AuthUser, 'id'>): { success: boolean; user?: AuthUser; error?: string } {
+    return { success: false, error: 'Local account creation is disabled. Provision users through Supabase Auth and assign their profile and role in Supabase.' };
   },
 
   canChangeUserPassword(actingUser: AuthUser, targetUserId: string): boolean {
@@ -949,28 +841,12 @@ export const storageService = {
     return actingUser.id === targetUserId;
   },
 
-  changeUserPassword(userId: string, newPassword: string): boolean {
-    const users = this.getAllUsers();
-    const updated = users.map((u) => u.id === userId ? { ...u, password: newPassword } : u);
-    try {
-      localStorage.setItem(STORAGE_KEYS.ALL_USERS, JSON.stringify(updated));
-    } catch {}
-    const current = this.getCurrentUser();
-    if (current.id === userId) {
-      this.setCurrentUser({ ...current, password: newPassword });
-    }
-    return true;
+  changeUserPassword(_userId: string, _newPassword: string): boolean {
+    return false;
   },
 
-  changeUserPasswordWithPermission(actingUser: AuthUser, targetUserId: string, newPassword: string): { success: boolean; error?: string } {
-    if (!this.canChangeUserPassword(actingUser, targetUserId)) {
-      return {
-        success: false,
-        error: 'Only Super Admin can change passwords for other accounts. Non-admin users can change their own password only.'
-      };
-    }
-    this.changeUserPassword(targetUserId, newPassword);
-    return { success: true };
+  changeUserPasswordWithPermission(_actingUser: AuthUser, _targetUserId: string, _newPassword: string): { success: boolean; error?: string } {
+    return { success: false, error: 'Passwords are managed by Supabase Auth and cannot be viewed or changed through localStorage.' };
   },
 
   deleteUserAccount(userId: string): AuthUser[] {
