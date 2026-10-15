@@ -6,6 +6,7 @@ import { DigitalIdCard } from './DigitalIdCard';
 import confetti from 'canvas-confetti';
 import { TranslateButton } from './common/TranslateButton';
 import { translateEnglishToHindi } from '../utils/translationService';
+import { referenceDataService, type DistrictOption, type SubDistrictOption, type StateOption, type WingOption } from '../services/referenceDataService';
 
 interface Props {
   lang: Language;
@@ -35,8 +36,15 @@ export const MemberRegistration: React.FC<Props> = ({ lang, currentUser, onMembe
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
   const [state] = useState('Uttar Pradesh');
-  const [district, setDistrict] = useState('Moradabad');
-  const [subDistrict, setSubDistrict] = useState('City Unit');
+  const [states, setStates] = useState<StateOption[]>([]);
+  const [districtOptions, setDistrictOptions] = useState<DistrictOption[]>([]);
+  const [subDistrictOptions, setSubDistrictOptions] = useState<SubDistrictOption[]>([]);
+  const [wingOptions, setWingOptions] = useState<WingOption[]>([]);
+  const [districtId, setDistrictId] = useState('');
+  const [subDistrictId, setSubDistrictId] = useState('');
+  const [lookupError, setLookupError] = useState('');
+  const [district, setDistrict] = useState('');
+  const [subDistrict, setSubDistrict] = useState('');
   const [wing, setWing] = useState<YouthWing>('myl_cadre');
   const [designation, setDesignation] = useState('Active Youth Volunteer');
   const [communityBackground, setCommunityBackground] = useState('Dalit, Alpsankhyak & Serva Samaj Front');
@@ -57,7 +65,51 @@ export const MemberRegistration: React.FC<Props> = ({ lang, currentUser, onMembe
     } else if (list.length > 0) {
       setCurrentMember(list[0]);
     }
+
+    let cancelled = false;
+    void Promise.all([referenceDataService.states(), referenceDataService.districts(), referenceDataService.wings()])
+      .then(([stateRows, districtRows, wingRows]) => {
+        if (cancelled) return;
+        setStates(stateRows);
+        const up = stateRows.find((item) => item.code === 'UP');
+        const upDistricts = up ? districtRows.filter((item) => item.state_id === up.id) : districtRows;
+        setDistrictOptions(upDistricts);
+        setWingOptions(wingRows);
+        const initialDistrict = upDistricts.find((item) => item.code === 'moradabad') || upDistricts[0];
+        if (initialDistrict) {
+          setDistrictId(initialDistrict.id);
+          setDistrict(initialDistrict.name_en);
+        }
+        if (wingRows.some((item) => item.code === 'myl_cadre')) setWing('myl_cadre');
+        setLookupError('');
+      })
+      .catch((error: unknown) => {
+        if (!cancelled) setLookupError(error instanceof Error ? error.message : 'Could not load reference data from Supabase.');
+      });
+    return () => { cancelled = true; };
   }, []);
+
+  useEffect(() => {
+    if (!districtId) {
+      setSubDistrictOptions([]);
+      setSubDistrictId('');
+      setSubDistrict('');
+      return;
+    }
+    let cancelled = false;
+    void referenceDataService.subDistricts(districtId)
+      .then((rows) => {
+        if (cancelled) return;
+        setSubDistrictOptions(rows);
+        const first = rows[0];
+        setSubDistrictId(first?.id || '');
+        setSubDistrict(first?.name_en || '');
+      })
+      .catch((error: unknown) => {
+        if (!cancelled) setLookupError(error instanceof Error ? error.message : 'Could not load sub-districts.');
+      });
+    return () => { cancelled = true; };
+  }, [districtId]);
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -289,25 +341,39 @@ export const MemberRegistration: React.FC<Props> = ({ lang, currentUser, onMembe
                   </div>
                   <div>
                     <label className="block font-semibold text-stone-700 mb-1">District (UP) *</label>
-                    <input
-                      type="text"
+                    <select
                       required
-                      placeholder="e.g. Sambhal, Moradabad"
-                      value={district}
-                      onChange={(e) => setDistrict(e.target.value)}
-                      className="w-full px-3 py-2 border border-stone-300 rounded focus:border-emerald-600 focus:outline-none"
-                    />
+                      value={districtId}
+                      onChange={(e) => {
+                        const selected = districtOptions.find((item) => item.id === e.target.value);
+                        setDistrictId(e.target.value);
+                        setDistrict(selected?.name_en || '');
+                        setSubDistrictId('');
+                        setSubDistrict('');
+                      }}
+                      disabled={districtOptions.length === 0}
+                      className="w-full px-3 py-2 border border-stone-300 rounded focus:border-emerald-600 focus:outline-none bg-white disabled:bg-stone-100"
+                    >
+                      <option value="">{lang === 'hi' ? 'ज़िला चुनें' : 'Select district'}</option>
+                      {districtOptions.map((item) => <option key={item.id} value={item.id}>{lang === 'hi' && item.name_hi ? item.name_hi : item.name_en}</option>)}
+                    </select>
                   </div>
                   <div>
                     <label className="block font-semibold text-stone-700 mb-1">Tehsil / Ward *</label>
-                    <input
-                      type="text"
+                    <select
                       required
-                      placeholder="e.g. Sadar Tehsil"
-                      value={subDistrict}
-                      onChange={(e) => setSubDistrict(e.target.value)}
-                      className="w-full px-3 py-2 border border-stone-300 rounded focus:border-emerald-600 focus:outline-none"
-                    />
+                      value={subDistrictId}
+                      onChange={(e) => {
+                        const selected = subDistrictOptions.find((item) => item.id === e.target.value);
+                        setSubDistrictId(e.target.value);
+                        setSubDistrict(selected?.name_en || '');
+                      }}
+                      disabled={!districtId || subDistrictOptions.length === 0}
+                      className="w-full px-3 py-2 border border-stone-300 rounded focus:border-emerald-600 focus:outline-none bg-white disabled:bg-stone-100"
+                    >
+                      <option value="">{lang === 'hi' ? 'तहसील / इकाई चुनें' : 'Select tehsil / local unit'}</option>
+                      {subDistrictOptions.map((item) => <option key={item.id} value={item.id}>{lang === 'hi' && item.name_hi ? item.name_hi : item.name_en}</option>)}
+                    </select>
                   </div>
                 </div>
 
@@ -315,17 +381,16 @@ export const MemberRegistration: React.FC<Props> = ({ lang, currentUser, onMembe
                   <div>
                     <label className="block font-semibold text-stone-700 mb-1">Organization Wing *</label>
                     <select
+                      required
                       value={wing}
                       onChange={(e) => setWing(e.target.value as YouthWing)}
-                      className="w-full px-2.5 py-2 border border-stone-300 rounded bg-white font-medium text-emerald-900"
+                      disabled={wingOptions.length === 0}
+                      className="w-full px-2.5 py-2 border border-stone-300 rounded bg-white font-medium text-emerald-900 disabled:bg-stone-100"
                     >
-                      <option value="myl_cadre">Muslim Youth League (MYL)</option>
-                      <option value="msf">Muslim Students Fed. (MSF)</option>
-                      <option value="white_guard">White Guard (Seva Brigade)</option>
-                      <option value="life_lift">Life Lift (Career Cell)</option>
-                      <option value="legal_cell">Legal Aid & RTI Cell</option>
-                      <option value="general">General Cadre</option>
+                      <option value="">{lang === 'hi' ? 'विंग चुनें' : 'Select organization wing'}</option>
+                      {wingOptions.map((item) => <option key={item.id} value={item.code}>{lang === 'hi' && item.name_hi ? item.name_hi : item.name_en}</option>)}
                     </select>
+                    {lookupError && <p role="alert" className="mt-1 text-rose-700 text-[11px]">{lookupError}</p>}
                   </div>
 
                   <div>
