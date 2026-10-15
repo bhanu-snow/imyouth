@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Navbar } from './components/Navbar';
 import { HeroSection } from './components/HeroSection';
 import { PartyIntroMission } from './components/PartyIntroMission';
@@ -8,14 +8,15 @@ import { SocialBroadcastStudio } from './components/SocialBroadcastStudio';
 import { MemberRegistration } from './components/MemberRegistration';
 import { EventScheduler } from './components/EventScheduler';
 import { LiveNewsFeed } from './components/LiveNewsFeed';
-import { DistrictLeadershipTracker } from './components/DistrictLeadershipTracker';
+import { SangathanPage } from './components/SangathanPage';
 import { CadreApprovalsQueue } from './components/CadreApprovalsQueue';
 import { ParliamentaryHistoryView } from './components/ParliamentaryHistoryView';
 import { LoginPage } from './components/LoginPage';
 import { RoleManagementView } from './components/RoleManagementView';
 import { OrganizationalStructureManager } from './components/OrganizationalStructureManager';
 import { Language, NewsItem, PartyEvent, AuthUser, Member } from './types';
-import { storageService } from './services/storageService';
+import { storageService, PUBLIC_USER } from './services/storageService';
+import { authService } from './services/authService';
 import { 
   Compass, 
   BookOpen, 
@@ -34,7 +35,15 @@ export default function App() {
   const [activeTab, setActiveTab] = useState<string>('home');
   const [preselectedNews, setPreselectedNews] = useState<NewsItem | null>(null);
   const [preselectedEvent, setPreselectedEvent] = useState<PartyEvent | null>(null);
-  const [currentUser, setCurrentUser] = useState<AuthUser>(() => storageService.getCurrentUser());
+  const [currentUser, setCurrentUser] = useState<AuthUser>(PUBLIC_USER);
+
+  useEffect(() => {
+    let cancelled = false;
+    void authService.restoreSession()
+      .then((user) => { if (!cancelled && user) setCurrentUser(user); })
+      .catch(() => { if (!cancelled) setCurrentUser(PUBLIC_USER); });
+    return () => { cancelled = true; };
+  }, []);
   const [members, setMembers] = useState<Member[]>(() => storageService.getMembers());
 
   const pendingCadresCount = members.filter((m) => m.status === 'pending').length;
@@ -45,7 +54,6 @@ export default function App() {
 
   const handleUserChange = (user: AuthUser) => {
     setCurrentUser(user);
-    storageService.setCurrentUser(user);
   };
 
   const handleOpenSocialFromNews = (news: NewsItem) => {
@@ -329,10 +337,7 @@ export default function App() {
         )}
 
         {activeTab === 'districts' && (
-          <DistrictLeadershipTracker 
-            lang={lang} 
-            currentUser={currentUser} 
-          />
+          <SangathanPage lang={lang} currentUser={currentUser} />
         )}
 
         {activeTab === 'events' && (
@@ -422,7 +427,7 @@ export default function App() {
                 onClick={() => setActiveTab('districts')}
                 className="hover:text-emerald-800 transition-colors"
               >
-                {lang === 'hi' ? 'यूपी ज़िले' : 'UP Districts'}
+                {lang === 'hi' ? 'संगठन' : 'Sangathan'}
               </button>
               {(currentUser.role === 'superadmin' || currentUser.role === 'state_president') && (
                 <button

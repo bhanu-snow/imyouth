@@ -13,9 +13,10 @@ import {
   ShieldAlert 
 } from 'lucide-react';
 import { PartyEvent, Language, EventCategory, AuthUser } from '../types';
-import { storageService } from '../services/storageService';
+import { eventService } from '../services/eventService';
 import { TranslateButton } from './common/TranslateButton';
 import { translateEnglishToHindi } from '../utils/translationService';
+import { referenceDataService, type DistrictOption, type LookupOption } from '../services/referenceDataService';
 
 interface Props {
   lang: Language;
@@ -29,6 +30,7 @@ export const EventScheduler: React.FC<Props> = ({
   onOpenSocialBroadcast 
 }) => {
   const [events, setEvents] = useState<PartyEvent[]>([]);
+  const [dataError, setDataError] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingEvent, setEditingEvent] = useState<PartyEvent | null>(null);
@@ -44,20 +46,54 @@ export const EventScheduler: React.FC<Props> = ({
   const [locationEn, setLocationEn] = useState('');
   const [locationHi, setLocationHi] = useState('');
   const [district, setDistrict] = useState(currentUser.district || 'Moradabad');
-  const [state] = useState('Uttar Pradesh');
+  const [districtId, setDistrictId] = useState('');
+  const [districtOptions, setDistrictOptions] = useState<DistrictOption[]>([]);
+  const [categoryOptions, setCategoryOptions] = useState<LookupOption[]>([]);
+  const [lookupError, setLookupError] = useState('');
   const [coordinatorName, setCoordinatorName] = useState(currentUser.name || 'Adv. Sarfaraz Ahmed');
   const [coordinatorPhone, setCoordinatorPhone] = useState(currentUser.phone || '+91 98370 00112');
 
   const isAuthorized = currentUser.role === 'superadmin' || currentUser.role === 'press_release';
 
   useEffect(() => {
-    const list = storageService.getEvents();
-    setEvents(list);
-  }, []);
+    let cancelled = false;
+    void eventService.list()
+      .then((rows) => { if (!cancelled) { setEvents(rows); setDataError(''); } })
+      .catch((error: unknown) => { if (!cancelled) setDataError(error instanceof Error ? error.message : 'Could not load events from Supabase.'); });
 
-  const handleToggleRsvp = (eventId: string, rsvpType: 'going' | 'maybe') => {
-    const updated = storageService.toggleRsvp(eventId, rsvpType);
-    setEvents(updated);
+    void Promise.all([referenceDataService.districts(), referenceDataService.eventCategories()])
+      .then(([districtRows, categoryRows]) => {
+        if (cancelled) return;
+        setDistrictOptions(districtRows);
+        setCategoryOptions(categoryRows);
+        const initialDistrict = districtRows.find((item) => item.name_en.toLowerCase() === (currentUser.district || 'Moradabad').toLowerCase())
+          || districtRows.find((item) => item.code === 'moradabad')
+          || districtRows[0];
+        if (initialDistrict) {
+          setDistrictId(initialDistrict.id);
+          setDistrict(initialDistrict.name_en);
+        }
+        setLookupError('');
+      })
+      .catch((error: unknown) => {
+        if (!cancelled) setLookupError(error instanceof Error ? error.message : 'Could not load reference data from Supabase.');
+      });
+    return () => { cancelled = true; };
+  }, [currentUser.district]);
+
+  const refreshEvents = async () => {
+    const rows = await eventService.list();
+    setEvents(rows);
+    setDataError('');
+  };
+
+  const handleToggleRsvp = async (eventId: string, rsvpType: 'going' | 'maybe') => {
+    try {
+      await eventService.toggleRsvp(eventId, rsvpType);
+      await refreshEvents();
+    } catch (error) {
+      setDataError(error instanceof Error ? error.message : 'Could not save event RSVP.');
+    }
   };
 
   const handleOpenAdd = () => {
@@ -83,21 +119,26 @@ export const EventScheduler: React.FC<Props> = ({
     setLocationEn(ev.location.en);
     setLocationHi(ev.location.hi);
     setDistrict(ev.district);
+    const matchingDistrict = districtOptions.find((item) => item.name_en.toLowerCase() === ev.district.toLowerCase());
+    setDistrictId(matchingDistrict?.id || '');
     setCoordinatorName(ev.coordinator.name);
     setCoordinatorPhone(ev.coordinator.phone);
     setShowAddModal(true);
   };
 
-  const handleDelete = (eventId: string) => {
-    if (window.confirm('Are you sure you want to delete this event schedule?')) {
-      const updated = storageService.deleteEvent(eventId);
-      setEvents(updated);
+  const handleDelete = async (eventId: string) => {
+    if (!window.confirm('Are you sure you want to delete this event schedule?')) return;
+    try {
+      await eventService.remove(eventId);
+      await refreshEvents();
+    } catch (error) {
+      setDataError(error instanceof Error ? error.message : 'Could not delete event.');
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!titleEn || !locationEn) return;
+    if (!titleEn || !locationEn || !districtId) return;
 
     const eventToSave: PartyEvent = {
       id: editingEvent ? editingEvent.id : `ev-up-${Date.now()}`,
@@ -109,8 +150,8 @@ export const EventScheduler: React.FC<Props> = ({
       location: { en: locationEn, hi: locationHi || locationEn },
       district,
       state: 'Uttar Pradesh',
-      rsvpCount: editingEvent ? editingEvent.rsvpCount : 1,
-      userRsvp: editingEvent ? editingEvent.userRsvp : 'going',
+      rsvpCount: editingEvent ? editingEvent.rsvpCount : 0,
+      userRsvp: editingEvent ? editingEvent.userRsvp : null,
       coordinator: {
         name: coordinatorName,
         phone: coordinatorPhone,
@@ -123,10 +164,14 @@ export const EventScheduler: React.FC<Props> = ({
       createdBy: currentUser.name,
     };
 
-    const updated = storageService.saveEvent(eventToSave);
-    setEvents(updated);
-    setShowAddModal(false);
-    setEditingEvent(null);
+    try {
+      await eventService.save(eventToSave);
+      await refreshEvents();
+      setShowAddModal(false);
+      setEditingEvent(null);
+    } catch (error) {
+      setDataError(error instanceof Error ? error.message : 'Could not save event.');
+    }
   };
 
   const downloadIcs = (event: PartyEvent) => {
@@ -158,6 +203,7 @@ END:VCALENDAR`;
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-8 space-y-6">
+      {dataError && <div role="alert" className="rounded-lg border border-rose-200 bg-rose-50 p-3 text-sm text-rose-800">{dataError}</div>}
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
@@ -201,10 +247,10 @@ END:VCALENDAR`;
       <div className="flex items-center gap-2 overflow-x-auto pb-2">
         {[
           { key: 'all', label: { en: 'All Events', hi: 'सभी कार्यक्रम' } },
-          { key: 'career_conclave', label: { en: 'Life Lift Conclaves', hi: 'लाइफ लिफ्ट करियर' } },
-          { key: 'campus_drive', label: { en: 'MSF Student Drives', hi: 'MSF छात्र सभा' } },
-          { key: 'relief_seva', label: { en: 'White Guard Seva', hi: 'सेवा व राहत' } },
-          { key: 'rally', label: { en: 'Youth Conferences', hi: 'युवा सम्मेलन' } },
+          ...categoryOptions.map((item) => ({
+            key: item.code,
+            label: { en: item.name_en, hi: item.name_hi || item.name_en },
+          })),
         ].map((item) => (
           <button
             key={item.key}
@@ -295,8 +341,10 @@ END:VCALENDAR`;
               <div className="flex items-center gap-1.5">
                 <button
                   type="button"
+                  disabled={currentUser.role === 'public'}
+                  title={currentUser.role === 'public' ? (lang === 'hi' ? 'RSVP के लिए पहले लॉगिन करें' : 'Sign in to RSVP') : undefined}
                   onClick={() => handleToggleRsvp(ev.id, 'going')}
-                  className={`px-3 py-1.5 text-xs font-semibold rounded transition-colors inline-flex items-center gap-1 ${
+                  className={`px-3 py-1.5 text-xs font-semibold rounded transition-colors inline-flex items-center gap-1 disabled:cursor-not-allowed disabled:opacity-50 ${
                     ev.userRsvp === 'going'
                       ? 'bg-emerald-700 text-white font-bold'
                       : 'bg-stone-100 text-stone-700 hover:bg-stone-200'
@@ -412,26 +460,33 @@ END:VCALENDAR`;
                 <div>
                   <label className="block font-semibold text-stone-700 mb-1">Category</label>
                   <select
+                    required
                     value={category}
                     onChange={(e) => setCategory(e.target.value as EventCategory)}
-                    className="w-full p-2 border border-stone-300 rounded bg-white"
+                    disabled={categoryOptions.length === 0}
+                    className="w-full p-2 border border-stone-300 rounded bg-white disabled:bg-stone-100"
                   >
-                    <option value="career_conclave">Life Lift Conclave (करियर सम्मेलन)</option>
-                    <option value="campus_drive">MSF Campus Drive (छात्र सभा)</option>
-                    <option value="relief_seva">White Guard Seva (सेवा शिविर)</option>
-                    <option value="rally">Youth Conference (विशाल सम्मेलन)</option>
+                    <option value="">{lang === 'hi' ? 'श्रेणी चुनें' : 'Select category'}</option>
+                    {categoryOptions.map((item) => <option key={item.id} value={item.code}>{lang === 'hi' && item.name_hi ? item.name_hi : item.name_en}</option>)}
                   </select>
                 </div>
                 <div>
                   <label className="block font-semibold text-stone-700 mb-1">District (UP)</label>
-                  <input
-                    type="text"
+                  <select
                     required
-                    placeholder="e.g. Sambhal, Moradabad"
-                    value={district}
-                    onChange={(e) => setDistrict(e.target.value)}
-                    className="w-full p-2 border border-stone-300 rounded focus:border-emerald-700 focus:outline-none"
-                  />
+                    value={districtId}
+                    onChange={(e) => {
+                      const selected = districtOptions.find((item) => item.id === e.target.value);
+                      setDistrictId(e.target.value);
+                      setDistrict(selected?.name_en || '');
+                    }}
+                    disabled={districtOptions.length === 0}
+                    className="w-full p-2 border border-stone-300 rounded bg-white focus:border-emerald-700 focus:outline-none disabled:bg-stone-100"
+                  >
+                    <option value="">{lang === 'hi' ? 'ज़िला चुनें' : 'Select district'}</option>
+                    {districtOptions.map((item) => <option key={item.id} value={item.id}>{lang === 'hi' && item.name_hi ? item.name_hi : item.name_en}</option>)}
+                  </select>
+                  {lookupError && <p role="alert" className="mt-1 text-rose-700 text-[11px]">{lookupError}</p>}
                 </div>
               </div>
 

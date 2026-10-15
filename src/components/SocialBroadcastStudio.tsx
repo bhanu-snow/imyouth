@@ -28,6 +28,7 @@ import {
   generateInstagramBanner 
 } from '../utils/socialShare';
 import { storageService } from '../services/storageService';
+import { referenceDataService, type LookupOption } from '../services/referenceDataService';
 
 interface Props {
   lang: Language;
@@ -43,6 +44,8 @@ export const SocialBroadcastStudio: React.FC<Props> = ({
   const [newsList, setNewsList] = useState<NewsItem[]>([]);
   const [eventsList, setEventsList] = useState<PartyEvent[]>([]);
   const [broadcastHistory, setBroadcastHistory] = useState<SocialBroadcastItem[]>([]);
+  const [platformOptions, setPlatformOptions] = useState<LookupOption[]>([]);
+  const [lookupError, setLookupError] = useState('');
 
   // Source selection
   const [sourceType, setSourceType] = useState<'news' | 'event' | 'custom'>('news');
@@ -71,6 +74,11 @@ export const SocialBroadcastStudio: React.FC<Props> = ({
     setNewsList(news);
     setEventsList(events);
     setBroadcastHistory(broadcasts);
+    let cancelled = false;
+    void referenceDataService.socialPlatforms().then(
+      (rows) => { if (!cancelled) { setPlatformOptions(rows); setLookupError(''); } },
+      (error: unknown) => { if (!cancelled) setLookupError(error instanceof Error ? error.message : 'Could not load social platforms.'); },
+    );
 
     if (preselectedNews) {
       setSourceType('news');
@@ -81,6 +89,7 @@ export const SocialBroadcastStudio: React.FC<Props> = ({
     } else if (news.length > 0) {
       setSelectedNewsId(news[0].id);
     }
+    return () => { cancelled = true; };
   }, [preselectedNews, preselectedEvent]);
 
   // Derived current share content
@@ -191,7 +200,7 @@ export const SocialBroadcastStudio: React.FC<Props> = ({
       contentHi: currentShareContent.textHi,
       hashtags: currentShareContent.hashtags,
       url: currentShareContent.url,
-      targetPlatforms: ['whatsapp', 'telegram', 'twitter', 'facebook', 'instagram'],
+      targetPlatforms: platformOptions.map((platform) => platform.code as SocialPlatform),
       createdAt: new Date().toISOString(),
       metrics: {
         shares: 1,
@@ -481,66 +490,34 @@ export const SocialBroadcastStudio: React.FC<Props> = ({
           <div className="p-5 bg-white border border-stone-200 rounded-lg space-y-4">
             {/* Platform Selector Tabs */}
             <div className="flex items-center gap-1 p-1 bg-stone-100 rounded-lg overflow-x-auto">
-              <button
-                onClick={() => setPreviewPlatform('whatsapp')}
-                className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
-                  previewPlatform === 'whatsapp'
-                    ? 'bg-white text-emerald-800 shadow-sm font-bold'
-                    : 'text-stone-600 hover:text-stone-900'
-                }`}
-              >
-                <MessageSquare className="w-3.5 h-3.5 text-emerald-600" />
-                <span>WhatsApp</span>
-              </button>
-
-              <button
-                onClick={() => setPreviewPlatform('telegram')}
-                className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
-                  previewPlatform === 'telegram'
-                    ? 'bg-white text-sky-800 shadow-sm font-bold'
-                    : 'text-stone-600 hover:text-stone-900'
-                }`}
-              >
-                <Send className="w-3.5 h-3.5 text-sky-600" />
-                <span>Telegram</span>
-              </button>
-
-              <button
-                onClick={() => setPreviewPlatform('twitter')}
-                className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
-                  previewPlatform === 'twitter'
-                    ? 'bg-white text-stone-900 shadow-sm font-bold'
-                    : 'text-stone-600 hover:text-stone-900'
-                }`}
-              >
-                <Twitter className="w-3.5 h-3.5 text-stone-800" />
-                <span>X (Twitter)</span>
-              </button>
-
-              <button
-                onClick={() => setPreviewPlatform('facebook')}
-                className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
-                  previewPlatform === 'facebook'
-                    ? 'bg-white text-blue-800 shadow-sm font-bold'
-                    : 'text-stone-600 hover:text-stone-900'
-                }`}
-              >
-                <Facebook className="w-3.5 h-3.5 text-blue-600" />
-                <span>Facebook</span>
-              </button>
-
-              <button
-                onClick={() => setPreviewPlatform('instagram')}
-                className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
-                  previewPlatform === 'instagram'
-                    ? 'bg-white text-rose-800 shadow-sm font-bold'
-                    : 'text-stone-600 hover:text-stone-900'
-                }`}
-              >
-                <Instagram className="w-3.5 h-3.5 text-rose-600" />
-                <span>Instagram Card</span>
-              </button>
+              {platformOptions.map((platform) => {
+                const code = platform.code as SocialPlatform;
+                const active = previewPlatform === code;
+                const icon = code === 'twitter'
+                  ? <Twitter className="w-3.5 h-3.5" />
+                  : code === 'facebook'
+                    ? <Facebook className="w-3.5 h-3.5" />
+                    : code === 'instagram'
+                      ? <Instagram className="w-3.5 h-3.5" />
+                      : code === 'telegram'
+                        ? <Send className="w-3.5 h-3.5" />
+                        : <MessageSquare className="w-3.5 h-3.5" />;
+                return (
+                  <button
+                    key={platform.id}
+                    type="button"
+                    onClick={() => setPreviewPlatform(code)}
+                    className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md transition-colors whitespace-nowrap ${
+                      active ? 'bg-white text-emerald-800 shadow-sm font-bold' : 'text-stone-600 hover:text-stone-900'
+                    }`}
+                  >
+                    {icon}
+                    <span>{platform.name_en}{code === 'instagram' ? ' Card' : ''}</span>
+                  </button>
+                );
+              })}
             </div>
+            {lookupError && <p role="alert" className="text-xs text-rose-700">{lookupError}</p>}
 
             {/* Platform Preview Box */}
             {previewPlatform !== 'instagram' ? (

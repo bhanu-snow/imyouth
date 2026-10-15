@@ -16,10 +16,11 @@ import {
   Sparkles
 } from 'lucide-react';
 import { Language, MythFaqItem, AuthUser } from '../types';
-import { storageService } from '../services/storageService';
+import { faqService } from '../services/faqService';
 import { LadderSymbolIcon } from './PartySymbol';
 import { TranslateButton } from './common/TranslateButton';
 import { translateEnglishToHindi } from '../utils/translationService';
+import { referenceDataService, type LookupOption } from '../services/referenceDataService';
 
 interface Props {
   lang: Language;
@@ -28,6 +29,9 @@ interface Props {
 
 export const FaqMythBuster: React.FC<Props> = ({ lang, currentUser }) => {
   const [faqs, setFaqs] = useState<MythFaqItem[]>([]);
+  const [categoryOptions, setCategoryOptions] = useState<LookupOption[]>([]);
+  const [lookupError, setLookupError] = useState('');
+  const [faqError, setFaqError] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [expandedId, setExpandedId] = useState<string | null>(null);
@@ -51,13 +55,21 @@ export const FaqMythBuster: React.FC<Props> = ({ lang, currentUser }) => {
 
   useEffect(() => {
     loadFaqs();
+    let cancelled = false;
+    void referenceDataService.faqCategories()
+      .then((rows) => { if (!cancelled) { setCategoryOptions(rows); setLookupError(''); } })
+      .catch((error: unknown) => { if (!cancelled) setLookupError(error instanceof Error ? error.message : 'Could not load FAQ categories.'); });
+    return () => { cancelled = true; };
   }, []);
 
-  const loadFaqs = () => {
-    const list = storageService.getFaqs();
-    setFaqs(list);
-    if (list.length > 0 && !expandedId) {
-      setExpandedId(list[0].id);
+  const loadFaqs = async () => {
+    try {
+      const list = await faqService.list();
+      setFaqs(list);
+      setFaqError('');
+      setExpandedId((current) => current && list.some((item) => item.id === current) ? current : (list[0]?.id ?? null));
+    } catch (error) {
+      setFaqError(error instanceof Error ? error.message : 'Could not load FAQs from Supabase.');
     }
   };
 
@@ -90,15 +102,18 @@ export const FaqMythBuster: React.FC<Props> = ({ lang, currentUser }) => {
     setShowModal(true);
   };
 
-  const handleDeleteFaq = (id: string, e: React.MouseEvent) => {
+  const handleDeleteFaq = async (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
-    if (confirm(lang === 'hi' ? 'क्या आप इस FAQ को हटाना चाहते हैं?' : 'Are you sure you want to delete this FAQ clarification?')) {
-      const updated = storageService.deleteFaq(id);
-      setFaqs(updated);
+    if (!confirm(lang === 'hi' ? 'क्या आप इस FAQ को हटाना चाहते हैं?' : 'Are you sure you want to delete this FAQ clarification?')) return;
+    try {
+      await faqService.remove(id);
+      await loadFaqs();
+    } catch (error) {
+      setLookupError(error instanceof Error ? error.message : 'Could not delete FAQ.');
     }
   };
 
-  const handleSaveFaq = (e: React.FormEvent) => {
+  const handleSaveFaq = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!mythEn || !mythHi || !factEn || !factHi) return;
 
@@ -124,9 +139,13 @@ export const FaqMythBuster: React.FC<Props> = ({ lang, currentUser }) => {
       cadreTalkingPointsHi: parsedPointsHi.length ? parsedPointsHi : [factHi],
     };
 
-    const updated = storageService.saveFaq(faqData);
-    setFaqs(updated);
-    setShowModal(false);
+    try {
+      await faqService.save(faqData);
+      await loadFaqs();
+      setShowModal(false);
+    } catch (error) {
+      setLookupError(error instanceof Error ? error.message : 'Could not save FAQ to Supabase.');
+    }
   };
 
   const filteredFaqs = faqs.filter((faq) => {
@@ -228,6 +247,18 @@ export const FaqMythBuster: React.FC<Props> = ({ lang, currentUser }) => {
       </div>
 
       {/* FAQ Accordion List with High Visibility Fonts */}
+      {faqError && (
+        <div role="alert" className="rounded-xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-800">
+          {faqError}
+        </div>
+      )}
+      {!faqError && faqs.length === 0 && (
+        <div className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
+          {lang === 'hi'
+            ? 'Supabase में अभी FAQ रिकॉर्ड नहीं हैं। supabase/seed.sql को Supabase SQL Editor में चलाएँ, फिर पेज रीफ़्रेश करें।'
+            : 'No FAQ records were found in Supabase. Run supabase/seed.sql in the Supabase SQL Editor, then refresh this page.'}
+        </div>
+      )}
       <div className="space-y-5">
         {filteredFaqs.map((faq) => {
           const isExpanded = expandedId === faq.id;
@@ -377,12 +408,9 @@ export const FaqMythBuster: React.FC<Props> = ({ lang, currentUser }) => {
                   onChange={(e) => setCategory(e.target.value as any)}
                   className="w-full p-2 border border-stone-300 rounded-lg bg-white"
                 >
-                  <option value="history">1948 History & Formation</option>
-                  <option value="up_focus">Uttar Pradesh Relevance & Need</option>
-                  <option value="secularism">Secularism & Constitutional Allegiance</option>
-                  <option value="wings">MYL / MSF / White Guard Wings</option>
-                  <option value="ideology">Ideology & Non-communal Model</option>
+                  {categoryOptions.map((item) => <option key={item.id} value={item.code}>{lang === 'hi' && item.name_hi ? item.name_hi : item.name_en}</option>)}
                 </select>
+                {lookupError && <p role="alert" className="mt-1 text-rose-700">{lookupError}</p>}
               </div>
 
               {/* Myth Inputs */}

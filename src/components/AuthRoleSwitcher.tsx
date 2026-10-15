@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { LogIn, LogOut, ChevronDown, Lock, Key, Settings, User } from 'lucide-react';
 import { AuthUser, Language } from '../types';
-import { storageService, PUBLIC_USER } from '../services/storageService';
+import { PUBLIC_USER } from '../services/storageService';
+import { authService } from '../services/authService';
 
 interface Props {
   currentUser: AuthUser;
@@ -22,10 +23,13 @@ export const AuthRoleSwitcher: React.FC<Props> = ({
 
   const isPublic = currentUser.role === 'public';
 
-  const handleLogout = () => {
-    storageService.setCurrentUser(PUBLIC_USER);
-    onUserChange(PUBLIC_USER);
-    setDropdownOpen(false);
+  const handleLogout = async () => {
+    try {
+      await authService.signOut();
+    } finally {
+      onUserChange(PUBLIC_USER);
+      setDropdownOpen(false);
+    }
   };
 
   const getRoleBadge = (role: AuthUser['role']) => {

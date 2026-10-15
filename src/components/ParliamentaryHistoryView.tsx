@@ -28,6 +28,7 @@ import { storageService } from '../services/storageService';
 import { LadderSymbolIcon, PartyFlagIcon, PartySymbolCard } from './PartySymbol';
 import { TranslateButton } from './common/TranslateButton';
 import { translateEnglishToHindi } from '../utils/translationService';
+import { referenceDataService, type LookupOption } from '../services/referenceDataService';
 
 interface Props {
   lang: Language;
@@ -110,6 +111,8 @@ const LeaderPortrait: React.FC<{ leader: ParliamentaryLeader; size?: 'normal' | 
 
 export const ParliamentaryHistoryView: React.FC<Props> = ({ lang, currentUser }) => {
   const [leaders, setLeaders] = useState<ParliamentaryLeader[]>([]);
+  const [houseOptions, setHouseOptions] = useState<LookupOption[]>([]);
+  const [lookupError, setLookupError] = useState('');
   const [activeTab, setActiveTab] = useState<'timeline' | 'ideology' | 'symbol' | 'coalitions'>('timeline');
   const [selectedHouse, setSelectedHouse] = useState<string>('all');
   const [searchFilter, setSearchFilter] = useState<string>('');
@@ -138,6 +141,11 @@ export const ParliamentaryHistoryView: React.FC<Props> = ({ lang, currentUser })
 
   useEffect(() => {
     loadLeaders();
+    let cancelled = false;
+    void referenceDataService.parliamentaryHouses()
+      .then((rows) => { if (!cancelled) { setHouseOptions(rows); setLookupError(''); } })
+      .catch((error: unknown) => { if (!cancelled) setLookupError(error instanceof Error ? error.message : 'Could not load parliamentary categories.'); });
+    return () => { cancelled = true; };
   }, []);
 
   const loadLeaders = () => {
@@ -659,14 +667,9 @@ export const ParliamentaryHistoryView: React.FC<Props> = ({ lang, currentUser })
                     onChange={(e) => setFormHouse(e.target.value as ParliamentaryHouse)}
                     className="w-full p-2 border border-stone-300 rounded-lg bg-white"
                   >
-                    <option value="lok_sabha">Lok Sabha (Lower House)</option>
-                    <option value="rajya_sabha">Rajya Sabha (Upper House)</option>
-                    <option value="constituent_assembly">Constituent Assembly of India (1946–50)</option>
-                    <option value="union_ministry">Union Ministry Cabinet</option>
-                    <option value="state_assembly">State Assembly (Kerala / Tamil Nadu)</option>
-                    <option value="myl_national">MYL National Committee</option>
-                    <option value="myl_state_up">MYL Uttar Pradesh State Committee</option>
+                    {houseOptions.map((item) => <option key={item.id} value={item.code}>{lang === 'hi' && item.name_hi ? item.name_hi : item.name_en}</option>)}
                   </select>
+                  {lookupError && <p role="alert" className="mt-1 text-rose-700">{lookupError}</p>}
                 </div>
 
                 <div>

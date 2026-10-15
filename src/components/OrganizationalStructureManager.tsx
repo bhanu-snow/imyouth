@@ -21,10 +21,11 @@ import {
   Lock
 } from 'lucide-react';
 import { Language, AuthUser, PostDesignation, OrgWing, OrgDistrict } from '../types';
-import { storageService } from '../services/storageService';
+import { organizationAdminService, type GeographyDistrictOption } from '../services/organizationAdminService';
 import { LadderSymbolIcon, PartyFlagIcon } from './PartySymbol';
 import { TranslateButton } from './common/TranslateButton';
 import { translateEnglishToHindi } from '../utils/translationService';
+import { referenceDataService, type ZoneOption, type LookupOption } from '../services/referenceDataService';
 
 interface Props {
   lang: Language;
@@ -38,6 +39,13 @@ export const OrganizationalStructureManager: React.FC<Props> = ({ lang, currentU
   const [posts, setPosts] = useState<PostDesignation[]>([]);
   const [wings, setWings] = useState<OrgWing[]>([]);
   const [districts, setDistricts] = useState<OrgDistrict[]>([]);
+  const [zoneOptions, setZoneOptions] = useState<ZoneOption[]>([]);
+  const [designationLevelOptions, setDesignationLevelOptions] = useState<LookupOption[]>([]);
+  const [designationStatusOptions, setDesignationStatusOptions] = useState<LookupOption[]>([]);
+  const [lookupError, setLookupError] = useState('');
+  const [geographyDistricts, setGeographyDistricts] = useState<GeographyDistrictOption[]>([]);
+  const [dataLoading, setDataLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
 
   // Search & Filter
   const [searchQuery, setSearchQuery] = useState('');
@@ -58,7 +66,7 @@ export const OrganizationalStructureManager: React.FC<Props> = ({ lang, currentU
   const [postTitleEn, setPostTitleEn] = useState('');
   const [postTitleHi, setPostTitleHi] = useState('');
   const [postLevel, setPostLevel] = useState<PostDesignation['level']>('state');
-  const [postWingId, setPostWingId] = useState('myl_cadre');
+  const [postWingId, setPostWingId] = useState('');
   const [postDescEn, setPostDescEn] = useState('');
   const [postDescHi, setPostDescHi] = useState('');
   const [postStatus, setPostStatus] = useState<PostDesignation['status']>('active');
@@ -77,25 +85,48 @@ export const OrganizationalStructureManager: React.FC<Props> = ({ lang, currentU
   const [wingBadge, setWingBadge] = useState('Affiliated Wing');
 
   // Form states: Districts
-  const [distNameEn, setDistNameEn] = useState('');
-  const [distNameHi, setDistNameHi] = useState('');
-  const [distZone, setDistZone] = useState<OrgDistrict['zone']>('Rohilkhand');
-  const [distSubDistricts, setDistSubDistricts] = useState('');
+  const [distGeographyId, setDistGeographyId] = useState('');
   const [distHeadquarters, setDistHeadquarters] = useState('');
   const [distInCharge, setDistInCharge] = useState('');
-  const [distPhone, setDistPhone] = useState('+91 ');
-  const [distCadreCount, setDistCadreCount] = useState(150);
+  const [distPhone, setDistPhone] = useState('');
+  const [distCadreCount, setDistCadreCount] = useState(0);
 
   const isAuthorized = currentUser.role === 'superadmin' || currentUser.role === 'state_president';
 
   useEffect(() => {
-    loadAllData();
+    void loadAllData();
+    let cancelled = false;
+    void Promise.all([
+      referenceDataService.zones(),
+      referenceDataService.designationLevels(),
+      referenceDataService.designationStatuses(),
+    ])
+      .then(([zones, levels, statuses]) => {
+        if (!cancelled) {
+          setZoneOptions(zones);
+          setDesignationLevelOptions(levels);
+          setDesignationStatusOptions(statuses);
+          setLookupError('');
+        }
+      })
+      .catch((error: unknown) => { if (!cancelled) setLookupError(error instanceof Error ? error.message : 'Could not load organizational lookup data.'); });
+    return () => { cancelled = true; };
   }, []);
 
-  const loadAllData = () => {
-    setPosts(storageService.getPosts());
-    setWings(storageService.getWings());
-    setDistricts(storageService.getOrgDistricts());
+  const loadAllData = async () => {
+    setDataLoading(true);
+    try {
+      const data = await organizationAdminService.loadAll();
+      setPosts(data.posts);
+      setWings(data.wings);
+      setDistricts(data.districts);
+      setGeographyDistricts(data.geography);
+      setLookupError('');
+    } catch (error) {
+      setLookupError(error instanceof Error ? error.message : 'Could not load organisation records from Supabase.');
+    } finally {
+      setDataLoading(false);
+    }
   };
 
   // POST CRUD Handlers
@@ -104,7 +135,7 @@ export const OrganizationalStructureManager: React.FC<Props> = ({ lang, currentU
     setPostTitleEn('');
     setPostTitleHi('');
     setPostLevel('state');
-    setPostWingId('myl_cadre');
+    setPostWingId(wings[0]?.id ?? '');
     setPostDescEn('');
     setPostDescHi('');
     setPostStatus('active');
@@ -117,7 +148,7 @@ export const OrganizationalStructureManager: React.FC<Props> = ({ lang, currentU
     setPostTitleEn(post.titleEn);
     setPostTitleHi(post.titleHi);
     setPostLevel(post.level);
-    setPostWingId(post.wingId || 'myl_cadre');
+    setPostWingId(post.wingId || '');
     setPostDescEn(post.descriptionEn);
     setPostDescHi(post.descriptionHi);
     setPostStatus(post.status);
@@ -125,9 +156,10 @@ export const OrganizationalStructureManager: React.FC<Props> = ({ lang, currentU
     setShowPostModal(true);
   };
 
-  const handleSavePost = (e: React.FormEvent) => {
+  const handleSavePost = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!postTitleEn || !postTitleHi) return;
+    if (!postTitleEn.trim() || !postTitleHi.trim()) return;
+    setSaving(true);
     const postData: PostDesignation = {
       id: editingPost ? editingPost.id : `post-${Date.now()}`,
       titleEn: postTitleEn,
@@ -139,16 +171,19 @@ export const OrganizationalStructureManager: React.FC<Props> = ({ lang, currentU
       status: postStatus,
       termYears: Number(postTerm) || 2,
     };
-    storageService.savePost(postData);
-    loadAllData();
-    setShowPostModal(false);
+    try {
+      await organizationAdminService.savePost(postData);
+      await loadAllData();
+      setShowPostModal(false);
+    } catch (error) {
+      setLookupError(error instanceof Error ? error.message : 'Could not save designation.');
+    } finally { setSaving(false); }
   };
 
-  const handleDeletePost = (id: string) => {
-    if (confirm(lang === 'hi' ? 'क्या आप इस पद को हटाना चाहते हैं?' : 'Are you sure you want to delete this designation post?')) {
-      storageService.deletePost(id);
-      loadAllData();
-    }
+  const handleDeletePost = async (id: string) => {
+    if (!confirm(lang === 'hi' ? 'क्या आप इस पद को हटाना चाहते हैं?' : 'Are you sure you want to delete this designation post?')) return;
+    try { await organizationAdminService.deletePost(id); await loadAllData(); }
+    catch (error) { setLookupError(error instanceof Error ? error.message : 'Could not delete designation.'); }
   };
 
   // WING CRUD Handlers
@@ -182,9 +217,10 @@ export const OrganizationalStructureManager: React.FC<Props> = ({ lang, currentU
     setShowWingModal(true);
   };
 
-  const handleSaveWing = (e: React.FormEvent) => {
+  const handleSaveWing = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!wingNameEn || !wingNameHi) return;
+    if (!wingNameEn.trim() || !wingNameHi.trim() || !wingCode.trim()) return;
+    setSaving(true);
     const wingData: OrgWing = {
       id: editingWing ? editingWing.id : `wing-${Date.now()}`,
       code: wingCode || `wing_${Date.now().toString().slice(-4)}`,
@@ -198,38 +234,35 @@ export const OrganizationalStructureManager: React.FC<Props> = ({ lang, currentU
       headLeaderName: wingHead,
       badgeLabel: wingBadge,
     };
-    storageService.saveWing(wingData);
-    loadAllData();
-    setShowWingModal(false);
+    try {
+      await organizationAdminService.saveWing(wingData);
+      await loadAllData();
+      setShowWingModal(false);
+    } catch (error) {
+      setLookupError(error instanceof Error ? error.message : 'Could not save wing.');
+    } finally { setSaving(false); }
   };
 
-  const handleDeleteWing = (id: string) => {
-    if (confirm(lang === 'hi' ? 'क्या आप इस विंग/प्रकोष्ठ को हटाना चाहते हैं?' : 'Are you sure you want to delete this organizational wing?')) {
-      storageService.deleteWing(id);
-      loadAllData();
-    }
+  const handleDeleteWing = async (id: string) => {
+    if (!confirm(lang === 'hi' ? 'क्या आप इस विंग/प्रकोष्ठ को हटाना चाहते हैं?' : 'Are you sure you want to delete this organizational wing?')) return;
+    try { await organizationAdminService.deleteWing(id); await loadAllData(); }
+    catch (error) { setLookupError(error instanceof Error ? error.message : 'Could not delete wing.'); }
   };
 
   // DISTRICT CRUD Handlers
   const openNewDistrictModal = () => {
     setEditingDistrict(null);
-    setDistNameEn('');
-    setDistNameHi('');
-    setDistZone('Rohilkhand');
-    setDistSubDistricts('');
+    setDistGeographyId(geographyDistricts[0]?.id ?? '');
     setDistHeadquarters('');
     setDistInCharge('');
-    setDistPhone('+91 ');
-    setDistCadreCount(120);
+    setDistPhone('');
+    setDistCadreCount(0);
     setShowDistrictModal(true);
   };
 
   const openEditDistrictModal = (dist: OrgDistrict) => {
     setEditingDistrict(dist);
-    setDistNameEn(dist.nameEn);
-    setDistNameHi(dist.nameHi);
-    setDistZone(dist.zone);
-    setDistSubDistricts(dist.subDistricts.join(', '));
+    setDistGeographyId(dist.id);
     setDistHeadquarters(dist.headquarters || '');
     setDistInCharge(dist.inChargeName);
     setDistPhone(dist.inChargePhone);
@@ -237,36 +270,33 @@ export const OrganizationalStructureManager: React.FC<Props> = ({ lang, currentU
     setShowDistrictModal(true);
   };
 
-  const handleSaveDistrict = (e: React.FormEvent) => {
+  const handleSaveDistrict = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!distNameEn || !distNameHi) return;
-    const subDistArray = distSubDistricts
-      .split(',')
-      .map((s) => s.trim())
-      .filter(Boolean);
-
-    const distData: OrgDistrict = {
-      id: editingDistrict ? editingDistrict.id : `org-dist-${Date.now()}`,
-      nameEn: distNameEn,
-      nameHi: distNameHi,
-      zone: distZone,
-      subDistricts: subDistArray.length ? subDistArray : ['Sadar', 'City Unit'],
-      headquarters: distHeadquarters,
-      inChargeName: distInCharge,
-      inChargePhone: distPhone,
-      activeCadreCount: Number(distCadreCount) || 50,
-      status: 'active',
-    };
-    storageService.saveOrgDistrict(distData);
-    loadAllData();
-    setShowDistrictModal(false);
+    if (!distGeographyId) {
+      setLookupError(lang === 'hi' ? 'पहले एक वैध ज़िला चुनें।' : 'Select a valid district from the database.');
+      return;
+    }
+    setSaving(true);
+    try {
+      await organizationAdminService.saveDistrict({
+        districtId: distGeographyId,
+        headquarters: distHeadquarters,
+        inChargeName: distInCharge,
+        inChargePhone: distPhone,
+        activeCadreCount: Number(distCadreCount) || 0,
+        status: editingDistrict?.status ?? 'forming',
+      });
+      await loadAllData();
+      setShowDistrictModal(false);
+    } catch (error) {
+      setLookupError(error instanceof Error ? error.message : 'Could not save district details.');
+    } finally { setSaving(false); }
   };
 
-  const handleDeleteDistrict = (id: string) => {
-    if (confirm(lang === 'hi' ? 'क्या आप इस ज़िला इकाई को हटाना चाहते हैं?' : 'Are you sure you want to delete this district record?')) {
-      storageService.deleteOrgDistrict(id);
-      loadAllData();
-    }
+  const handleDeleteDistrict = async (id: string) => {
+    if (!confirm(lang === 'hi' ? 'इस ज़िले के संगठनात्मक विवरण हटाएं? मूल सरकारी ज़िला रिकॉर्ड नहीं हटेगा।' : 'Clear this district’s organisational details? The canonical geography district will remain.')) return;
+    try { await organizationAdminService.clearDistrictRecord(id); await loadAllData(); }
+    catch (error) { setLookupError(error instanceof Error ? error.message : 'Could not clear district details.'); }
   };
 
   // Access Guard
@@ -323,6 +353,8 @@ export const OrganizationalStructureManager: React.FC<Props> = ({ lang, currentU
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 space-y-8">
+      {lookupError && <div role="alert" className="rounded-xl border border-rose-200 bg-rose-50 p-3 text-sm text-rose-800 flex items-start gap-2"><AlertCircle className="w-4 h-4 mt-0.5 shrink-0" />{lookupError}</div>}
+      {dataLoading && <div className="rounded-xl border border-stone-200 bg-white p-4 text-sm text-stone-600">{lang === 'hi' ? 'Supabase से संगठन रिकॉर्ड लोड हो रहे हैं…' : 'Loading organisation records from Supabase…'}</div>}
       {/* Top Banner */}
       <div className="bg-gradient-to-r from-emerald-950 via-slate-900 to-blue-950 rounded-2xl p-6 sm:p-8 text-white shadow-md border border-emerald-800">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -798,11 +830,14 @@ export const OrganizationalStructureManager: React.FC<Props> = ({ lang, currentU
                     onChange={(e) => setPostLevel(e.target.value as any)}
                     className="w-full p-2 border border-stone-300 rounded-lg bg-white"
                   >
-                    <option value="state">State (प्रदेश)</option>
-                    <option value="zonal">Zonal (ज़ोनल)</option>
-                    <option value="district">District (ज़िला)</option>
-                    <option value="block">Block / Campus (ब्लॉक)</option>
-                    <option value="ward">Ward / Mohalla (वार्ड)</option>
+                    {designationLevelOptions.map((item) => <option key={item.id} value={item.code}>{lang === 'hi' && item.name_hi ? item.name_hi : item.name_en}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <label className="block font-bold text-stone-700 mb-1">{lang === 'hi' ? 'विंग / प्रकोष्ठ' : 'Wing / organisation cell'}</label>
+                  <select value={postWingId} onChange={(e) => setPostWingId(e.target.value)} className="w-full p-2 border border-stone-300 rounded-lg bg-white">
+                    <option value="">{lang === 'hi' ? 'कोई विंग नहीं' : 'No wing assigned'}</option>
+                    {wings.map((wing) => <option key={wing.id} value={wing.id}>{lang === 'hi' ? wing.nameHi : wing.nameEn}</option>)}
                   </select>
                 </div>
                 <div>
@@ -823,9 +858,7 @@ export const OrganizationalStructureManager: React.FC<Props> = ({ lang, currentU
                     onChange={(e) => setPostStatus(e.target.value as any)}
                     className="w-full p-2 border border-stone-300 rounded-lg bg-white"
                   >
-                    <option value="active">Active</option>
-                    <option value="reserved">Reserved</option>
-                    <option value="vacant">Vacant</option>
+                    {designationStatusOptions.map((item) => <option key={item.id} value={item.code}>{lang === 'hi' && item.name_hi ? item.name_hi : item.name_en}</option>)}
                   </select>
                 </div>
               </div>
@@ -1075,67 +1108,23 @@ export const OrganizationalStructureManager: React.FC<Props> = ({ lang, currentU
             </div>
 
             <form onSubmit={handleSaveDistrict} className="space-y-4 text-xs">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div>
-                  <label className="block font-bold text-stone-700 mb-1">District Name (English) *</label>
-                  <input
-                    type="text"
-                    required
-                    value={distNameEn}
-                    onChange={(e) => setDistNameEn(e.target.value)}
-                    onBlur={async () => {
-                      if (distNameEn.trim() && !distNameHi.trim()) {
-                        const tr = await translateEnglishToHindi(distNameEn);
-                        if (tr) setDistNameHi(tr);
-                      }
-                    }}
-                    placeholder="e.g. Saharanpur"
-                    className="w-full p-2 border border-stone-300 rounded-lg focus:outline-none focus:border-emerald-700 font-medium"
-                  />
-                </div>
-                <div>
-                  <div className="flex items-center justify-between mb-1">
-                    <label className="font-bold text-stone-700">ज़िले का नाम (हिंदी) *</label>
-                    <TranslateButton
-                      englishText={distNameEn}
-                      onTranslated={(hi) => setDistNameHi(hi)}
-                    />
-                  </div>
-                  <input
-                    type="text"
-                    required
-                    value={distNameHi}
-                    onChange={(e) => setDistNameHi(e.target.value)}
-                    placeholder="जैसे: सहारनपुर"
-                    className="w-full p-2 border border-stone-300 rounded-lg focus:outline-none focus:border-emerald-700 font-medium"
-                  />
-                </div>
+              <div>
+                <label className="block font-bold text-stone-700 mb-1">{lang === 'hi' ? 'सरकारी ज़िला रिकॉर्ड *' : 'Canonical district *'}</label>
+                <select required value={distGeographyId} onChange={(e) => setDistGeographyId(e.target.value)} disabled={Boolean(editingDistrict)} className="w-full p-2 border border-stone-300 rounded-lg bg-white">
+                  <option value="">{lang === 'hi' ? 'ज़िला चुनें' : 'Select a district'}</option>
+                  {geographyDistricts.map((item) => <option key={item.id} value={item.id}>{lang === 'hi' ? item.nameHi : item.nameEn} · {lang === 'hi' ? item.zoneNameHi : item.zoneNameEn}</option>)}
+                </select>
+                <p className="text-[11px] text-stone-500 mt-1">{lang === 'hi' ? 'ज़िले के नाम सरकारी भूगोल तालिका से आते हैं; यहाँ नया/डुप्लिकेट ज़िला नहीं बनाया जा सकता।' : 'District names come from the canonical geography table; this form cannot create duplicate districts.'}</p>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div>
-                  <label className="block font-bold text-stone-700 mb-1">Zone (क्षेत्र) *</label>
-                  <select
-                    value={distZone}
-                    onChange={(e) => setDistZone(e.target.value as any)}
-                    className="w-full p-2 border border-stone-300 rounded-lg bg-white"
-                  >
-                    <option value="Rohilkhand">Rohilkhand (रुहेलखंड)</option>
-                    <option value="Western UP">Western UP (पश्चिमी यूपी)</option>
-                    <option value="Awadh">Awadh (अवध)</option>
-                    <option value="Purvanchal">Purvanchal (पूर्वांचल)</option>
-                    <option value="Bundelkhand">Bundelkhand (बुंदेलखंड)</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block font-bold text-stone-700 mb-1">Active Cadre Count</label>
-                  <input
-                    type="number"
-                    value={distCadreCount}
-                    onChange={(e) => setDistCadreCount(Number(e.target.value))}
-                    className="w-full p-2 border border-stone-300 rounded-lg"
-                  />
-                </div>
+              <div>
+                <label className="block font-bold text-stone-700 mb-1">{lang === 'hi' ? 'दर्ज सक्रिय कैडर संख्या' : 'Recorded active cadre count'}</label>
+                <input
+                  type="number" min="0" step="1"
+                  value={distCadreCount}
+                  onChange={(e) => setDistCadreCount(Math.max(0, Number(e.target.value)))}
+                  className="w-full p-2 border border-stone-300 rounded-lg"
+                />
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -1143,10 +1132,9 @@ export const OrganizationalStructureManager: React.FC<Props> = ({ lang, currentU
                   <label className="block font-bold text-stone-700 mb-1">In-Charge Leader Name *</label>
                   <input
                     type="text"
-                    required
                     value={distInCharge}
                     onChange={(e) => setDistInCharge(e.target.value)}
-                    placeholder="e.g. Adv. Zeeshan Farooqui"
+                    placeholder={lang === 'hi' ? 'पुष्ट पदाधिकारी का नाम' : 'Verified office-bearer name'}
                     className="w-full p-2 border border-stone-300 rounded-lg"
                   />
                 </div>
@@ -1154,10 +1142,9 @@ export const OrganizationalStructureManager: React.FC<Props> = ({ lang, currentU
                   <label className="block font-bold text-stone-700 mb-1">Contact Phone *</label>
                   <input
                     type="text"
-                    required
                     value={distPhone}
                     onChange={(e) => setDistPhone(e.target.value)}
-                    placeholder="+91 98370 XXXXX"
+                    placeholder={lang === 'hi' ? 'प्रकाशित संपर्क नंबर (वैकल्पिक)' : 'Published contact number (optional)'}
                     className="w-full p-2 border border-stone-300 rounded-lg font-mono"
                   />
                 </div>
@@ -1174,20 +1161,6 @@ export const OrganizationalStructureManager: React.FC<Props> = ({ lang, currentU
                 />
               </div>
 
-              <div>
-                <label className="block font-bold text-stone-700 mb-1">
-                  Sub-Districts & Tehsils (Comma separated) *
-                </label>
-                <textarea
-                  rows={2}
-                  required
-                  value={distSubDistricts}
-                  onChange={(e) => setDistSubDistricts(e.target.value)}
-                  placeholder="e.g. Moradabad Sadar, Bilari, Kanth, Thakurdwara, Sambhal Road"
-                  className="w-full p-2 border border-stone-300 rounded-lg"
-                />
-              </div>
-
               <div className="flex items-center justify-end gap-2 pt-3 border-t">
                 <button
                   type="button"
@@ -1198,6 +1171,7 @@ export const OrganizationalStructureManager: React.FC<Props> = ({ lang, currentU
                 </button>
                 <button
                   type="submit"
+                  disabled={saving}
                   className="px-5 py-2 bg-emerald-800 hover:bg-emerald-900 text-white font-bold rounded-lg shadow-xs"
                 >
                   {editingDistrict ? (lang === 'hi' ? 'अपडेट करें' : 'Save Changes') : (lang === 'hi' ? 'ज़िला जोड़ें' : 'Save District')}

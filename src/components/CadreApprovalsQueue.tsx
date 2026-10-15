@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   ShieldCheck, 
   Clock, 
@@ -15,8 +15,9 @@ import {
   CheckCircle2
 } from 'lucide-react';
 import { Member, AuthUser, Language } from '../types';
-import { storageService } from '../services/storageService';
+import { memberService } from '../services/memberService';
 import { DigitalIdCard } from './DigitalIdCard';
+import { referenceDataService, type DistrictOption } from '../services/referenceDataService';
 
 interface Props {
   lang: Language;
@@ -29,46 +30,95 @@ export const CadreApprovalsQueue: React.FC<Props> = ({
   currentUser, 
   onRefreshMembers 
 }) => {
-  const [members, setMembers] = useState<Member[]>(storageService.getMembers());
+  const [members, setMembers] = useState<Member[]>([]);
+  const [memberError, setMemberError] = useState('');
+  const [isLoadingMembers, setIsLoadingMembers] = useState(false);
+  const [isUpdatingMember, setIsUpdatingMember] = useState<string | null>(null);
+  const [districtOptions, setDistrictOptions] = useState<DistrictOption[]>([]);
+  const [lookupError, setLookupError] = useState('');
   const [activeTab, setActiveTab] = useState<'approvals' | 'public_verify'>('approvals');
   const [selectedDistrict, setSelectedDistrict] = useState<string>('all');
   const [verifyIdInput, setVerifyIdInput] = useState<string>('');
   const [verifyResult, setVerifyResult] = useState<Member | null | 'not_found'>(null);
   const [viewingApprovedCard, setViewingApprovedCard] = useState<Member | null>(null);
 
-  const isAuthorized = currentUser.role === 'state_admin' || currentUser.role === 'district_incharge';
+  const isAuthorized = ['superadmin', 'state_president', 'state_admin', 'district_incharge'].includes(currentUser.role);
 
-  const handleApprove = (requestId: string) => {
-    const updated = storageService.approveCadre(requestId, currentUser);
-    setMembers(updated);
-    onRefreshMembers();
+  useEffect(() => {
+    let cancelled = false;
+    void referenceDataService.districts().then(
+      (rows) => { if (!cancelled) { setDistrictOptions(rows); setLookupError(''); } },
+      (error: unknown) => { if (!cancelled) setLookupError(error instanceof Error ? error.message : 'Could not load district reference data.'); },
+    );
+    return () => { cancelled = true; };
+  }, []);
+
+  useEffect(() => {
+    if (!isAuthorized) return;
+    let cancelled = false;
+    setIsLoadingMembers(true);
+    void memberService.listForAuthorizedUser()
+      .then((rows) => { if (!cancelled) { setMembers(rows); setMemberError(''); } })
+      .catch((error: unknown) => { if (!cancelled) setMemberError(error instanceof Error ? error.message : 'Could not load member applications.'); })
+      .finally(() => { if (!cancelled) setIsLoadingMembers(false); });
+    return () => { cancelled = true; };
+  }, [isAuthorized, currentUser.district]);
+
+  const handleApprove = async (requestId: string) => {
+    setIsUpdatingMember(requestId);
+    setMemberError('');
+    try {
+      const approved = await memberService.approve(requestId, currentUser);
+      setMembers((previous) => [approved, ...previous.filter((member) => member.id !== requestId)]);
+      onRefreshMembers();
+    } catch (error) {
+      setMemberError(error instanceof Error ? error.message : 'Could not approve this application.');
+    } finally {
+      setIsUpdatingMember(null);
+    }
   };
 
-  const handleReject = (requestId: string) => {
-    const updated = storageService.rejectCadre(requestId);
-    setMembers(updated);
-    onRefreshMembers();
+  const handleReject = async (requestId: string) => {
+    setIsUpdatingMember(requestId);
+    setMemberError('');
+    try {
+      await memberService.reject(requestId);
+      setMembers((previous) => previous.map((member) => member.id === requestId ? { ...member, status: 'rejected' as const, verified: false } : member));
+      onRefreshMembers();
+    } catch (error) {
+      setMemberError(error instanceof Error ? error.message : 'Could not reject this application.');
+    } finally {
+      setIsUpdatingMember(null);
+    }
   };
 
-  const handlePublicVerify = (e: React.FormEvent) => {
+  const handlePublicVerify = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!verifyIdInput.trim()) return;
-    const result = storageService.verifyCadreById(verifyIdInput.trim());
-    setVerifyResult(result ? result : 'not_found');
+    setMemberError('');
+    try {
+      const result = await memberService.verifyPublic(verifyIdInput.trim());
+      setVerifyResult(result ?? 'not_found');
+    } catch (error) {
+      setMemberError(error instanceof Error ? error.message : 'Could not verify this cadre ID.');
+      setVerifyResult(null);
+    }
   };
 
   const pendingMembers = members.filter((m) => {
     const isPending = m.status === 'pending';
     const matchesDistrict = 
-      currentUser.role === 'state_admin' 
+      currentUser.role === 'state_admin'
         ? selectedDistrict === 'all' || m.district === selectedDistrict
-        : m.district === currentUser.district;
+        : ['superadmin', 'state_president'].includes(currentUser.role)
+          ? true
+          : m.district === currentUser.district;
     return isPending && matchesDistrict;
   });
 
   const approvedMembers = members.filter((m) => m.status === 'approved');
 
-  const uniqueDistricts = Array.from(new Set(members.map((m) => m.district)));
+  
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-8 space-y-8">
@@ -126,6 +176,8 @@ export const CadreApprovalsQueue: React.FC<Props> = ({
         </div>
       </div>
 
+      {memberError && <div role="alert" className="p-3 rounded-lg border border-rose-200 bg-rose-50 text-rose-800 text-xs">{memberError}</div>}
+
       {/* TAB 1: CADRE APPROVALS QUEUE (PROTECTED) */}
       {activeTab === 'approvals' && (
         <div className="space-y-6">
@@ -164,10 +216,11 @@ export const CadreApprovalsQueue: React.FC<Props> = ({
                       className="px-2 py-1 border border-stone-300 rounded bg-white font-medium"
                     >
                       <option value="all">All Districts (सभी ज़िले)</option>
-                      {uniqueDistricts.map((d) => (
-                        <option key={d} value={d}>{d}</option>
+                      {districtOptions.map((item) => (
+                        <option key={item.id} value={item.name_en}>{lang === 'hi' && item.name_hi ? item.name_hi : item.name_en}</option>
                       ))}
                     </select>
+                    {lookupError && <p role="alert" className="mt-1 text-rose-700 text-[11px]">{lookupError}</p>}
                   </div>
                 )}
               </div>
@@ -184,7 +237,9 @@ export const CadreApprovalsQueue: React.FC<Props> = ({
                   </span>
                 </div>
 
-                {pendingMembers.length === 0 ? (
+                {isLoadingMembers ? (
+                  <div className="p-8 text-center text-xs text-stone-500">Loading member applications from Supabase…</div>
+                ) : pendingMembers.length === 0 ? (
                   <div className="p-8 text-center text-xs text-stone-500 space-y-1">
                     <CheckCircle2 className="w-6 h-6 text-emerald-600 mx-auto" />
                     <div className="font-bold text-stone-700">All applications processed!</div>
@@ -249,20 +304,22 @@ export const CadreApprovalsQueue: React.FC<Props> = ({
                         <div className="flex items-center gap-2 shrink-0 self-end md:self-center">
                           <button
                             type="button"
+                            disabled={isUpdatingMember === m.id}
                             onClick={() => handleReject(m.id)}
                             className="px-3 py-1.5 bg-stone-200 hover:bg-stone-300 text-stone-700 text-xs font-semibold rounded transition-colors inline-flex items-center gap-1 cursor-pointer"
                           >
                             <X className="w-3.5 h-3.5" />
-                            <span>Reject</span>
+                            <span>{isUpdatingMember === m.id ? 'Saving…' : 'Reject'}</span>
                           </button>
 
                           <button
                             type="button"
+                            disabled={isUpdatingMember === m.id}
                             onClick={() => handleApprove(m.id)}
                             className="px-4 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold rounded transition-colors inline-flex items-center gap-1.5 cursor-pointer shadow-xs"
                           >
                             <Check className="w-3.5 h-3.5" />
-                            <span>{lang === 'hi' ? 'सत्यापित करें व कार्ड जारी करें' : 'Approve & Issue ID'}</span>
+                            <span>{isUpdatingMember === m.id ? 'Saving…' : lang === 'hi' ? 'सत्यापित करें व कार्ड जारी करें' : 'Approve & Issue ID'}</span>
                           </button>
                         </div>
                       </div>
@@ -394,7 +451,7 @@ export const CadreApprovalsQueue: React.FC<Props> = ({
                     </div>
                     <div>
                       <span className="text-stone-400 block text-[10px]">Approval Authority:</span>
-                      <span className="text-emerald-900 font-medium">{verifyResult.approvedBy || 'Pending State Approval'}</span>
+                      <span className="text-emerald-900 font-medium">{verifyResult.approvedBy || (verifyResult.status === 'approved' ? 'Authorized committee' : 'Pending State Approval')}</span>
                     </div>
                   </div>
 
