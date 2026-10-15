@@ -23,6 +23,7 @@ import {
 import { AuthUser, UserRole, Language } from '../types';
 import { storageService } from '../services/storageService';
 import { LadderSymbolIcon } from './PartySymbol';
+import { referenceDataService, type DistrictOption, type LookupOption } from '../services/referenceDataService';
 
 interface Props {
   lang: Language;
@@ -40,6 +41,9 @@ export const RoleManagementView: React.FC<Props> = ({
   onNavigateLogin
 }) => {
   const [users, setUsers] = useState<AuthUser[]>([]);
+  const [districtOptions, setDistrictOptions] = useState<DistrictOption[]>([]);
+  const [roleOptions, setRoleOptions] = useState<LookupOption[]>([]);
+  const [lookupError, setLookupError] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedRoleFilter, setSelectedRoleFilter] = useState<string>('all');
   const [showAllPasswords, setShowAllPasswords] = useState(false);
@@ -75,6 +79,18 @@ export const RoleManagementView: React.FC<Props> = ({
 
   useEffect(() => {
     loadUsers();
+    let cancelled = false;
+    void Promise.all([referenceDataService.districts(), referenceDataService.roles()])
+      .then(([districtRows, roleRows]) => {
+        if (cancelled) return;
+        setDistrictOptions(districtRows);
+        setRoleOptions(roleRows);
+        setLookupError('');
+      })
+      .catch((error: unknown) => {
+        if (!cancelled) setLookupError(error instanceof Error ? error.message : 'Could not load role/district lookups.');
+      });
+    return () => { cancelled = true; };
   }, []);
 
   const loadUsers = () => {
@@ -412,12 +428,7 @@ export const RoleManagementView: React.FC<Props> = ({
               className="px-2.5 py-1.5 border border-stone-300 rounded-lg text-xs bg-white font-medium"
             >
               <option value="all">All Roles (सभी)</option>
-              <option value="superadmin">Super Admin</option>
-              <option value="state_president">State President</option>
-              <option value="press_release">Press / Media In-Charge</option>
-              <option value="content_manager">Content Manager</option>
-              <option value="district_incharge">District In-Charge</option>
-              <option value="cadre_volunteer">Cadre Volunteer</option>
+              {roleOptions.map((item) => <option key={item.id} value={item.code}>{lang === 'hi' && item.name_hi ? item.name_hi : item.name_en}</option>)
             </select>
           </div>
         </div>
@@ -612,22 +623,15 @@ export const RoleManagementView: React.FC<Props> = ({
                     onChange={(e) => setNewRole(e.target.value as UserRole)}
                     className="w-full p-2 border border-stone-300 rounded-lg bg-white font-medium"
                   >
-                    <option value="superadmin">Super Admin (Main Settings)</option>
-                    <option value="state_president">State President (UP)</option>
-                    <option value="press_release">Press / Media In-Charge</option>
-                    <option value="content_manager">Content Manager</option>
-                    <option value="district_incharge">District In-Charge</option>
-                    <option value="cadre_volunteer">Cadre Volunteer</option>
+                    {roleOptions.map((item) => <option key={item.id} value={item.code}>{lang === 'hi' && item.name_hi ? item.name_hi : item.name_en}</option>)}
                   </select>
                 </div>
                 <div>
                   <label className="block font-semibold text-stone-700 mb-1">District</label>
-                  <input
-                    type="text"
-                    value={newDistrict}
-                    onChange={(e) => setNewDistrict(e.target.value)}
-                    className="w-full p-2 border border-stone-300 rounded-lg"
-                  />
+                  <select value={newDistrict} onChange={(e) => setNewDistrict(e.target.value)} disabled={districtOptions.length === 0} className="w-full p-2 border border-stone-300 rounded-lg bg-white disabled:bg-stone-100">
+                    <option value="">{lang === 'hi' ? 'ज़िला चुनें' : 'Select district'}</option>
+                    {districtOptions.map((item) => <option key={item.id} value={item.name_en}>{lang === 'hi' && item.name_hi ? item.name_hi : item.name_en}</option>)}
+                  </select>
                 </div>
               </div>
 
@@ -662,6 +666,8 @@ export const RoleManagementView: React.FC<Props> = ({
         </div>
       )}
 
+      {lookupError && <p role="alert" className="mx-4 text-xs text-rose-700">{lookupError}</p>}
+
       {/* EDIT ROLE MODAL */}
       {editingUser && (
         <div className="fixed inset-0 z-50 bg-stone-900/60 backdrop-blur-xs flex items-center justify-center p-4">
@@ -686,23 +692,16 @@ export const RoleManagementView: React.FC<Props> = ({
                   onChange={(e) => setEditRole(e.target.value as UserRole)}
                   className="w-full p-2 border border-stone-300 rounded-lg bg-white font-semibold"
                 >
-                  <option value="superadmin">Super Admin (All Passwords & Settings)</option>
-                  <option value="state_president">State President (Org Structure CRUD)</option>
-                  <option value="press_release">Press / Media In-Charge (Events & News)</option>
-                  <option value="content_manager">Content Manager (FAQ & Evidence)</option>
-                  <option value="district_incharge">District In-Charge</option>
-                  <option value="cadre_volunteer">Cadre Volunteer</option>
+                  {roleOptions.map((item) => <option key={item.id} value={item.code}>{lang === 'hi' && item.name_hi ? item.name_hi : item.name_en}</option>)}
                 </select>
               </div>
 
               <div>
                 <label className="block font-semibold text-stone-700 mb-1">Assigned District</label>
-                <input
-                  type="text"
-                  value={editDistrict}
-                  onChange={(e) => setEditDistrict(e.target.value)}
-                  className="w-full p-2 border border-stone-300 rounded-lg"
-                />
+                <select value={editDistrict} onChange={(e) => setEditDistrict(e.target.value)} disabled={districtOptions.length === 0} className="w-full p-2 border border-stone-300 rounded-lg bg-white disabled:bg-stone-100">
+                  <option value="">{lang === 'hi' ? 'ज़िला चुनें' : 'Select district'}</option>
+                  {districtOptions.map((item) => <option key={item.id} value={item.name_en}>{lang === 'hi' && item.name_hi ? item.name_hi : item.name_en}</option>)}
+                </select>
               </div>
 
               <div>
