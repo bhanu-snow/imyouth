@@ -1,0 +1,7 @@
+{
+  "name": "IM Youth - Dynamic Youth Wing Political Portal & Social Broadcast Engine",
+  "description": "Dynamic web application for political party youth wing with bilingual Hindi-English support, member registration & digital ID cards, event scheduling, live media feed, 1-shot multi-platform social media broadcast, and district leadership tenure tracker.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
+
