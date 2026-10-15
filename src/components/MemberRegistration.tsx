@@ -6,7 +6,7 @@ import { DigitalIdCard } from './DigitalIdCard';
 import confetti from 'canvas-confetti';
 import { TranslateButton } from './common/TranslateButton';
 import { translateEnglishToHindi } from '../utils/translationService';
-import { referenceDataService, type DistrictOption, type SubDistrictOption, type StateOption, type WingOption } from '../services/referenceDataService';
+import { referenceDataService, type DistrictOption, type SubDistrictOption, type StateOption, type WingOption, type LookupOption } from '../services/referenceDataService';
 
 interface Props {
   lang: Language;
@@ -40,6 +40,7 @@ export const MemberRegistration: React.FC<Props> = ({ lang, currentUser, onMembe
   const [districtOptions, setDistrictOptions] = useState<DistrictOption[]>([]);
   const [subDistrictOptions, setSubDistrictOptions] = useState<SubDistrictOption[]>([]);
   const [wingOptions, setWingOptions] = useState<WingOption[]>([]);
+  const [communityOptions, setCommunityOptions] = useState<LookupOption[]>([]);
   const [districtId, setDistrictId] = useState('');
   const [subDistrictId, setSubDistrictId] = useState('');
   const [lookupError, setLookupError] = useState('');
@@ -67,14 +68,15 @@ export const MemberRegistration: React.FC<Props> = ({ lang, currentUser, onMembe
     }
 
     let cancelled = false;
-    void Promise.all([referenceDataService.states(), referenceDataService.districts(), referenceDataService.wings()])
-      .then(([stateRows, districtRows, wingRows]) => {
+    void Promise.all([referenceDataService.states(), referenceDataService.districts(), referenceDataService.wings(), referenceDataService.memberCommunities()])
+      .then(([stateRows, districtRows, wingRows, communityRows]) => {
         if (cancelled) return;
         setStates(stateRows);
         const up = stateRows.find((item) => item.code === 'UP');
         const upDistricts = up ? districtRows.filter((item) => item.state_id === up.id) : districtRows;
         setDistrictOptions(upDistricts);
         setWingOptions(wingRows);
+        setCommunityOptions(communityRows);
         const initialDistrict = upDistricts.find((item) => item.code === 'moradabad') || upDistricts[0];
         if (initialDistrict) {
           setDistrictId(initialDistrict.id);
@@ -401,13 +403,7 @@ export const MemberRegistration: React.FC<Props> = ({ lang, currentUser, onMembe
                       onChange={(e) => setCommunityBackground(e.target.value)}
                       className="w-full px-2.5 py-2 border border-stone-300 rounded bg-white text-blue-900 font-semibold"
                     >
-                      <option value="Muslim Minority / अल्पसंख्यक मोर्चा">Muslim Minority (अल्पसंख्यक मोर्चा)</option>
-                      <option value="Dalit (SC/ST) / डॉ. आंबेडकर सामाजिक न्याय मोर्चा">Dalit / Ambedkarite Samaj (दलित मोर्चा)</option>
-                      <option value="Sikh Minority / सिख अल्पसंख्यक मोर्चा">Sikh Minority (सिख मोर्चा)</option>
-                      <option value="Christian Minority / ईसाई अल्पसंख्यक मोर्चा">Christian Minority (ईसाई मोर्चा)</option>
-                      <option value="Buddhist Minority / बौद्ध समरसता मोर्चा">Buddhist Minority (बौद्ध मोर्चा)</option>
-                      <option value="OBC / Backward Classes / पिछड़ा वर्ग">OBC / Backward Classes (पिछड़ा वर्ग)</option>
-                      <option value="General Cadre / सर्वसमाज">General Cadre (सर्वसमाज)</option>
+                      {communityOptions.map((item) => <option key={item.id} value={item.name_en}>{lang === 'hi' && item.name_hi ? item.name_hi : item.name_en}</option>)}
                     </select>
                   </div>
                 </div>
