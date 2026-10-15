@@ -9,6 +9,7 @@ import {
   PostDesignation,
   OrgWing,
   OrgDistrict,
+  LeadershipTenure,
   MythFaqItem,
   ParliamentaryLeader
 } from '../types';
@@ -19,32 +20,44 @@ const STORAGE_KEYS = {
   MEMBERS: 'myl_up_members_v4',
   EVENTS: 'myl_up_events_v4',
   NEWS: 'myl_up_news_v4',
-  DISTRICTS: 'myl_up_districts_v4',
+  DISTRICTS: 'myl_up_districts_v5',
   BROADCASTS: 'myl_up_broadcasts_v4',
-  AUTH_USER: 'myl_up_auth_user_v5',
-  ALL_USERS: 'myl_up_all_users_v5',
+  AUTH_USER: 'myl_up_auth_user_v7',
+  ALL_USERS: 'myl_up_all_users_v7',
   POSTS: 'myl_up_posts_v1',
   WINGS: 'myl_up_wings_v1',
-  ORG_DISTRICTS: 'myl_up_org_districts_v1',
+  ORG_DISTRICTS: 'myl_up_org_districts_v2',
+  DISTRICT_LEADERSHIP: 'myl_up_dist_leadership_v2',
   FAQS: 'myl_up_faqs_v1',
   LEADERS: 'myl_up_leaders_v1',
 };
 
+export const PUBLIC_USER: AuthUser = {
+  id: 'user-public-guest',
+  name: 'Public Citizen',
+  email: 'guest@mylup.org',
+  phone: '',
+  password: '',
+  role: 'public',
+  designation: 'Public Visitor',
+  createdAt: '2026-10-15',
+};
+
 export const DEMO_USERS: AuthUser[] = [
   {
-    id: 'user-superadmin-1',
-    name: 'Adv. Sarfaraz Ahmed (Super Admin)',
+    id: 'user-superadmin',
+    name: 'superadmin',
     email: 'superadmin@mylup.org',
     phone: '+91 98370 00111',
-    password: 'admin123',
+    password: 'SuperAdmin@2026',
     role: 'superadmin',
-    designation: 'National President (MYL) & Supreme Admin',
+    designation: 'Super Administrator',
     createdAt: '2024-01-01',
     lastLogin: '2026-10-15',
   },
   {
     id: 'user-president-1',
-    name: 'Dr. Masood Alam (State President)',
+    name: 'Dr. Masood Alam',
     email: 'president@mylup.org',
     phone: '+91 98370 00112',
     password: 'president123',
@@ -55,7 +68,7 @@ export const DEMO_USERS: AuthUser[] = [
   },
   {
     id: 'user-press-1',
-    name: 'Mohd. Irfan (Press & Media Secretary)',
+    name: 'Mohd. Irfan',
     email: 'press@mylup.org',
     phone: '+91 98370 22334',
     password: 'press123',
@@ -66,7 +79,7 @@ export const DEMO_USERS: AuthUser[] = [
   },
   {
     id: 'user-content-1',
-    name: 'Ziaur Rahman (Content & Ideology Desk)',
+    name: 'Ziaur Rahman',
     email: 'content@mylup.org',
     phone: '+91 98370 33445',
     password: 'content123',
@@ -99,16 +112,7 @@ export const DEMO_USERS: AuthUser[] = [
     createdAt: '2024-03-15',
     lastLogin: '2026-10-12',
   },
-  {
-    id: 'user-guest-1',
-    name: 'Public Visitor (Unauthenticated)',
-    email: 'guest@mylup.org',
-    phone: '',
-    password: '',
-    role: 'public',
-    designation: 'Public Citizen / Cadre Aspirant',
-    createdAt: '2026-10-15',
-  },
+  PUBLIC_USER,
 ];
 
 const INITIAL_MEMBERS: Member[] = [
@@ -849,8 +853,8 @@ export const storageService = {
       const data = localStorage.getItem(STORAGE_KEYS.AUTH_USER);
       if (data) return JSON.parse(data);
     } catch {}
-    // Default to State Admin for immediate convenience
-    return DEMO_USERS[0];
+    // Default website opens with public role
+    return PUBLIC_USER;
   },
 
   setCurrentUser(user: AuthUser): void {
@@ -871,13 +875,13 @@ export const storageService = {
     const users = this.getAllUsers();
     const cleanId = identifier.trim().toLowerCase();
     const found = users.find((u) => 
+      u.name.toLowerCase() === cleanId || 
       u.email?.toLowerCase() === cleanId || 
-      (u.phone && u.phone.replace(/[\s\-\+]/g, '').includes(cleanId.replace(/[\s\-\+]/g, ''))) ||
-      u.name.toLowerCase() === cleanId
+      (u.phone && u.phone.replace(/[\s\-\+]/g, '').includes(cleanId.replace(/[\s\-\+]/g, '')))
     );
 
     if (!found) {
-      return { success: false, error: 'User account not found. Please verify email/phone.' };
+      return { success: false, error: 'User account not found. Please verify username or email.' };
     }
 
     if (found.password && found.password !== passwordAttempt) {
@@ -1316,6 +1320,112 @@ export const storageService = {
       localStorage.setItem(STORAGE_KEYS.ORG_DISTRICTS, JSON.stringify(updated));
     } catch {}
     return updated;
+  },
+
+  getDistrictLeadership(districtId: string): LeadershipTenure[] {
+    try {
+      const data = localStorage.getItem(STORAGE_KEYS.DISTRICT_LEADERSHIP);
+      if (data) {
+        const map: Record<string, LeadershipTenure[]> = JSON.parse(data);
+        if (map[districtId]) return map[districtId];
+      }
+    } catch {}
+    
+    // Seed timeline for key districts
+    const seedMap: Record<string, LeadershipTenure[]> = {
+      'org-dist-1': [ // Moradabad
+        {
+          id: 'lead-mrd-1',
+          leaderName: { en: 'Adv. Zeeshan Farooqui', hi: 'एडवोकेट ज़ीशान फ़ारूक़ी' },
+          postTitle: { en: 'District President (MYL Moradabad)', hi: 'ज़िला अध्यक्ष (मुस्लिम यूथ लीग मुरादाबाद)' },
+          tenureStart: '2024-02',
+          tenureEnd: 'Present',
+          status: 'current',
+          contact: '+91 98370 12345',
+          email: 'moradabad.myl@up.org',
+          achievements: [
+            { en: 'Established MSF campus coordination desk at Moradabad Hindu College', hi: 'मुरादाबाद हिंदू कॉलेज में एमएसएफ छात्र सहायता डेस्क स्थापित' },
+            { en: 'Organized flood relief camps along Ramganga catchment tehsils', hi: 'रामगंगा बाढ़ प्रभावित क्षेत्रों में निःशुल्क भोजन व राहत वितरण' },
+          ],
+        },
+        {
+          id: 'lead-mrd-0',
+          leaderName: { en: 'Haji Shakir Husain', hi: 'हाजी शाकिर हुसैन' },
+          postTitle: { en: 'Former District President (MYL)', hi: 'पूर्व ज़िला अध्यक्ष (MYL)' },
+          tenureStart: '2021-01',
+          tenureEnd: '2024-01',
+          status: 'past',
+          contact: '+91 98370 55443',
+          achievements: [
+            { en: 'Formed active tehsil committees in Bilari, Kanth, and Thakurdwara', hi: 'बिलारी, कांठ और ठाकुरद्वारा में सक्रिय तहसील कमेटियों का गठन' },
+          ],
+        },
+      ],
+      'org-dist-2': [ // Sambhal
+        {
+          id: 'lead-smb-1',
+          leaderName: { en: 'Farhan Akhtar Siddiqui', hi: 'फरहान अख्तर सिद्दीकी' },
+          postTitle: { en: 'District President (MYL Sambhal)', hi: 'ज़िला अध्यक्ष (मुस्लिम यूथ लीग संभल)' },
+          tenureStart: '2024-01',
+          tenureEnd: 'Present',
+          status: 'current',
+          contact: '+91 98372 11223',
+          achievements: [
+            { en: 'Launched educational scholarship helpline across rural tehsils', hi: 'ग्रामीण तहसीलों में छात्रवृत्ति मार्गदर्शन व सहायता अभियान' },
+          ],
+        },
+      ],
+      'org-dist-9': [ // Lucknow
+        {
+          id: 'lead-lko-1',
+          leaderName: { en: 'Simranjeet Singh', hi: 'सिमरनजीत सिंह' },
+          postTitle: { en: 'District President (MYL Lucknow)', hi: 'ज़िला अध्यक्ष (मुस्लिम यूथ लीग लखनऊ)' },
+          tenureStart: '2024-02',
+          tenureEnd: 'Present',
+          status: 'current',
+          contact: '+91 97190 88221',
+          achievements: [
+            { en: 'Set up UP state central cadre grievance & legal helpline in Kaiserbagh', hi: 'कैसरबाग में केंद्रीय कार्यकर्ता समस्या समाधान व विधिक हेल्पलाइन' },
+          ],
+        },
+      ],
+    };
+    return seedMap[districtId] || [];
+  },
+
+  saveDistrictLeadership(districtId: string, tenure: LeadershipTenure): LeadershipTenure[] {
+    try {
+      const data = localStorage.getItem(STORAGE_KEYS.DISTRICT_LEADERSHIP);
+      const map: Record<string, LeadershipTenure[]> = data ? JSON.parse(data) : {};
+      const currentList = map[districtId] || this.getDistrictLeadership(districtId);
+      
+      const updatedList = tenure.status === 'current'
+        ? currentList.map((item) =>
+            item.status === 'current'
+              ? { ...item, status: 'past' as const, tenureEnd: new Date().toISOString().slice(0, 7) }
+              : item
+          )
+        : [...currentList];
+
+      map[districtId] = [tenure, ...updatedList];
+      localStorage.setItem(STORAGE_KEYS.DISTRICT_LEADERSHIP, JSON.stringify(map));
+      return map[districtId];
+    } catch {
+      return [];
+    }
+  },
+
+  deleteDistrictLeadership(districtId: string, tenureId: string): LeadershipTenure[] {
+    try {
+      const data = localStorage.getItem(STORAGE_KEYS.DISTRICT_LEADERSHIP);
+      const map: Record<string, LeadershipTenure[]> = data ? JSON.parse(data) : {};
+      const currentList = map[districtId] || this.getDistrictLeadership(districtId);
+      map[districtId] = currentList.filter((t) => t.id !== tenureId);
+      localStorage.setItem(STORAGE_KEYS.DISTRICT_LEADERSHIP, JSON.stringify(map));
+      return map[districtId];
+    } catch {
+      return [];
+    }
   },
 
   // FAQ Myths & Facts Content CRUD

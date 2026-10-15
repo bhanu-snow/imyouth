@@ -23,6 +23,8 @@ import {
 import { Language, AuthUser, PostDesignation, OrgWing, OrgDistrict } from '../types';
 import { storageService } from '../services/storageService';
 import { LadderSymbolIcon, PartyFlagIcon } from './PartySymbol';
+import { TranslateButton } from './common/TranslateButton';
+import { translateEnglishToHindi } from '../utils/translationService';
 
 interface Props {
   lang: Language;
@@ -759,19 +761,31 @@ export const OrganizationalStructureManager: React.FC<Props> = ({ lang, currentU
                     required
                     value={postTitleEn}
                     onChange={(e) => setPostTitleEn(e.target.value)}
+                    onBlur={async () => {
+                      if (postTitleEn.trim() && !postTitleHi.trim()) {
+                        const tr = await translateEnglishToHindi(postTitleEn);
+                        if (tr) setPostTitleHi(tr);
+                      }
+                    }}
                     placeholder="e.g. State Vice President"
-                    className="w-full p-2 border border-stone-300 rounded-lg focus:outline-none focus:border-emerald-600"
+                    className="w-full p-2 border border-stone-300 rounded-lg focus:outline-none focus:border-emerald-600 font-medium"
                   />
                 </div>
                 <div>
-                  <label className="block font-bold text-stone-700 mb-1">पद का शीर्षक (हिंदी) *</label>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="font-bold text-stone-700">पद का शीर्षक (हिंदी) *</label>
+                    <TranslateButton
+                      englishText={postTitleEn}
+                      onTranslated={(hi) => setPostTitleHi(hi)}
+                    />
+                  </div>
                   <input
                     type="text"
                     required
                     value={postTitleHi}
                     onChange={(e) => setPostTitleHi(e.target.value)}
                     placeholder="जैसे: प्रदेश उपाध्यक्ष"
-                    className="w-full p-2 border border-stone-300 rounded-lg focus:outline-none focus:border-emerald-600"
+                    className="w-full p-2 border border-stone-300 rounded-lg focus:outline-none focus:border-emerald-600 font-medium"
                   />
                 </div>
               </div>
@@ -822,13 +836,25 @@ export const OrganizationalStructureManager: React.FC<Props> = ({ lang, currentU
                   rows={2}
                   value={postDescEn}
                   onChange={(e) => setPostDescEn(e.target.value)}
+                  onBlur={async () => {
+                    if (postDescEn.trim() && !postDescHi.trim()) {
+                      const tr = await translateEnglishToHindi(postDescEn);
+                      if (tr) setPostDescHi(tr);
+                    }
+                  }}
                   placeholder="Key responsibilities and organizational functions..."
                   className="w-full p-2 border border-stone-300 rounded-lg focus:outline-none focus:border-emerald-600"
                 />
               </div>
 
               <div>
-                <label className="block font-bold text-stone-700 mb-1">दायित्व विवरण (हिंदी)</label>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="font-bold text-stone-700">दायित्व विवरण (हिंदी)</label>
+                  <TranslateButton
+                    englishText={postDescEn}
+                    onTranslated={(hi) => setPostDescHi(hi)}
+                  />
+                </div>
                 <textarea
                   rows={2}
                   value={postDescHi}
@@ -886,19 +912,31 @@ export const OrganizationalStructureManager: React.FC<Props> = ({ lang, currentU
                     required
                     value={wingNameEn}
                     onChange={(e) => setWingNameEn(e.target.value)}
+                    onBlur={async () => {
+                      if (wingNameEn.trim() && !wingNameHi.trim()) {
+                        const tr = await translateEnglishToHindi(wingNameEn);
+                        if (tr) setWingNameHi(tr);
+                      }
+                    }}
                     placeholder="e.g. Lawyers & Legal Forum"
-                    className="w-full p-2 border border-stone-300 rounded-lg focus:outline-none focus:border-blue-900"
+                    className="w-full p-2 border border-stone-300 rounded-lg focus:outline-none focus:border-blue-900 font-medium"
                   />
                 </div>
                 <div>
-                  <label className="block font-bold text-stone-700 mb-1">विंग का नाम (हिंदी) *</label>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="font-bold text-stone-700">विंग का नाम (हिंदी) *</label>
+                    <TranslateButton
+                      englishText={wingNameEn}
+                      onTranslated={(hi) => setWingNameHi(hi)}
+                    />
+                  </div>
                   <input
                     type="text"
                     required
                     value={wingNameHi}
                     onChange={(e) => setWingNameHi(e.target.value)}
                     placeholder="जैसे: विधिक व मानवाधिकार प्रकोष्ठ"
-                    className="w-full p-2 border border-stone-300 rounded-lg focus:outline-none focus:border-blue-900"
+                    className="w-full p-2 border border-stone-300 rounded-lg focus:outline-none focus:border-blue-900 font-medium"
                   />
                 </div>
               </div>
@@ -934,13 +972,25 @@ export const OrganizationalStructureManager: React.FC<Props> = ({ lang, currentU
                   required
                   value={wingFocusEn}
                   onChange={(e) => setWingFocusEn(e.target.value)}
+                  onBlur={async () => {
+                    if (wingFocusEn.trim() && !wingFocusHi.trim()) {
+                      const tr = await translateEnglishToHindi(wingFocusEn);
+                      if (tr) setWingFocusHi(tr);
+                    }
+                  }}
                   placeholder="e.g. Free legal defense, RTI filing for youth..."
                   className="w-full p-2 border border-stone-300 rounded-lg"
                 />
               </div>
 
               <div>
-                <label className="block font-bold text-stone-700 mb-1">मुख्य कार्यक्षेत्र (हिंदी) *</label>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="font-bold text-stone-700">मुख्य कार्यक्षेत्र (हिंदी) *</label>
+                  <TranslateButton
+                    englishText={wingFocusEn}
+                    onTranslated={(hi) => setWingFocusHi(hi)}
+                  />
+                </div>
                 <input
                   type="text"
                   required
@@ -957,13 +1007,25 @@ export const OrganizationalStructureManager: React.FC<Props> = ({ lang, currentU
                   rows={2}
                   value={wingDescEn}
                   onChange={(e) => setWingDescEn(e.target.value)}
+                  onBlur={async () => {
+                    if (wingDescEn.trim() && !wingDescHi.trim()) {
+                      const tr = await translateEnglishToHindi(wingDescEn);
+                      if (tr) setWingDescHi(tr);
+                    }
+                  }}
                   placeholder="Objectives, targeted youth demographic..."
                   className="w-full p-2 border border-stone-300 rounded-lg"
                 />
               </div>
 
               <div>
-                <label className="block font-bold text-stone-700 mb-1">विस्तृत विवरण (हिंदी)</label>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="font-bold text-stone-700">विस्तृत विवरण (हिंदी)</label>
+                  <TranslateButton
+                    englishText={wingDescEn}
+                    onTranslated={(hi) => setWingDescHi(hi)}
+                  />
+                </div>
                 <textarea
                   rows={2}
                   value={wingDescHi}
@@ -1021,19 +1083,31 @@ export const OrganizationalStructureManager: React.FC<Props> = ({ lang, currentU
                     required
                     value={distNameEn}
                     onChange={(e) => setDistNameEn(e.target.value)}
+                    onBlur={async () => {
+                      if (distNameEn.trim() && !distNameHi.trim()) {
+                        const tr = await translateEnglishToHindi(distNameEn);
+                        if (tr) setDistNameHi(tr);
+                      }
+                    }}
                     placeholder="e.g. Saharanpur"
-                    className="w-full p-2 border border-stone-300 rounded-lg focus:outline-none focus:border-emerald-700"
+                    className="w-full p-2 border border-stone-300 rounded-lg focus:outline-none focus:border-emerald-700 font-medium"
                   />
                 </div>
                 <div>
-                  <label className="block font-bold text-stone-700 mb-1">ज़िले का नाम (हिंदी) *</label>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="font-bold text-stone-700">ज़िले का नाम (हिंदी) *</label>
+                    <TranslateButton
+                      englishText={distNameEn}
+                      onTranslated={(hi) => setDistNameHi(hi)}
+                    />
+                  </div>
                   <input
                     type="text"
                     required
                     value={distNameHi}
                     onChange={(e) => setDistNameHi(e.target.value)}
                     placeholder="जैसे: सहारनपुर"
-                    className="w-full p-2 border border-stone-300 rounded-lg focus:outline-none focus:border-emerald-700"
+                    className="w-full p-2 border border-stone-300 rounded-lg focus:outline-none focus:border-emerald-700 font-medium"
                   />
                 </div>
               </div>

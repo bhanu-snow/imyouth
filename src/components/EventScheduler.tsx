@@ -14,6 +14,8 @@ import {
 } from 'lucide-react';
 import { PartyEvent, Language, EventCategory, AuthUser } from '../types';
 import { storageService } from '../services/storageService';
+import { TranslateButton } from './common/TranslateButton';
+import { translateEnglishToHindi } from '../utils/translationService';
 
 interface Props {
   lang: Language;
@@ -353,14 +355,26 @@ END:VCALENDAR`;
                   placeholder="e.g. Life Lift State Career Conclave"
                   value={titleEn}
                   onChange={(e) => setTitleEn(e.target.value)}
+                  onBlur={async () => {
+                    if (titleEn.trim() && !titleHi.trim()) {
+                      const tr = await translateEnglishToHindi(titleEn);
+                      if (tr) setTitleHi(tr);
+                    }
+                  }}
                   className="w-full p-2 border border-stone-300 rounded focus:border-emerald-700 focus:outline-none"
                 />
               </div>
 
               <div>
-                <label className="block font-semibold text-stone-700 mb-1">
-                  कार्यक्रम शीर्षक (हिंदी)
-                </label>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="font-semibold text-stone-700">
+                    कार्यक्रम शीर्षक (हिंदी)
+                  </label>
+                  <TranslateButton
+                    englishText={titleEn}
+                    onTranslated={(hi) => setTitleHi(hi)}
+                  />
+                </div>
                 <input
                   type="text"
                   placeholder="उदा. लाइफ लिफ्ट राज्य करियर महासम्मेलन"

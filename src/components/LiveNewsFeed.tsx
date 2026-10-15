@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Newspaper, Share2, PlusCircle, Clock, Tag, ExternalLink, MessageSquare, Trash2, Lock } from 'lucide-react';
 import { NewsItem, Language, NewsCategory, AuthUser } from '../types';
 import { storageService } from '../services/storageService';
+import { TranslateButton } from './common/TranslateButton';
+import { translateEnglishToHindi } from '../utils/translationService';
 
 interface Props {
   lang: Language;
@@ -257,14 +259,26 @@ export const LiveNewsFeed: React.FC<Props> = ({ lang, currentUser, onOpenSocialB
                   placeholder="e.g. Youth Wing Submits 10-Point Education Charter..."
                   value={titleEn}
                   onChange={(e) => setTitleEn(e.target.value)}
+                  onBlur={async () => {
+                    if (titleEn.trim() && !titleHi.trim()) {
+                      const tr = await translateEnglishToHindi(titleEn);
+                      if (tr) setTitleHi(tr);
+                    }
+                  }}
                   className="w-full p-2 border border-stone-300 rounded focus:border-amber-600 focus:outline-none"
                 />
               </div>
 
               <div>
-                <label className="block font-semibold text-stone-700 mb-1">
-                  शीर्षक (हिंदी) *
-                </label>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="font-semibold text-stone-700">
+                    शीर्षक (हिंदी) *
+                  </label>
+                  <TranslateButton
+                    englishText={titleEn}
+                    onTranslated={(hi) => setTitleHi(hi)}
+                  />
+                </div>
                 <input
                   type="text"
                   required
@@ -307,12 +321,24 @@ export const LiveNewsFeed: React.FC<Props> = ({ lang, currentUser, onOpenSocialB
                   placeholder="Short excerpt for social media preview..."
                   value={excerptEn}
                   onChange={(e) => setExcerptEn(e.target.value)}
+                  onBlur={async () => {
+                    if (excerptEn.trim() && !excerptHi.trim()) {
+                      const tr = await translateEnglishToHindi(excerptEn);
+                      if (tr) setExcerptHi(tr);
+                    }
+                  }}
                   className="w-full p-2 border border-stone-300 rounded focus:border-amber-600 focus:outline-none"
                 />
               </div>
 
               <div>
-                <label className="block font-semibold text-stone-700 mb-1">सारांश (हिंदी)</label>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="font-semibold text-stone-700">सारांश (हिंदी)</label>
+                  <TranslateButton
+                    englishText={excerptEn}
+                    onTranslated={(hi) => setExcerptHi(hi)}
+                  />
+                </div>
                 <textarea
                   rows={2}
                   placeholder="सोशल मीडिया पूर्वावलोकन हेतु संक्षिप्त विवरण..."

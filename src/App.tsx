@@ -313,6 +313,10 @@ export default function App() {
             currentUser={currentUser}
             onUserUpdated={refreshMembers}
             onNavigateToStructure={() => setActiveTab('structure')}
+            onNavigateLogin={() => {
+              setActiveTab('login');
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
           />
         )}
 

@@ -4,6 +4,8 @@ import { Member, Language, YouthWing, AuthUser } from '../types';
 import { storageService } from '../services/storageService';
 import { DigitalIdCard } from './DigitalIdCard';
 import confetti from 'canvas-confetti';
+import { TranslateButton } from './common/TranslateButton';
+import { translateEnglishToHindi } from '../utils/translationService';
 
 interface Props {
   lang: Language;
@@ -218,13 +220,25 @@ export const MemberRegistration: React.FC<Props> = ({ lang, currentUser, onMembe
                       placeholder="e.g. Mohd. Farhan"
                       value={fullName}
                       onChange={(e) => setFullName(e.target.value)}
+                      onBlur={async () => {
+                        if (fullName.trim() && !fullNameHi.trim()) {
+                          const tr = await translateEnglishToHindi(fullName);
+                          if (tr) setFullNameHi(tr);
+                        }
+                      }}
                       className="w-full px-3 py-2 border border-stone-300 rounded focus:outline-none focus:border-emerald-600"
                     />
                   </div>
                   <div>
-                    <label className="block font-semibold text-stone-700 mb-1">
-                      पूरा नाम (हिंदी)
-                    </label>
+                    <div className="flex items-center justify-between mb-1">
+                      <label className="font-semibold text-stone-700">
+                        पूरा नाम (हिंदी)
+                      </label>
+                      <TranslateButton
+                        englishText={fullName}
+                        onTranslated={(hi) => setFullNameHi(hi)}
+                      />
+                    </div>
                     <input
                       type="text"
                       placeholder="उदा. मोहम्मद फ़रहान"

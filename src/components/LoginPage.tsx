@@ -103,14 +103,14 @@ export const LoginPage: React.FC<Props> = ({
         <form onSubmit={handleLoginSubmit} className="space-y-4 text-xs">
           <div>
             <label className="block font-bold text-stone-700 mb-1">
-              {lang === 'hi' ? 'ईमेल आईडी या पंजीकृत मोबाइल नंबर' : 'Email Address or Mobile Phone'}
+              {lang === 'hi' ? 'यूज़रनेम, ईमेल या मोबाइल नंबर' : 'Username, Email or Mobile Number'}
             </label>
             <div className="relative">
               <Mail className="w-4 h-4 text-stone-400 absolute left-3 top-3" />
               <input
                 type="text"
                 required
-                placeholder="e.g. admin@mylup.org or +91 98370 00112"
+                placeholder="e.g. superadmin or president@mylup.org"
                 value={identifier}
                 onChange={(e) => setIdentifier(e.target.value)}
                 className="w-full pl-9 pr-3 py-2.5 border border-stone-300 rounded-xl focus:border-emerald-700 focus:outline-none font-medium"
@@ -123,9 +123,6 @@ export const LoginPage: React.FC<Props> = ({
               <label className="font-bold text-stone-700">
                 {lang === 'hi' ? 'खाता पासवर्ड' : 'Account Password'}
               </label>
-              <span className="text-[10px] text-stone-400">
-                {lang === 'hi' ? 'डिफ़ॉल्ट पासवर्ड नीचे दिए गए हैं' : 'Standard passwords available below'}
-              </span>
             </div>
             <div className="relative">
               <Lock className="w-4 h-4 text-stone-400 absolute left-3 top-3" />
@@ -151,7 +148,7 @@ export const LoginPage: React.FC<Props> = ({
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full py-3 bg-emerald-700 hover:bg-emerald-800 text-white font-extrabold text-sm rounded-xl transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer"
+            className="w-full py-3 bg-emerald-700 hover:bg-emerald-800 text-white font-extrabold text-sm rounded-xl transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
           >
             {isLoading ? (
               <span>{lang === 'hi' ? 'सत्यापित हो रहा है...' : 'Authenticating...'}</span>
@@ -164,61 +161,26 @@ export const LoginPage: React.FC<Props> = ({
           </button>
         </form>
 
-        {/* Quick Demo Credentials Panel (For immediate testing) */}
-        <div className="pt-2 border-t border-stone-100 space-y-2.5">
-          <div className="text-[11px] font-bold uppercase tracking-wider text-stone-400 text-center">
-            {lang === 'hi' ? 'त्वरित 1-क्लिक परीक्षण खाते (Quick Preset Logins)' : 'Instant 1-Click Role Accounts (No OTP)'}
+        {/* Security & Access Notice */}
+        <div className="pt-3 border-t border-stone-100 text-center space-y-2">
+          <div className="flex items-center justify-center gap-1.5 text-stone-500 text-[11px] font-medium">
+            <ShieldCheck className="w-3.5 h-3.5 text-emerald-700" />
+            <span>
+              {lang === 'hi'
+                ? 'अधिकृत पदाधिकारी अपने क्रेडेंशियल्स द्वारा लॉगिन कर सकते हैं।'
+                : 'Authorized committee office bearers can sign in with assigned credentials.'}
+            </span>
           </div>
 
-          <div className="space-y-1.5 text-xs">
-            {DEMO_USERS.filter((u) => u.role !== 'public').map((u) => (
-              <button
-                key={u.id}
-                type="button"
-                onClick={() => handleQuickPresetLogin(u)}
-                className="w-full p-2.5 bg-stone-50 hover:bg-emerald-50/60 border border-stone-200 hover:border-emerald-500 rounded-xl flex items-center justify-between text-left transition-all cursor-pointer group"
-              >
-                <div>
-                  <div className="font-bold text-stone-900 group-hover:text-emerald-900 flex items-center gap-1.5">
-                    <span>{u.name}</span>
-                    <span className="text-[9px] font-mono text-stone-500 bg-stone-200/80 px-1.5 py-0.2 rounded">
-                      {u.password}
-                    </span>
-                  </div>
-                  <div className="text-[10px] text-stone-500">
-                    {u.designation} {u.district && `· ${u.district}`}
-                  </div>
-                </div>
-
-                <span className={`text-[10px] font-extrabold px-2 py-0.5 rounded uppercase ${
-                  u.role === 'superadmin'
-                    ? 'bg-rose-100 text-rose-800 border border-rose-300'
-                    : u.role === 'state_president'
-                    ? 'bg-purple-100 text-purple-900 border border-purple-300'
-                    : u.role === 'press_release'
-                    ? 'bg-amber-100 text-amber-900 border border-amber-300'
-                    : u.role === 'content_manager'
-                    ? 'bg-cyan-100 text-cyan-900 border border-cyan-300'
-                    : u.role === 'district_incharge'
-                    ? 'bg-blue-100 text-blue-900 border border-blue-300'
-                    : 'bg-stone-200 text-stone-800'
-                }`}>
-                  {u.role.replace('_', ' ')}
-                </span>
-              </button>
-            ))}
+          <div>
+            <button
+              type="button"
+              onClick={onNavigateHome}
+              className="text-xs text-stone-500 hover:text-emerald-800 font-semibold cursor-pointer"
+            >
+              ← {lang === 'hi' ? 'होमपेज पर वापस जाएं' : 'Return to Home'}
+            </button>
           </div>
-        </div>
-
-        {/* Back link */}
-        <div className="text-center pt-2">
-          <button
-            type="button"
-            onClick={onNavigateHome}
-            className="text-xs text-stone-500 hover:text-emerald-800 font-semibold"
-          >
-            ← {lang === 'hi' ? 'होमपेज पर वापस जाएं' : 'Return to Home'}
-          </button>
         </div>
       </div>
     </div>

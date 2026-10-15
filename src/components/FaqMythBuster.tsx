@@ -18,6 +18,8 @@ import {
 import { Language, MythFaqItem, AuthUser } from '../types';
 import { storageService } from '../services/storageService';
 import { LadderSymbolIcon } from './PartySymbol';
+import { TranslateButton } from './common/TranslateButton';
+import { translateEnglishToHindi } from '../utils/translationService';
 
 interface Props {
   lang: Language;
@@ -392,19 +394,31 @@ export const FaqMythBuster: React.FC<Props> = ({ lang, currentUser }) => {
                     required
                     value={mythEn}
                     onChange={(e) => setMythEn(e.target.value)}
+                    onBlur={async () => {
+                      if (mythEn.trim() && !mythHi.trim()) {
+                        const tr = await translateEnglishToHindi(mythEn);
+                        if (tr) setMythHi(tr);
+                      }
+                    }}
                     placeholder="e.g. Is IUML a pre-partition party?"
-                    className="w-full p-2 border border-stone-300 rounded-lg focus:outline-none focus:border-emerald-600"
+                    className="w-full p-2 border border-stone-300 rounded-lg focus:outline-none focus:border-emerald-600 font-medium"
                   />
                 </div>
                 <div>
-                  <label className="block font-bold text-rose-800 mb-1">भ्रामक मिथक / शंका (हिंदी) *</label>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="font-bold text-rose-800">भ्रामक मिथक / शंका (हिंदी) *</label>
+                    <TranslateButton
+                      englishText={mythEn}
+                      onTranslated={(hi) => setMythHi(hi)}
+                    />
+                  </div>
                   <textarea
                     rows={2}
                     required
                     value={mythHi}
                     onChange={(e) => setMythHi(e.target.value)}
                     placeholder="उदा. क्या IUML बंटवारे से पहले की पार्टी है?"
-                    className="w-full p-2 border border-stone-300 rounded-lg focus:outline-none focus:border-emerald-600"
+                    className="w-full p-2 border border-stone-300 rounded-lg focus:outline-none focus:border-emerald-600 font-medium"
                   />
                 </div>
               </div>
@@ -418,19 +432,31 @@ export const FaqMythBuster: React.FC<Props> = ({ lang, currentUser }) => {
                     required
                     value={factEn}
                     onChange={(e) => setFactEn(e.target.value)}
+                    onBlur={async () => {
+                      if (factEn.trim() && !factHi.trim()) {
+                        const tr = await translateEnglishToHindi(factEn);
+                        if (tr) setFactHi(tr);
+                      }
+                    }}
                     placeholder="e.g. FALSE. IUML was founded in independent India on 10 March 1948 in Madras..."
-                    className="w-full p-2 border border-stone-300 rounded-lg focus:outline-none focus:border-emerald-600"
+                    className="w-full p-2 border border-stone-300 rounded-lg focus:outline-none focus:border-emerald-600 font-medium"
                   />
                 </div>
                 <div>
-                  <label className="block font-bold text-emerald-800 mb-1">1-पंक्ति तथ्य निष्कर्ष (हिंदी) *</label>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="font-bold text-emerald-800">1-पंक्ति तथ्य निष्कर्ष (हिंदी) *</label>
+                    <TranslateButton
+                      englishText={factEn}
+                      onTranslated={(hi) => setFactHi(hi)}
+                    />
+                  </div>
                   <textarea
                     rows={2}
                     required
                     value={factHi}
                     onChange={(e) => setFactHi(e.target.value)}
                     placeholder="उदा. पूर्णतः असत्य। IUML का गठन आज़ाद भारत में 10 मार्च 1948 को मद्रास में हुआ..."
-                    className="w-full p-2 border border-stone-300 rounded-lg focus:outline-none focus:border-emerald-600"
+                    className="w-full p-2 border border-stone-300 rounded-lg focus:outline-none focus:border-emerald-600 font-medium"
                   />
                 </div>
               </div>
@@ -443,12 +469,24 @@ export const FaqMythBuster: React.FC<Props> = ({ lang, currentUser }) => {
                     rows={3}
                     value={detailedEn}
                     onChange={(e) => setDetailedEn(e.target.value)}
+                    onBlur={async () => {
+                      if (detailedEn.trim() && !detailedHi.trim()) {
+                        const tr = await translateEnglishToHindi(detailedEn);
+                        if (tr) setDetailedHi(tr);
+                      }
+                    }}
                     placeholder="Historical facts, Constituent Assembly references, coalition governance..."
                     className="w-full p-2 border border-stone-300 rounded-lg focus:outline-none focus:border-emerald-600"
                   />
                 </div>
                 <div>
-                  <label className="block font-bold text-stone-700 mb-1">विस्तृत ऐतिहासिक संदर्भ (हिंदी)</label>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="font-bold text-stone-700">विस्तृत ऐतिहासिक संदर्भ (हिंदी)</label>
+                    <TranslateButton
+                      englishText={detailedEn}
+                      onTranslated={(hi) => setDetailedHi(hi)}
+                    />
+                  </div>
                   <textarea
                     rows={3}
                     value={detailedHi}
@@ -472,7 +510,13 @@ export const FaqMythBuster: React.FC<Props> = ({ lang, currentUser }) => {
                   />
                 </div>
                 <div>
-                  <label className="block font-bold text-stone-700 mb-1">कार्यकर्ताओं के लिए तर्क (हिंदी, प्रति पंक्ति एक बिंदु)</label>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="font-bold text-stone-700">कार्यकर्ताओं के लिए तर्क (हिंदी)</label>
+                    <TranslateButton
+                      englishText={pointsEnText}
+                      onTranslated={(hi) => setPointsHiText(hi)}
+                    />
+                  </div>
                   <textarea
                     rows={3}
                     value={pointsHiText}

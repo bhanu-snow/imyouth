@@ -26,6 +26,8 @@ import { Language, ParliamentaryHouse, ParliamentaryLeader, AuthUser } from '../
 import { IDEOLOGY_COMPARISONS } from '../data/parliamentaryHistoryData';
 import { storageService } from '../services/storageService';
 import { LadderSymbolIcon, PartyFlagIcon, PartySymbolCard } from './PartySymbol';
+import { TranslateButton } from './common/TranslateButton';
+import { translateEnglishToHindi } from '../utils/translationService';
 
 interface Props {
   lang: Language;
@@ -689,19 +691,31 @@ export const ParliamentaryHistoryView: React.FC<Props> = ({ lang, currentUser })
                     required
                     value={formNameEn}
                     onChange={(e) => setFormNameEn(e.target.value)}
+                    onBlur={async () => {
+                      if (formNameEn.trim() && !formNameHi.trim()) {
+                        const tr = await translateEnglishToHindi(formNameEn);
+                        if (tr) setFormNameHi(tr);
+                      }
+                    }}
                     placeholder="e.g. Adv. Haris Beeran"
-                    className="w-full p-2 border border-stone-300 rounded-lg"
+                    className="w-full p-2 border border-stone-300 rounded-lg font-medium"
                   />
                 </div>
                 <div>
-                  <label className="block font-bold text-stone-700 mb-1">नेता का नाम (हिंदी) *</label>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="font-bold text-stone-700">नेता का नाम (हिंदी) *</label>
+                    <TranslateButton
+                      englishText={formNameEn}
+                      onTranslated={(hi) => setFormNameHi(hi)}
+                    />
+                  </div>
                   <input
                     type="text"
                     required
                     value={formNameHi}
                     onChange={(e) => setFormNameHi(e.target.value)}
                     placeholder="उदा. एड. हारिस बीरान"
-                    className="w-full p-2 border border-stone-300 rounded-lg"
+                    className="w-full p-2 border border-stone-300 rounded-lg font-medium"
                   />
                 </div>
               </div>
@@ -715,19 +729,31 @@ export const ParliamentaryHistoryView: React.FC<Props> = ({ lang, currentUser })
                     required
                     value={formConstituencyEn}
                     onChange={(e) => setFormConstituencyEn(e.target.value)}
+                    onBlur={async () => {
+                      if (formConstituencyEn.trim() && !formConstituencyHi.trim()) {
+                        const tr = await translateEnglishToHindi(formConstituencyEn);
+                        if (tr) setFormConstituencyHi(tr);
+                      }
+                    }}
                     placeholder="e.g. Rajya Sabha (Kerala) or Ponnani"
-                    className="w-full p-2 border border-stone-300 rounded-lg"
+                    className="w-full p-2 border border-stone-300 rounded-lg font-medium"
                   />
                 </div>
                 <div>
-                  <label className="block font-bold text-stone-700 mb-1">सदन / निर्वाचन क्षेत्र (हिंदी) *</label>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="font-bold text-stone-700">सदन / निर्वाचन क्षेत्र (हिंदी) *</label>
+                    <TranslateButton
+                      englishText={formConstituencyEn}
+                      onTranslated={(hi) => setFormConstituencyHi(hi)}
+                    />
+                  </div>
                   <input
                     type="text"
                     required
                     value={formConstituencyHi}
                     onChange={(e) => setFormConstituencyHi(e.target.value)}
                     placeholder="उदा. राज्यसभा (केरल) या पोन्नानी"
-                    className="w-full p-2 border border-stone-300 rounded-lg"
+                    className="w-full p-2 border border-stone-300 rounded-lg font-medium"
                   />
                 </div>
               </div>

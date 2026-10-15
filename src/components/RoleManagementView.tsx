@@ -29,13 +29,15 @@ interface Props {
   currentUser: AuthUser;
   onUserUpdated: () => void;
   onNavigateToStructure?: () => void;
+  onNavigateLogin?: () => void;
 }
 
 export const RoleManagementView: React.FC<Props> = ({ 
   lang, 
   currentUser, 
   onUserUpdated,
-  onNavigateToStructure
+  onNavigateToStructure,
+  onNavigateLogin
 }) => {
   const [users, setUsers] = useState<AuthUser[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
@@ -259,7 +261,16 @@ export const RoleManagementView: React.FC<Props> = ({
         </div>
 
         <div className="flex items-center gap-2">
-          {isSuperAdmin ? (
+          {currentUser.role === 'public' && onNavigateLogin ? (
+            <button
+              type="button"
+              onClick={onNavigateLogin}
+              className="px-4 py-2 bg-emerald-700 hover:bg-emerald-800 text-white font-bold rounded-lg text-xs flex items-center gap-1.5 cursor-pointer shadow-xs"
+            >
+              <Lock className="w-3.5 h-3.5" />
+              <span>{lang === 'hi' ? 'पासवर्ड से लॉगिन करें' : 'Log In with Password'}</span>
+            </button>
+          ) : isSuperAdmin ? (
             <div className="text-rose-800 bg-rose-50 px-3 py-1.5 rounded-lg border border-rose-200 text-xs font-bold flex items-center gap-1.5">
               <ShieldCheck className="w-4 h-4 text-rose-600" />
               <span>Super Admin Authority: Master Password & Role Access</span>
