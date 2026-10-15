@@ -28,6 +28,7 @@ Use the Supabase SQL Editor or Supabase CLI to apply these files in ascending ti
 8. migrations/20261016000800_designation_lookups.sql
 9. migrations/20261016000900_member_workflows.sql
 10. migrations/20261016001000_sangathan_access.sql
+11. migrations/20261016001100_designation_status.sql
 
 Do not run only the first migration: later migrations add row-level security, lookup data, and integrity constraints.
 
@@ -39,7 +40,7 @@ The FAQ, Events, and News pages now read and write through Supabase rather than 
 
 Important: bundled events and news are prototype/sample content from the existing frontend. Verify every claim, event date, coordinator, and organizational detail before using them as official public announcements. Historical demo RSVP counts and news share counts are intentionally not imported as real engagement.
 
-This seed does not create an Auth user, insert a password, or seed fake member records. The Sangathan directory and leadership history now read from Supabase; leadership appointments are written to Supabase. Social broadcasts and parliamentary history still have legacy localStorage-backed workflows.
+This seed does not create an Auth user, insert a password, or seed fake member records. The Sangathan directory, organisation administration (wings, designations and district organisational metadata), and leadership history now read from Supabase; changes persist to Supabase. District names are selected from canonical geography rather than created as duplicate free-text districts. Social broadcasts and parliamentary history still have legacy localStorage-backed workflows.
 
 ## 4. Geography data is not complete yet
 
