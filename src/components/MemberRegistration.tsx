@@ -6,7 +6,7 @@ import { DigitalIdCard } from './DigitalIdCard';
 import confetti from 'canvas-confetti';
 import { TranslateButton } from './common/TranslateButton';
 import { translateEnglishToHindi } from '../utils/translationService';
-import { referenceDataService, type DistrictOption, type SubDistrictOption, type StateOption, type WingOption, type LookupOption } from '../services/referenceDataService';
+import { referenceDataService, type DistrictOption, type SubDistrictOption, type WingOption, type LookupOption } from '../services/referenceDataService';
 
 interface Props {
   lang: Language;
@@ -35,8 +35,6 @@ export const MemberRegistration: React.FC<Props> = ({ lang, currentUser, onMembe
   const [districtId, setDistrictId] = useState('');
   const [subDistrictId, setSubDistrictId] = useState('');
   const [lookupError, setLookupError] = useState('');
-  const [district, setDistrict] = useState('');
-  const [subDistrict, setSubDistrict] = useState('');
   const [wing, setWing] = useState<YouthWing>('myl_cadre');
   const [designation, setDesignation] = useState('Active Youth Volunteer');
   const [communityBackground, setCommunityBackground] = useState('');
@@ -60,7 +58,6 @@ export const MemberRegistration: React.FC<Props> = ({ lang, currentUser, onMembe
         const initialDistrict = upDistricts.find((item) => item.code.toLowerCase() === 'moradabad') || upDistricts[0];
         if (initialDistrict) {
           setDistrictId(initialDistrict.id);
-          setDistrict(initialDistrict.name_en);
         }
         if (wingRows.some((item) => item.code === 'myl_cadre')) setWing('myl_cadre');
         if (canViewDirectory) {
@@ -83,7 +80,6 @@ export const MemberRegistration: React.FC<Props> = ({ lang, currentUser, onMembe
     if (!districtId) {
       setSubDistrictOptions([]);
       setSubDistrictId('');
-      setSubDistrict('');
       return;
     }
     let cancelled = false;
@@ -93,7 +89,6 @@ export const MemberRegistration: React.FC<Props> = ({ lang, currentUser, onMembe
         setSubDistrictOptions(rows);
         const first = rows[0];
         setSubDistrictId(first?.id || '');
-        setSubDistrict(first?.name_en || '');
       },
       (error: unknown) => {
         if (!cancelled) setLookupError(error instanceof Error ? error.message : 'Could not load sub-districts.');
@@ -309,9 +304,7 @@ export const MemberRegistration: React.FC<Props> = ({ lang, currentUser, onMembe
                       onChange={(e) => {
                         const selected = districtOptions.find((item) => item.id === e.target.value);
                         setDistrictId(e.target.value);
-                        setDistrict(selected?.name_en || '');
                         setSubDistrictId('');
-                        setSubDistrict('');
                       }}
                       disabled={districtOptions.length === 0}
                       className="w-full px-3 py-2 border border-stone-300 rounded focus:border-emerald-600 focus:outline-none bg-white disabled:bg-stone-100"
@@ -328,7 +321,6 @@ export const MemberRegistration: React.FC<Props> = ({ lang, currentUser, onMembe
                       onChange={(e) => {
                         const selected = subDistrictOptions.find((item) => item.id === e.target.value);
                         setSubDistrictId(e.target.value);
-                        setSubDistrict(selected?.name_en || '');
                       }}
                       disabled={!districtId || subDistrictOptions.length === 0}
                       className="w-full px-3 py-2 border border-stone-300 rounded focus:border-emerald-600 focus:outline-none bg-white disabled:bg-stone-100"
