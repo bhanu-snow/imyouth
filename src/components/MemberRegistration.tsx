@@ -108,6 +108,8 @@ export const MemberRegistration: React.FC<Props> = ({ lang, currentUser, onMembe
     try {
       const newMember = await memberService.submitApplication({
         fullName, fullNameHi, phone, email, stateId, districtId, subDistrictId,
+        stateName: 'Uttar Pradesh', districtName: districtOptions.find((item) => item.id === districtId)?.name_en,
+        subDistrictName: subDistrictOptions.find((item) => item.id === subDistrictId)?.name_en,
         wingCode: wing, designation: designation || 'Active Youth Volunteer',
         designationHi: wing === 'msf' ? 'छात्र कार्यकर्ता (MSF)' : 'सक्रिय युवा कार्यकर्ता (MYL)',
         communityBackground, bloodGroup, education,
