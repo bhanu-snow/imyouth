@@ -25,6 +25,7 @@ import { storageService } from '../services/storageService';
 import { LadderSymbolIcon, PartyFlagIcon } from './PartySymbol';
 import { TranslateButton } from './common/TranslateButton';
 import { translateEnglishToHindi } from '../utils/translationService';
+import { referenceDataService, type ZoneOption } from '../services/referenceDataService';
 
 interface Props {
   lang: Language;
@@ -38,6 +39,8 @@ export const OrganizationalStructureManager: React.FC<Props> = ({ lang, currentU
   const [posts, setPosts] = useState<PostDesignation[]>([]);
   const [wings, setWings] = useState<OrgWing[]>([]);
   const [districts, setDistricts] = useState<OrgDistrict[]>([]);
+  const [zoneOptions, setZoneOptions] = useState<ZoneOption[]>([]);
+  const [lookupError, setLookupError] = useState('');
 
   // Search & Filter
   const [searchQuery, setSearchQuery] = useState('');
@@ -90,6 +93,11 @@ export const OrganizationalStructureManager: React.FC<Props> = ({ lang, currentU
 
   useEffect(() => {
     loadAllData();
+    let cancelled = false;
+    void referenceDataService.zones()
+      .then((rows) => { if (!cancelled) { setZoneOptions(rows); setLookupError(''); } })
+      .catch((error: unknown) => { if (!cancelled) setLookupError(error instanceof Error ? error.message : 'Could not load zone reference data.'); });
+    return () => { cancelled = true; };
   }, []);
 
   const loadAllData = () => {
@@ -1120,12 +1128,9 @@ export const OrganizationalStructureManager: React.FC<Props> = ({ lang, currentU
                     onChange={(e) => setDistZone(e.target.value as any)}
                     className="w-full p-2 border border-stone-300 rounded-lg bg-white"
                   >
-                    <option value="Rohilkhand">Rohilkhand (रुहेलखंड)</option>
-                    <option value="Western UP">Western UP (पश्चिमी यूपी)</option>
-                    <option value="Awadh">Awadh (अवध)</option>
-                    <option value="Purvanchal">Purvanchal (पूर्वांचल)</option>
-                    <option value="Bundelkhand">Bundelkhand (बुंदेलखंड)</option>
+                    {zoneOptions.map((item) => <option key={item.id} value={item.name_en}>{lang === 'hi' && item.name_hi ? item.name_hi : item.name_en}</option>)}
                   </select>
+                  {lookupError && <p role="alert" className="mt-1 text-rose-700">{lookupError}</p>}
                 </div>
                 <div>
                   <label className="block font-bold text-stone-700 mb-1">Active Cadre Count</label>
