@@ -27,6 +27,7 @@ Use the Supabase SQL Editor or Supabase CLI to apply these files in ascending ti
 7. migrations/20261016000700_up_district_directory.sql
 8. migrations/20261016000800_designation_lookups.sql
 9. migrations/20261016000900_member_workflows.sql
+10. migrations/20261016001000_sangathan_access.sql
 
 Do not run only the first migration: later migrations add row-level security, lookup data, and integrity constraints.
 
@@ -38,7 +39,7 @@ The FAQ, Events, and News pages now read and write through Supabase rather than 
 
 Important: bundled events and news are prototype/sample content from the existing frontend. Verify every claim, event date, coordinator, and organizational detail before using them as official public announcements. Historical demo RSVP counts and news share counts are intentionally not imported as real engagement.
 
-This seed does not create an Auth user, insert a password, or seed fake member records. Organizational leadership, social broadcasts, and parliamentary history still have legacy localStorage-backed workflows.
+This seed does not create an Auth user, insert a password, or seed fake member records. The Sangathan directory and leadership history now read from Supabase; leadership appointments are written to Supabase. Social broadcasts and parliamentary history still have legacy localStorage-backed workflows.
 
 ## 4. Geography data is not complete yet
 
@@ -59,6 +60,6 @@ Use the actual Auth user UUID and verify the resulting rows. Never store a passw
 
 ## 6. Important current migration boundary
 
-This branch has migrated FAQ, Events, News, Member Registration, Cadre Approvals, and public approved-cadre verification to Supabase. Organizational leadership, social broadcasts, and parliamentary history remain on legacy storage and are not yet protected by Supabase RLS. Member applications remain private under RLS; public verification exposes only approved status and non-sensitive identity fields. Local account creation and password reset are intentionally disabled until a server-side Supabase Auth admin workflow is implemented. Do not treat this branch as production-ready until those workflows are migrated.
+This branch has migrated FAQ, Events, News, Member Registration, Cadre Approvals, public approved-cadre verification, and the Sangathan directory/leadership records to Supabase. Organizational leadership, social broadcasts, and parliamentary history remain on legacy storage and are not yet protected by Supabase RLS. Member applications remain private under RLS; public verification exposes only approved status and non-sensitive identity fields. Local account creation and password reset are intentionally disabled until a server-side Supabase Auth admin workflow is implemented. Do not treat this branch as production-ready until those workflows are migrated.
 
 After configuring Supabase, run npm run lint and npm run build, then test public application submission, role assignment, login, and each lookup chain in a non-production project before deployment.
