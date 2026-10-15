@@ -1,6 +1,9 @@
 -- Member directory: enforce geography consistency and provide a privacy-safe public verification endpoint.
 begin;
 
+alter table public.members add column if not exists cadre_id text;
+create unique index if not exists uq_members_cadre_id on public.members(cadre_id) where cadre_id is not null;
+
 drop policy if exists members_submit_application on public.members;
 create policy members_submit_application on public.members
 for insert to anon, authenticated
@@ -45,7 +48,7 @@ security definer
 set search_path = public
 as $$
   select
-    m.id,
+    coalesce(m.cadre_id, m.id) as id,
     m.full_name,
     m.full_name_hi,
     m.designation_text,
@@ -61,7 +64,7 @@ as $$
   join public.districts d on d.id = m.district_id
   left join public.sub_districts sd on sd.id = m.sub_district_id and sd.district_id = m.district_id
   left join public.org_wings w on w.id = m.wing_id
-  where upper(m.id) = upper(trim(p_cadre_id))
+  where upper(coalesce(m.cadre_id, m.id)) = upper(trim(p_cadre_id))
     and m.status = 'approved'
     and m.verified = true
   limit 1;
