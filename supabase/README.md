@@ -26,6 +26,7 @@ Use the Supabase SQL Editor or Supabase CLI to apply these files in ascending ti
 6. migrations/20261016000600_security_hardening.sql
 7. migrations/20261016000700_up_district_directory.sql
 8. migrations/20261016000800_designation_lookups.sql
+9. migrations/20261016000900_member_workflows.sql
 
 Do not run only the first migration: later migrations add row-level security, lookup data, and integrity constraints.
 
@@ -33,11 +34,11 @@ Do not run only the first migration: later migrations add row-level security, lo
 
 After all migrations are applied, run the complete `supabase/seed.sql` file in Supabase SQL Editor. It imports the existing bilingual FAQ content into `faq_categories`, `myth_faqs`, and `faq_talking_points`, plus the three bundled sample events and two bundled sample news posts with their tags. It also creates the aggregate-only `event_rsvp_counts` view used by the events page. The seed is idempotent for these bundled records and can be rerun to refresh them.
 
-The FAQ, Events, and News pages now read and write through Supabase rather than browser localStorage. Event RSVP requires a signed-in Supabase user. The FAQ editor requires `superadmin` or `content_manager`; event/news publishing is gated by the page roles and enforced by database RLS.
+The FAQ, Events, and News pages now read and write through Supabase rather than browser localStorage. Member Registration and Cadre Approvals also use Supabase CRUD; the new member workflow migration adds geography checks and a privacy-safe public verification RPC. No sample member records are seeded. Event RSVP requires a signed-in Supabase user. The FAQ editor requires `superadmin` or `content_manager`; event/news publishing is gated by the page roles and enforced by database RLS.
 
 Important: bundled events and news are prototype/sample content from the existing frontend. Verify every claim, event date, coordinator, and organizational detail before using them as official public announcements. Historical demo RSVP counts and news share counts are intentionally not imported as real engagement.
 
-This seed does not create an Auth user, insert a password, or migrate other localStorage-backed modules such as members, organizational leadership, social broadcasts, or parliamentary history.
+This seed does not create an Auth user, insert a password, or seed fake member records. Organizational leadership, social broadcasts, and parliamentary history still have legacy localStorage-backed workflows.
 
 ## 4. Geography data is not complete yet
 
@@ -58,6 +59,6 @@ Use the actual Auth user UUID and verify the resulting rows. Never store a passw
 
 ## 6. Important current migration boundary
 
-This branch adds the normalized schema, row-level security, a Supabase client, Supabase Auth sign-in/session restoration, and database-backed reference-data loading for the dropdowns updated so far. Several content and administration workflows still call the legacy storageService and browser localStorage; they are not yet migrated to relational CRUD and are not protected by Supabase RLS. Local account creation and password reset are intentionally disabled until a server-side Supabase Auth admin workflow is implemented. Do not treat this branch as production-ready until those workflows are migrated.
+This branch has migrated FAQ, Events, News, Member Registration, Cadre Approvals, and public approved-cadre verification to Supabase. Organizational leadership, social broadcasts, and parliamentary history remain on legacy storage and are not yet protected by Supabase RLS. Member applications remain private under RLS; public verification exposes only approved status and non-sensitive identity fields. Local account creation and password reset are intentionally disabled until a server-side Supabase Auth admin workflow is implemented. Do not treat this branch as production-ready until those workflows are migrated.
 
 After configuring Supabase, run npm run lint and npm run build, then test public application submission, role assignment, login, and each lookup chain in a non-production project before deployment.
