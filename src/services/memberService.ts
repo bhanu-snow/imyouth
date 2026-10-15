@@ -2,7 +2,7 @@ import type { AuthUser, Member, MemberStatus, YouthWing } from '../types';
 import { requireSupabase } from './supabaseClient';
 
 type MemberRow = {
-  id: string; auth_user_id: string | null; full_name: string; full_name_hi: string | null;
+  id: string; cadre_id: string | null; auth_user_id: string | null; full_name: string; full_name_hi: string | null;
   phone: string; email: string | null; avatar_url: string | null; state_id: string;
   district_id: string; sub_district_id: string | null; wing_id: string | null;
   designation_text: string | null; designation_hi: string | null; community_background: string | null;
@@ -12,7 +12,7 @@ type MemberRow = {
 
 type LookupRow = { id: string; name_en: string; name_hi?: string | null; code?: string };
 
-const MEMBER_COLUMNS = 'id,auth_user_id,full_name,full_name_hi,phone,email,avatar_url,state_id,district_id,sub_district_id,wing_id,designation_text,designation_hi,community_background,blood_group,education,bio,status,verified,approved_by,approved_at,joined_at';
+const MEMBER_COLUMNS = 'id,cadre_id,auth_user_id,full_name,full_name_hi,phone,email,avatar_url,state_id,district_id,sub_district_id,wing_id,designation_text,designation_hi,community_background,blood_group,education,bio,status,verified,approved_by,approved_at,joined_at';
 
 async function mapRows(rows: MemberRow[]): Promise<Member[]> {
   if (!rows.length) return [];
@@ -33,7 +33,8 @@ async function mapRows(rows: MemberRow[]): Promise<Member[]> {
   const wings = new Map((wingResult.data ?? []).map((x: LookupRow) => [x.id, x.code]));
   const approvers = new Map((approverResult.data ?? []).map((x: { user_id: string; full_name: string }) => [x.user_id, x.full_name]));
   return rows.map(row => ({
-    id: row.id,
+    id: row.cadre_id ?? row.id,
+    recordId: row.id,
     fullName: row.full_name,
     fullNameHi: row.full_name_hi ?? undefined,
     phone: row.phone,
@@ -81,7 +82,7 @@ export const memberService = {
     if (!wing || !state) throw new Error('Select a valid active state and organization wing.');
     const id = `REQ-UP-${new Date().getFullYear()}-${crypto.randomUUID().slice(0, 8).toUpperCase()}`;
     const { error } = await client.from('members').insert({
-      id, full_name: input.fullName.trim(), full_name_hi: input.fullNameHi?.trim() || null,
+      id, cadre_id: null, full_name: input.fullName.trim(), full_name_hi: input.fullNameHi?.trim() || null,
       phone: input.phone.trim(), email: input.email?.trim() || null, state_id: input.stateId,
       district_id: input.districtId, sub_district_id: input.subDistrictId || null, wing_id: wing.id,
       designation_text: input.designation.trim() || 'Active Youth Volunteer',
@@ -94,7 +95,7 @@ export const memberService = {
     // Public applicants cannot read member rows under RLS. Return only the acknowledgement
     // assembled from submitted values; do not weaken row-level security for insert-returning.
     return {
-      id, fullName: input.fullName.trim(), fullNameHi: input.fullNameHi?.trim() || undefined,
+      id, recordId: id, fullName: input.fullName.trim(), fullNameHi: input.fullNameHi?.trim() || undefined,
       phone: input.phone.trim(), email: input.email?.trim() || '', avatarUrl: '',
       state: 'Uttar Pradesh', district: '', subDistrict: '', wing: input.wingCode as YouthWing,
       designation: input.designation.trim() || 'Active Youth Volunteer',
@@ -110,7 +111,7 @@ export const memberService = {
     const { data: authData } = await client.auth.getUser();
     if (!authData.user) throw new Error('Sign in again before approving an application.');
     const { data, error } = await client.from('members').update({
-      id: officialId, status: 'approved', verified: true,
+      cadre_id: officialId, status: 'approved', verified: true,
       approved_by: authData.user.id, approved_at: new Date().toISOString(),
     }).eq('id', requestId).eq('status', 'pending').select(MEMBER_COLUMNS).single();
     if (error) throw new Error(`Could not approve application: ${error.message}`);
@@ -137,7 +138,7 @@ export const memberService = {
     } | undefined;
     if (!row) return null;
     return {
-      id: row.id, fullName: row.full_name, fullNameHi: row.full_name_hi ?? undefined,
+      id: row.id, recordId: row.id, fullName: row.full_name, fullNameHi: row.full_name_hi ?? undefined,
       phone: '', email: '', avatarUrl: '', state: 'Uttar Pradesh', district: row.district_name,
       subDistrict: row.sub_district_name ?? '', wing: (row.wing_code ?? 'general') as YouthWing,
       designation: row.designation_text ?? 'Cadre', designationHi: row.designation_hi ?? '',
