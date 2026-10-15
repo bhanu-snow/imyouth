@@ -60,7 +60,7 @@ export const eventService = {
     const client = requireSupabase();
     const { data, error } = await client
       .from('events')
-      .select('id,legacy_id,title_en,title_hi,description_en,description_hi,event_date,event_time,location_en,location_hi,coordinator_name,coordinator_phone,coordinator_designation,highlight_tag_en,highlight_tag_hi,event_categories!inner(code),districts!inner(name_en),states!inner(name_en)')
+      .select('id,legacy_id,title_en,title_hi,description_en,description_hi,event_date,event_time,location_en,location_hi,coordinator_name,coordinator_phone,coordinator_designation,highlight_tag_en,highlight_tag_hi,event_categories!inner(code),districts!events_district_id_fkey!inner(name_en),states!events_state_id_fkey!inner(name_en)')
       .eq('is_published', true)
       .order('event_date', { ascending: true });
     if (error) throw new Error(`Could not load events from Supabase: ${error.message}`);
