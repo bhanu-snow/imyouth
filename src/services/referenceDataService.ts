@@ -53,6 +53,8 @@ export const referenceDataService = {
   },
   wings: () => activeRows<WingOption>('org_wings', 'id,code,name_en,name_hi,color,sort_order'),
   designations: () => activeRows<LookupOption>('post_designations', 'id,code,title_en,title_hi,sort_order'),
+  designationLevels: () => activeRows<LookupOption>('designation_levels', 'id,code,name_en,name_hi,sort_order'),
+  designationStatuses: () => activeRows<LookupOption>('designation_statuses', 'id,code,name_en,name_hi,sort_order'),
   eventCategories: () => activeRows<LookupOption>('event_categories', 'id,code,name_en,name_hi,sort_order'),
   newsCategories: () => activeRows<LookupOption>('news_categories', 'id,code,name_en,name_hi,sort_order'),
   faqCategories: () => activeRows<LookupOption>('faq_categories', 'id,code,name_en,name_hi,sort_order'),
