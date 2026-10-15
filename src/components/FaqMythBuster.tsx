@@ -20,6 +20,7 @@ import { storageService } from '../services/storageService';
 import { LadderSymbolIcon } from './PartySymbol';
 import { TranslateButton } from './common/TranslateButton';
 import { translateEnglishToHindi } from '../utils/translationService';
+import { referenceDataService, type LookupOption } from '../services/referenceDataService';
 
 interface Props {
   lang: Language;
@@ -28,6 +29,8 @@ interface Props {
 
 export const FaqMythBuster: React.FC<Props> = ({ lang, currentUser }) => {
   const [faqs, setFaqs] = useState<MythFaqItem[]>([]);
+  const [categoryOptions, setCategoryOptions] = useState<LookupOption[]>([]);
+  const [lookupError, setLookupError] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [expandedId, setExpandedId] = useState<string | null>(null);
@@ -51,6 +54,11 @@ export const FaqMythBuster: React.FC<Props> = ({ lang, currentUser }) => {
 
   useEffect(() => {
     loadFaqs();
+    let cancelled = false;
+    void referenceDataService.faqCategories()
+      .then((rows) => { if (!cancelled) { setCategoryOptions(rows); setLookupError(''); } })
+      .catch((error: unknown) => { if (!cancelled) setLookupError(error instanceof Error ? error.message : 'Could not load FAQ categories.'); });
+    return () => { cancelled = true; };
   }, []);
 
   const loadFaqs = () => {
@@ -377,12 +385,9 @@ export const FaqMythBuster: React.FC<Props> = ({ lang, currentUser }) => {
                   onChange={(e) => setCategory(e.target.value as any)}
                   className="w-full p-2 border border-stone-300 rounded-lg bg-white"
                 >
-                  <option value="history">1948 History & Formation</option>
-                  <option value="up_focus">Uttar Pradesh Relevance & Need</option>
-                  <option value="secularism">Secularism & Constitutional Allegiance</option>
-                  <option value="wings">MYL / MSF / White Guard Wings</option>
-                  <option value="ideology">Ideology & Non-communal Model</option>
+                  {categoryOptions.map((item) => <option key={item.id} value={item.code}>{lang === 'hi' && item.name_hi ? item.name_hi : item.name_en}</option>)}
                 </select>
+                {lookupError && <p role="alert" className="mt-1 text-rose-700">{lookupError}</p>}
               </div>
 
               {/* Myth Inputs */}
