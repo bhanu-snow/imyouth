@@ -77,7 +77,8 @@ export type YouthWing =
 export type MemberStatus = 'pending' | 'approved' | 'rejected';
 
 export interface Member {
-  id: string; // e.g. MYL-UP-2026-8941
+  id: string; // public application/cadre ID
+  recordId?: string; // stable database application key; not displayed
   fullName: string;
   fullNameHi?: string;
   phone: string;
