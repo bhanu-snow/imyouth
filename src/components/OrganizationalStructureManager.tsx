@@ -66,7 +66,7 @@ export const OrganizationalStructureManager: React.FC<Props> = ({ lang, currentU
   const [postTitleEn, setPostTitleEn] = useState('');
   const [postTitleHi, setPostTitleHi] = useState('');
   const [postLevel, setPostLevel] = useState<PostDesignation['level']>('state');
-  const [postWingId, setPostWingId] = useState('myl_cadre');
+  const [postWingId, setPostWingId] = useState('');
   const [postDescEn, setPostDescEn] = useState('');
   const [postDescHi, setPostDescHi] = useState('');
   const [postStatus, setPostStatus] = useState<PostDesignation['status']>('active');
@@ -135,7 +135,7 @@ export const OrganizationalStructureManager: React.FC<Props> = ({ lang, currentU
     setPostTitleEn('');
     setPostTitleHi('');
     setPostLevel('state');
-    setPostWingId('myl_cadre');
+    setPostWingId(wings[0]?.id ?? '');
     setPostDescEn('');
     setPostDescHi('');
     setPostStatus('active');
@@ -148,7 +148,7 @@ export const OrganizationalStructureManager: React.FC<Props> = ({ lang, currentU
     setPostTitleEn(post.titleEn);
     setPostTitleHi(post.titleHi);
     setPostLevel(post.level);
-    setPostWingId(post.wingId || 'myl_cadre');
+    setPostWingId(post.wingId || '');
     setPostDescEn(post.descriptionEn);
     setPostDescHi(post.descriptionHi);
     setPostStatus(post.status);
@@ -831,6 +831,13 @@ export const OrganizationalStructureManager: React.FC<Props> = ({ lang, currentU
                     className="w-full p-2 border border-stone-300 rounded-lg bg-white"
                   >
                     {designationLevelOptions.map((item) => <option key={item.id} value={item.code}>{lang === 'hi' && item.name_hi ? item.name_hi : item.name_en}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <label className="block font-bold text-stone-700 mb-1">{lang === 'hi' ? 'विंग / प्रकोष्ठ' : 'Wing / organisation cell'}</label>
+                  <select value={postWingId} onChange={(e) => setPostWingId(e.target.value)} className="w-full p-2 border border-stone-300 rounded-lg bg-white">
+                    <option value="">{lang === 'hi' ? 'कोई विंग नहीं' : 'No wing assigned'}</option>
+                    {wings.map((wing) => <option key={wing.id} value={wing.id}>{lang === 'hi' ? wing.nameHi : wing.nameEn}</option>)}
                   </select>
                 </div>
                 <div>
