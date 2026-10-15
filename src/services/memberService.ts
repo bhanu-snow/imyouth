@@ -80,7 +80,7 @@ export const memberService = {
     if (stateError) throw new Error(stateError.message);
     if (!wing || !state) throw new Error('Select a valid active state and organization wing.');
     const id = `REQ-UP-${new Date().getFullYear()}-${crypto.randomUUID().slice(0, 8).toUpperCase()}`;
-    const { data, error } = await client.from('members').insert({
+    const { error } = await client.from('members').insert({
       id, full_name: input.fullName.trim(), full_name_hi: input.fullNameHi?.trim() || null,
       phone: input.phone.trim(), email: input.email?.trim() || null, state_id: input.stateId,
       district_id: input.districtId, sub_district_id: input.subDistrictId || null, wing_id: wing.id,
@@ -89,9 +89,19 @@ export const memberService = {
       community_background: input.communityBackground || null,
       blood_group: input.bloodGroup || null, education: input.education || null,
       status: 'pending', verified: false, approved_by: null, approved_at: null,
-    }).select(MEMBER_COLUMNS).single();
+    });
     if (error) throw new Error(`Could not submit application: ${error.message}`);
-    return (await mapRows([data as unknown as MemberRow]))[0];
+    // Public applicants cannot read member rows under RLS. Return only the acknowledgement
+    // assembled from submitted values; do not weaken row-level security for insert-returning.
+    return {
+      id, fullName: input.fullName.trim(), fullNameHi: input.fullNameHi?.trim() || undefined,
+      phone: input.phone.trim(), email: input.email?.trim() || '', avatarUrl: '',
+      state: 'Uttar Pradesh', district: '', subDistrict: '', wing: input.wingCode as YouthWing,
+      designation: input.designation.trim() || 'Active Youth Volunteer',
+      designationHi: input.designationHi?.trim() || '', joinedAt: new Date().toISOString().slice(0, 10),
+      verified: false, status: 'pending', communityBackground: input.communityBackground || undefined,
+      bloodGroup: input.bloodGroup || undefined, education: input.education || undefined,
+    };
   },
 
   async approve(requestId: string, _approver: AuthUser): Promise<Member> {
