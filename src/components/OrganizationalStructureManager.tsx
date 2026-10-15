@@ -89,7 +89,7 @@ export const OrganizationalStructureManager: React.FC<Props> = ({ lang, currentU
   const [distHeadquarters, setDistHeadquarters] = useState('');
   const [distInCharge, setDistInCharge] = useState('');
   const [distPhone, setDistPhone] = useState('');
-  const [distCadreCount, setDistCadreCount] = useState(150);
+  const [distCadreCount, setDistCadreCount] = useState(0);
 
   const isAuthorized = currentUser.role === 'superadmin' || currentUser.role === 'state_president';
 
@@ -256,7 +256,7 @@ export const OrganizationalStructureManager: React.FC<Props> = ({ lang, currentU
     setDistHeadquarters('');
     setDistInCharge('');
     setDistPhone('');
-    setDistCadreCount(120);
+    setDistCadreCount(0);
     setShowDistrictModal(true);
   };
 
@@ -1132,10 +1132,9 @@ export const OrganizationalStructureManager: React.FC<Props> = ({ lang, currentU
                   <label className="block font-bold text-stone-700 mb-1">In-Charge Leader Name *</label>
                   <input
                     type="text"
-                    required
                     value={distInCharge}
                     onChange={(e) => setDistInCharge(e.target.value)}
-                    placeholder="e.g. Adv. Zeeshan Farooqui"
+                    placeholder={lang === 'hi' ? 'पुष्ट पदाधिकारी का नाम' : 'Verified office-bearer name'}
                     className="w-full p-2 border border-stone-300 rounded-lg"
                   />
                 </div>
@@ -1143,10 +1142,9 @@ export const OrganizationalStructureManager: React.FC<Props> = ({ lang, currentU
                   <label className="block font-bold text-stone-700 mb-1">Contact Phone *</label>
                   <input
                     type="text"
-                    required
                     value={distPhone}
                     onChange={(e) => setDistPhone(e.target.value)}
-                    placeholder="+91 98370 XXXXX"
+                    placeholder={lang === 'hi' ? 'प्रकाशित संपर्क नंबर (वैकल्पिक)' : 'Published contact number (optional)'}
                     className="w-full p-2 border border-stone-300 rounded-lg font-mono"
                   />
                 </div>
