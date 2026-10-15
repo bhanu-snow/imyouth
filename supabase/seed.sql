@@ -138,3 +138,10 @@ SELECT p.id,t.id FROM public.news_posts p CROSS JOIN public.news_tags t
 WHERE p.legacy_id='news-up-2' AND t.name IN ('MSF', 'ScholarshipHelp', 'StudentEmpowerment');
 
 COMMIT;
+
+-- Expose only aggregate RSVP counts publicly; never expose individual RSVP identities.
+CREATE OR REPLACE VIEW public.event_rsvp_counts AS
+SELECT event_id, COUNT(*)::integer AS rsvp_count
+FROM public.event_rsvps
+GROUP BY event_id;
+GRANT SELECT ON public.event_rsvp_counts TO anon, authenticated;
