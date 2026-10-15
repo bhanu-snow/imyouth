@@ -46,6 +46,6 @@ Use the actual Auth user UUID and verify the resulting rows. Never store a passw
 
 ## 5. Important current migration boundary
 
-This branch adds the normalized schema, row-level security, a Supabase client, and database-backed reference-data loading for the dropdowns updated so far. Several content and administration workflows still call the legacy storageService and browser localStorage. Those workflows are not yet migrated to relational CRUD and must not be treated as production-persistent or protected by Supabase RLS until their data access is moved to Supabase.
+This branch adds the normalized schema, row-level security, a Supabase client, Supabase Auth sign-in/session restoration, and database-backed reference-data loading for the dropdowns updated so far. Several content and administration workflows still call the legacy storageService and browser localStorage; they are not yet migrated to relational CRUD and are not protected by Supabase RLS. Local account creation and password reset are intentionally disabled until a server-side Supabase Auth admin workflow is implemented. Do not treat this branch as production-ready until those workflows are migrated.
 
 After configuring Supabase, run npm run lint and npm run build, then test public application submission, role assignment, login, and each lookup chain in a non-production project before deployment.
