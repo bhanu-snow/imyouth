@@ -16,7 +16,7 @@ import {
   Sparkles
 } from 'lucide-react';
 import { Language, MythFaqItem, AuthUser } from '../types';
-import { storageService } from '../services/storageService';
+import { faqService } from '../services/faqService';
 import { LadderSymbolIcon } from './PartySymbol';
 import { TranslateButton } from './common/TranslateButton';
 import { translateEnglishToHindi } from '../utils/translationService';
@@ -61,11 +61,14 @@ export const FaqMythBuster: React.FC<Props> = ({ lang, currentUser }) => {
     return () => { cancelled = true; };
   }, []);
 
-  const loadFaqs = () => {
-    const list = storageService.getFaqs();
-    setFaqs(list);
-    if (list.length > 0 && !expandedId) {
-      setExpandedId(list[0].id);
+  const loadFaqs = async () => {
+    try {
+      const list = await faqService.list();
+      setFaqs(list);
+      setLookupError('');
+      setExpandedId((current) => current && list.some((item) => item.id === current) ? current : (list[0]?.id ?? null));
+    } catch (error) {
+      setLookupError(error instanceof Error ? error.message : 'Could not load FAQs from Supabase.');
     }
   };
 
@@ -98,15 +101,18 @@ export const FaqMythBuster: React.FC<Props> = ({ lang, currentUser }) => {
     setShowModal(true);
   };
 
-  const handleDeleteFaq = (id: string, e: React.MouseEvent) => {
+  const handleDeleteFaq = async (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
-    if (confirm(lang === 'hi' ? 'क्या आप इस FAQ को हटाना चाहते हैं?' : 'Are you sure you want to delete this FAQ clarification?')) {
-      const updated = storageService.deleteFaq(id);
-      setFaqs(updated);
+    if (!confirm(lang === 'hi' ? 'क्या आप इस FAQ को हटाना चाहते हैं?' : 'Are you sure you want to delete this FAQ clarification?')) return;
+    try {
+      await faqService.remove(id);
+      await loadFaqs();
+    } catch (error) {
+      setLookupError(error instanceof Error ? error.message : 'Could not delete FAQ.');
     }
   };
 
-  const handleSaveFaq = (e: React.FormEvent) => {
+  const handleSaveFaq = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!mythEn || !mythHi || !factEn || !factHi) return;
 
@@ -132,9 +138,13 @@ export const FaqMythBuster: React.FC<Props> = ({ lang, currentUser }) => {
       cadreTalkingPointsHi: parsedPointsHi.length ? parsedPointsHi : [factHi],
     };
 
-    const updated = storageService.saveFaq(faqData);
-    setFaqs(updated);
-    setShowModal(false);
+    try {
+      await faqService.save(faqData);
+      await loadFaqs();
+      setShowModal(false);
+    } catch (error) {
+      setLookupError(error instanceof Error ? error.message : 'Could not save FAQ to Supabase.');
+    }
   };
 
   const filteredFaqs = faqs.filter((faq) => {
