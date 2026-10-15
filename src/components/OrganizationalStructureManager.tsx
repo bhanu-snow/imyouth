@@ -86,7 +86,6 @@ export const OrganizationalStructureManager: React.FC<Props> = ({ lang, currentU
 
   // Form states: Districts
   const [distGeographyId, setDistGeographyId] = useState('');
-  const [distZone, setDistZone] = useState<OrgDistrict['zone']>('Rohilkhand');
   const [distHeadquarters, setDistHeadquarters] = useState('');
   const [distInCharge, setDistInCharge] = useState('');
   const [distPhone, setDistPhone] = useState('');
@@ -254,7 +253,6 @@ export const OrganizationalStructureManager: React.FC<Props> = ({ lang, currentU
   const openNewDistrictModal = () => {
     setEditingDistrict(null);
     setDistGeographyId(geographyDistricts[0]?.id ?? '');
-    setDistZone('Rohilkhand');
     setDistHeadquarters('');
     setDistInCharge('');
     setDistPhone('');
@@ -265,7 +263,6 @@ export const OrganizationalStructureManager: React.FC<Props> = ({ lang, currentU
   const openEditDistrictModal = (dist: OrgDistrict) => {
     setEditingDistrict(dist);
     setDistGeographyId(dist.id);
-    setDistZone(dist.zone);
     setDistHeadquarters(dist.headquarters || '');
     setDistInCharge(dist.inChargeName);
     setDistPhone(dist.inChargePhone);
@@ -1113,27 +1110,14 @@ export const OrganizationalStructureManager: React.FC<Props> = ({ lang, currentU
                 <p className="text-[11px] text-stone-500 mt-1">{lang === 'hi' ? 'ज़िले के नाम सरकारी भूगोल तालिका से आते हैं; यहाँ नया/डुप्लिकेट ज़िला नहीं बनाया जा सकता।' : 'District names come from the canonical geography table; this form cannot create duplicate districts.'}</p>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div>
-                  <label className="block font-bold text-stone-700 mb-1">Zone (क्षेत्र) *</label>
-                  <select
-                    value={distZone}
-                    onChange={(e) => setDistZone(e.target.value as any)}
-                    className="w-full p-2 border border-stone-300 rounded-lg bg-white"
-                  >
-                    {zoneOptions.map((item) => <option key={item.id} value={item.name_en}>{lang === 'hi' && item.name_hi ? item.name_hi : item.name_en}</option>)}
-                  </select>
-                  {lookupError && <p role="alert" className="mt-1 text-rose-700">{lookupError}</p>}
-                </div>
-                <div>
-                  <label className="block font-bold text-stone-700 mb-1">Active Cadre Count</label>
-                  <input
-                    type="number"
-                    value={distCadreCount}
-                    onChange={(e) => setDistCadreCount(Number(e.target.value))}
-                    className="w-full p-2 border border-stone-300 rounded-lg"
-                  />
-                </div>
+              <div>
+                <label className="block font-bold text-stone-700 mb-1">{lang === 'hi' ? 'दर्ज सक्रिय कैडर संख्या' : 'Recorded active cadre count'}</label>
+                <input
+                  type="number" min="0" step="1"
+                  value={distCadreCount}
+                  onChange={(e) => setDistCadreCount(Math.max(0, Number(e.target.value)))}
+                  className="w-full p-2 border border-stone-300 rounded-lg"
+                />
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
