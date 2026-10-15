@@ -31,6 +31,7 @@ export const FaqMythBuster: React.FC<Props> = ({ lang, currentUser }) => {
   const [faqs, setFaqs] = useState<MythFaqItem[]>([]);
   const [categoryOptions, setCategoryOptions] = useState<LookupOption[]>([]);
   const [lookupError, setLookupError] = useState('');
+  const [faqError, setFaqError] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [expandedId, setExpandedId] = useState<string | null>(null);
@@ -65,10 +66,10 @@ export const FaqMythBuster: React.FC<Props> = ({ lang, currentUser }) => {
     try {
       const list = await faqService.list();
       setFaqs(list);
-      setLookupError('');
+      setFaqError('');
       setExpandedId((current) => current && list.some((item) => item.id === current) ? current : (list[0]?.id ?? null));
     } catch (error) {
-      setLookupError(error instanceof Error ? error.message : 'Could not load FAQs from Supabase.');
+      setFaqError(error instanceof Error ? error.message : 'Could not load FAQs from Supabase.');
     }
   };
 
@@ -246,6 +247,18 @@ export const FaqMythBuster: React.FC<Props> = ({ lang, currentUser }) => {
       </div>
 
       {/* FAQ Accordion List with High Visibility Fonts */}
+      {faqError && (
+        <div role="alert" className="rounded-xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-800">
+          {faqError}
+        </div>
+      )}
+      {!faqError && faqs.length === 0 && (
+        <div className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
+          {lang === 'hi'
+            ? 'Supabase में अभी FAQ रिकॉर्ड नहीं हैं। supabase/seed.sql को Supabase SQL Editor में चलाएँ, फिर पेज रीफ़्रेश करें।'
+            : 'No FAQ records were found in Supabase. Run supabase/seed.sql in the Supabase SQL Editor, then refresh this page.'}
+        </div>
+      )}
       <div className="space-y-5">
         {filteredFaqs.map((faq) => {
           const isExpanded = expandedId === faq.id;
