@@ -40,7 +40,7 @@ export const Navbar: React.FC<Props> = ({
     { key: 'home', label: { en: 'Home', hi: 'मुख्य' } },
     { key: 'parliamentary', label: { en: 'Leaders & Evidence', hi: 'संसदीय साक्ष्य' } },
     { key: 'faq', label: { en: 'Myths & Facts (FAQ)', hi: 'तथ्य व भ्रम (FAQ)' } },
-    { key: 'districts', label: { en: 'UP Districts', hi: 'यूपी ज़िले' } },
+    { key: 'districts', label: { en: 'Sangathan / Organisation', hi: 'संगठन' } },
     { key: 'events', label: { en: 'Events & Press', hi: 'कार्यक्रम व प्रेस' } },
     { key: 'membership', label: { en: 'Membership Request', hi: 'सदस्यता' } },
   ];
