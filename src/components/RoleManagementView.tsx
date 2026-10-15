@@ -414,7 +414,7 @@ export const RoleManagementView: React.FC<Props> = ({
               className="px-2.5 py-1.5 border border-stone-300 rounded-lg text-xs bg-white font-medium"
             >
               <option value="all">All Roles (सभी)</option>
-              {roleOptions.map((item) => <option key={item.id} value={item.code}>{lang === 'hi' && item.name_hi ? item.name_hi : item.name_en}</option>)
+              {roleOptions.map((item) => <option key={item.id} value={item.code}>{lang === 'hi' && item.name_hi ? item.name_hi : item.name_en}</option>)}
             </select>
           </div>
         </div>
