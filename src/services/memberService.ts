@@ -30,7 +30,7 @@ async function mapRows(rows: MemberRow[]): Promise<Member[]> {
   const districts = new Map((districtResult.data ?? []).map((x: LookupRow) => [x.id, x.name_en]));
   const subDistricts = new Map((subDistrictResult.data ?? []).map((x: LookupRow) => [x.id, x.name_en]));
   const states = new Map((stateResult.data ?? []).map((x: LookupRow) => [x.id, x.name_en]));
-  const wings = new Map((wingResult.data ?? []).map((x: LookupRow) => [x.id, x.code]));
+  const wings = new Map((wingResult.data ?? []).map((x: { id: string; code: string }) => [x.id, x.code]));
   const approvers = new Map((approverResult.data ?? []).map((x: { user_id: string; full_name: string }) => [x.user_id, x.full_name]));
   return rows.map(row => ({
     id: row.cadre_id ?? row.id,
