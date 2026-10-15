@@ -4,6 +4,7 @@ import { NewsItem, Language, NewsCategory, AuthUser } from '../types';
 import { storageService } from '../services/storageService';
 import { TranslateButton } from './common/TranslateButton';
 import { translateEnglishToHindi } from '../utils/translationService';
+import { referenceDataService, type LookupOption } from '../services/referenceDataService';
 
 interface Props {
   lang: Language;
@@ -13,6 +14,8 @@ interface Props {
 
 export const LiveNewsFeed: React.FC<Props> = ({ lang, currentUser, onOpenSocialBroadcast }) => {
   const [news, setNews] = useState<NewsItem[]>([]);
+  const [categoryOptions, setCategoryOptions] = useState<LookupOption[]>([]);
+  const [lookupError, setLookupError] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [expandedNewsId, setExpandedNewsId] = useState<string | null>(null);
   const [showPublishModal, setShowPublishModal] = useState(false);
@@ -30,6 +33,11 @@ export const LiveNewsFeed: React.FC<Props> = ({ lang, currentUser, onOpenSocialB
   useEffect(() => {
     const list = storageService.getNews();
     setNews(list);
+    let cancelled = false;
+    void referenceDataService.newsCategories()
+      .then((rows) => { if (!cancelled) { setCategoryOptions(rows); setLookupError(''); } })
+      .catch((error: unknown) => { if (!cancelled) setLookupError(error instanceof Error ? error.message : 'Could not load news categories.'); });
+    return () => { cancelled = true; };
   }, []);
 
   const handlePublishSubmit = (e: React.FormEvent) => {
@@ -297,11 +305,9 @@ export const LiveNewsFeed: React.FC<Props> = ({ lang, currentUser, onOpenSocialB
                     onChange={(e) => setCategory(e.target.value as NewsCategory)}
                     className="w-full p-2 border border-stone-300 rounded bg-white"
                   >
-                    <option value="press_release">Press Release (प्रेस विज्ञप्ति)</option>
-                    <option value="ground_action">Ground Action (ज़मीनी आंदोलन)</option>
-                    <option value="statement">Official Statement (बयान)</option>
-                    <option value="campaign">Youth Campaign (अभियान)</option>
+                    {categoryOptions.map((item) => <option key={item.id} value={item.code}>{lang === 'hi' && item.name_hi ? item.name_hi : item.name_en}</option>)}
                   </select>
+                  {lookupError && <p role="alert" className="mt-1 text-rose-700">{lookupError}</p>}
                 </div>
                 <div>
                   <label className="block font-semibold text-stone-700 mb-1">Tags (comma-separated)</label>
