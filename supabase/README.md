@@ -24,12 +24,14 @@ Use the Supabase SQL Editor or Supabase CLI to apply these files in ascending ti
 4. migrations/20261016000400_lookup_ordering.sql
 5. migrations/20261016000500_member_lookup_catalogs.sql
 6. migrations/20261016000600_security_hardening.sql
+7. migrations/20261016000700_up_district_directory.sql
+8. migrations/20261016000800_designation_lookups.sql
 
 Do not run only the first migration: later migrations add row-level security, lookup data, and integrity constraints.
 
 ## 3. Geography data is not complete yet
 
-The current seed list includes only the 12 districts already represented in the UI. The generic "District HQ / Local Unit" entries are placeholders to let the dropdown graph function; they are not official tehsil/block records.
+The district directory migration seeds all 75 districts listed by the Government of Uttar Pradesh district portal. The generic "District HQ / Local Unit" entries are placeholders to let the district → local-unit dropdown graph function; they are not official tehsil/block records. Replace them with a verified tehsil/block/ward directory before production.
 
 Before production, import a verified, authoritative Uttar Pradesh dataset into states, zones, districts, and sub_districts. Keep stable codes and UUIDs, and ensure each sub-district references its correct district. Do not add fabricated tehsil names or office-bearer contact details.
 
