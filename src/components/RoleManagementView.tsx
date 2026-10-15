@@ -15,8 +15,6 @@ import {
   RefreshCw,
   Search,
   Filter,
-  Eye,
-  EyeOff,
   Radio,
   FileText
 } from 'lucide-react';
@@ -46,7 +44,6 @@ export const RoleManagementView: React.FC<Props> = ({
   const [lookupError, setLookupError] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedRoleFilter, setSelectedRoleFilter] = useState<string>('all');
-  const [showAllPasswords, setShowAllPasswords] = useState(false);
   
   // Modals state
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -392,7 +389,7 @@ export const RoleManagementView: React.FC<Props> = ({
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-stone-100">
           <div>
             <h3 className="font-bold text-stone-900 text-sm">
-              {lang === 'hi' ? 'सक्रिय पदाधिकारी एवं कैडर खाते' : 'Registered Accounts & Password Master Directory'}
+              {lang === 'hi' ? 'सक्रिय पदाधिकारी एवं कैडर खाते' : 'Registered Accounts'}
             </h3>
             <span className="text-xs text-stone-500">
               {filteredUsers.length} {lang === 'hi' ? 'खाते सूचीबद्ध' : 'accounts listed'}
@@ -400,17 +397,6 @@ export const RoleManagementView: React.FC<Props> = ({
           </div>
 
           <div className="flex flex-wrap items-center gap-2">
-            {isSuperAdmin && (
-              <button
-                type="button"
-                onClick={() => setShowAllPasswords(!showAllPasswords)}
-                className="px-2.5 py-1.5 text-xs font-bold text-rose-800 bg-rose-50 hover:bg-rose-100 rounded-lg border border-rose-200 transition-colors flex items-center gap-1.5 cursor-pointer"
-              >
-                {showAllPasswords ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
-                <span>{showAllPasswords ? 'Mask Passwords' : 'Show All Passwords'}</span>
-              </button>
-            )}
-
             <div className="relative">
               <Search className="w-3.5 h-3.5 text-stone-400 absolute left-2.5 top-2.5" />
               <input
@@ -462,17 +448,8 @@ export const RoleManagementView: React.FC<Props> = ({
                       {u.email && <span>· Email: <span className="font-mono text-stone-600">{u.email}</span></span>}
                     </div>
 
-                    {/* Password display: Super Admin sees all passwords */}
-                    <div className="mt-1 flex items-center gap-2">
-                      <span className="text-[11px] text-stone-500 font-semibold">Password:</span>
-                      {isSuperAdmin || isSelf ? (
-                        <span className="font-mono text-xs font-bold text-rose-800 bg-rose-50 px-2 py-0.5 rounded border border-rose-200">
-                          {isSuperAdmin && !showAllPasswords && !isSelf ? '••••••••' : u.password || 'not set'}
-                        </span>
-                      ) : (
-                        <span className="font-mono text-xs text-stone-400">•••••••• (Hidden)</span>
-                      )}
-                      <span className="text-[10px] text-stone-400">· Last Active: {u.lastLogin || 'Recent'}</span>
+                    <div className="mt-1 text-[10px] text-stone-400">
+                      Last Active: {u.lastLogin || 'Not available'} · Passwords are managed by Supabase Auth.
                     </div>
                   </div>
                 </div>
