@@ -68,7 +68,7 @@ export const memberService = {
 
   async submitApplication(input: {
     fullName: string; fullNameHi?: string; phone: string; email?: string;
-    stateId: string; districtId: string; subDistrictId?: string; wingCode: string;
+    stateId: string; districtId: string; subDistrictId?: string; stateName?: string; districtName?: string; subDistrictName?: string; wingCode: string;
     designation: string; designationHi?: string; communityBackground?: string;
     bloodGroup?: string; education?: string;
   }): Promise<Member> {
@@ -97,7 +97,7 @@ export const memberService = {
     return {
       id, recordId: id, fullName: input.fullName.trim(), fullNameHi: input.fullNameHi?.trim() || undefined,
       phone: input.phone.trim(), email: input.email?.trim() || '', avatarUrl: '',
-      state: 'Uttar Pradesh', district: '', subDistrict: '', wing: input.wingCode as YouthWing,
+      state: input.stateName ?? 'Uttar Pradesh', district: input.districtName ?? '', subDistrict: input.subDistrictName ?? '', wing: input.wingCode as YouthWing,
       designation: input.designation.trim() || 'Active Youth Volunteer',
       designationHi: input.designationHi?.trim() || '', joinedAt: new Date().toISOString().slice(0, 10),
       verified: false, status: 'pending', communityBackground: input.communityBackground || undefined,
