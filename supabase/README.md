@@ -29,13 +29,21 @@ Use the Supabase SQL Editor or Supabase CLI to apply these files in ascending ti
 
 Do not run only the first migration: later migrations add row-level security, lookup data, and integrity constraints.
 
-## 3. Geography data is not complete yet
+## 3. Seed the initial FAQ content
+
+After all migrations are applied, run the complete `supabase/seed.sql` file in Supabase SQL Editor. It imports the existing bilingual FAQ content from `src/data/mythsFaqData.ts` into `faq_categories`, `myth_faqs`, and `faq_talking_points`. The seed is idempotent for the five bundled FAQ records and can be rerun to refresh those records.
+
+The FAQ screen now reads, creates, edits, and deletes FAQ records through Supabase. It no longer uses browser localStorage for FAQ CRUD. The FAQ editor requires a signed-in user with an authorized `superadmin` or `content_manager` role.
+
+This seed only covers FAQ content. It does not create an Auth user, insert a password, or migrate other localStorage-backed modules such as members, events, news, or parliamentary history.
+
+## 4. Geography data is not complete yet
 
 The district directory migration seeds all 75 districts listed by the [Government of Uttar Pradesh district portal](https://uttarpradesh.s3waas.gov.in/). The generic "District HQ / Local Unit" entries are placeholders to let the district → local-unit dropdown graph function; they are not official tehsil/block records. Replace them with a verified tehsil/block/ward directory before production.
 
 Before production, import a verified, authoritative Uttar Pradesh dataset into states, zones, districts, and sub_districts. Keep stable codes and UUIDs, and ensure each sub-district references its correct district. Do not add fabricated tehsil names or office-bearer contact details.
 
-## 4. Enable the first real administrator
+## 5. Enable the first real administrator
 
 1. Create the first administrator account in Supabase Authentication → Users.
 2. Copy that user's UUID.
@@ -44,7 +52,7 @@ Before production, import a verified, authoritative Uttar Pradesh dataset into s
 
 Use the actual Auth user UUID and verify the resulting rows. Never store a password in user_profiles, application tables, or browser localStorage. Supabase Auth owns password verification.
 
-## 5. Important current migration boundary
+## 6. Important current migration boundary
 
 This branch adds the normalized schema, row-level security, a Supabase client, Supabase Auth sign-in/session restoration, and database-backed reference-data loading for the dropdowns updated so far. Several content and administration workflows still call the legacy storageService and browser localStorage; they are not yet migrated to relational CRUD and are not protected by Supabase RLS. Local account creation and password reset are intentionally disabled until a server-side Supabase Auth admin workflow is implemented. Do not treat this branch as production-ready until those workflows are migrated.
 
