@@ -57,6 +57,13 @@ export const referenceDataService = {
   newsCategories: () => activeRows<LookupOption>('news_categories', 'id,code,name_en,name_hi,sort_order'),
   faqCategories: () => activeRows<LookupOption>('faq_categories', 'id,code,name_en,name_hi,sort_order'),
   parliamentaryHouses: () => activeRows<LookupOption>('parliamentary_houses', 'id,code,name_en,name_hi,sort_order'),
-  socialPlatforms: () => activeRows<LookupOption>('social_platforms', 'id,code,name_en,sort_order'),
+  socialPlatforms: () => {
+    const client = requireSupabase();
+    return client.from('social_platforms').select('id,code,name,sort_order').eq('is_active', true).order('sort_order')
+      .then(({ data, error }) => {
+        if (error) throw new Error(`Could not load social platforms: ${error.message}`);
+        return (data ?? []).map((row) => ({ ...row, name_en: row.name })) as LookupOption[];
+      });
+  },
   roles: () => activeRows<LookupOption>('roles', 'id,code,name_en,name_hi,sort_order'),
 };
