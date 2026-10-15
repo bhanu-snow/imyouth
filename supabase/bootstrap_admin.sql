@@ -1,6 +1,6 @@
 -- Bootstrap the first application administrator AFTER creating the user in
 -- Supabase Dashboard -> Authentication -> Users.
--- Replace the email and display name below before running this script.
+-- Replace BOTH occurrences of REPLACE_WITH_YOUR_ADMIN_EMAIL and the display name below before running.
 -- This does not create a user or password; Supabase Auth owns credentials.
 
 DO $$
