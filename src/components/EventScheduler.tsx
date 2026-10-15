@@ -50,7 +50,6 @@ export const EventScheduler: React.FC<Props> = ({
   const [districtOptions, setDistrictOptions] = useState<DistrictOption[]>([]);
   const [categoryOptions, setCategoryOptions] = useState<LookupOption[]>([]);
   const [lookupError, setLookupError] = useState('');
-  const [state] = useState('Uttar Pradesh');
   const [coordinatorName, setCoordinatorName] = useState(currentUser.name || 'Adv. Sarfaraz Ahmed');
   const [coordinatorPhone, setCoordinatorPhone] = useState(currentUser.phone || '+91 98370 00112');
 
