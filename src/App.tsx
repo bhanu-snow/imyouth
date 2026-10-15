@@ -8,7 +8,7 @@ import { SocialBroadcastStudio } from './components/SocialBroadcastStudio';
 import { MemberRegistration } from './components/MemberRegistration';
 import { EventScheduler } from './components/EventScheduler';
 import { LiveNewsFeed } from './components/LiveNewsFeed';
-import { DistrictLeadershipTracker } from './components/DistrictLeadershipTracker';
+import { SangathanPage } from './components/SangathanPage';
 import { CadreApprovalsQueue } from './components/CadreApprovalsQueue';
 import { ParliamentaryHistoryView } from './components/ParliamentaryHistoryView';
 import { LoginPage } from './components/LoginPage';
@@ -337,10 +337,7 @@ export default function App() {
         )}
 
         {activeTab === 'districts' && (
-          <DistrictLeadershipTracker 
-            lang={lang} 
-            currentUser={currentUser} 
-          />
+          <SangathanPage lang={lang} currentUser={currentUser} />
         )}
 
         {activeTab === 'events' && (
@@ -430,7 +427,7 @@ export default function App() {
                 onClick={() => setActiveTab('districts')}
                 className="hover:text-emerald-800 transition-colors"
               >
-                {lang === 'hi' ? 'यूपी ज़िले' : 'UP Districts'}
+                {lang === 'hi' ? 'संगठन' : 'Sangathan'}
               </button>
               {(currentUser.role === 'superadmin' || currentUser.role === 'state_president') && (
                 <button
