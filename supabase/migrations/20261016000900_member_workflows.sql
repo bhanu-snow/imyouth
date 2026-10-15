@@ -9,6 +9,7 @@ with check (
   and verified = false
   and approved_by is null
   and approved_at is null
+  and (auth_user_id is null or auth_user_id = auth.uid())
   and exists (
     select 1 from public.districts d
     where d.id = public.members.district_id
