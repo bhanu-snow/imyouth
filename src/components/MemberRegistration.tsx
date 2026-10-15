@@ -491,12 +491,12 @@ export const MemberRegistration: React.FC<Props> = ({ lang, currentUser, onMembe
   
                       <div className="text-right">
                         <span className={`text-[10px] font-mono font-medium px-1.5 py-0.5 rounded block ${
-                          isPending ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-900'
+                          m.status === 'pending' ? 'bg-amber-100 text-amber-800' : m.status === 'rejected' ? 'bg-rose-100 text-rose-800' : 'bg-emerald-100 text-emerald-900'
                         }`}>
                           {m.id}
                         </span>
                         <span className="text-[10px] text-stone-400 mt-0.5 block">
-                          {isPending ? 'Pending Review' : 'Verified'}
+                          {m.status === 'pending' ? 'Pending Review' : m.status === 'rejected' ? 'Rejected' : 'Verified'}
                         </span>
                       </div>
                     </div>
