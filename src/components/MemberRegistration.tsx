@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { UserCheck, Shield, Sparkles, Search, UserPlus, Clock, CheckCircle2, AlertCircle, Lock } from 'lucide-react';
 import { Member, Language, YouthWing, AuthUser } from '../types';
-import { storageService } from '../services/storageService';
+import { memberService } from '../services/memberService';
 import { DigitalIdCard } from './DigitalIdCard';
 import confetti from 'canvas-confetti';
 import { TranslateButton } from './common/TranslateButton';
@@ -23,7 +23,7 @@ const SAMPLE_AVATARS = [
 ];
 
 export const MemberRegistration: React.FC<Props> = ({ lang, currentUser, onMemberRegistered }) => {
-  const [members, setMembers] = useState<Member[]>(storageService.getMembers());
+  const [members, setMembers] = useState<Member[]>([]);
   const [currentMember, setCurrentMember] = useState<Member | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -35,7 +35,7 @@ export const MemberRegistration: React.FC<Props> = ({ lang, currentUser, onMembe
   const [fullNameHi, setFullNameHi] = useState('');
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
-  const [state] = useState('Uttar Pradesh');
+  const [stateId, setStateId] = useState('');
   const [states, setStates] = useState<StateOption[]>([]);
   const [districtOptions, setDistrictOptions] = useState<DistrictOption[]>([]);
   const [subDistrictOptions, setSubDistrictOptions] = useState<SubDistrictOption[]>([]);
@@ -52,44 +52,43 @@ export const MemberRegistration: React.FC<Props> = ({ lang, currentUser, onMembe
   const [bloodGroup, setBloodGroup] = useState('O+');
   const [education, setEducation] = useState('Graduate');
   const [avatarUrl, setAvatarUrl] = useState(SAMPLE_AVATARS[0]);
-  const [directApprove, setDirectApprove] = useState(false);
-
-  const canDirectApprove = currentUser.role === 'state_admin' || currentUser.role === 'district_incharge';
+  const [submitError, setSubmitError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const canViewDirectory = ['superadmin', 'state_president', 'state_admin', 'district_incharge'].includes(currentUser.role);
 
   useEffect(() => {
-    const list = storageService.getMembers();
-    setMembers(list);
-    const currId = storageService.getCurrentMemberId();
-    if (currId) {
-      const found = list.find((m) => m.id === currId);
-      if (found) setCurrentMember(found);
-    } else if (list.length > 0) {
-      setCurrentMember(list[0]);
-    }
-
     let cancelled = false;
     void Promise.all([referenceDataService.states(), referenceDataService.districts(), referenceDataService.wings(), referenceDataService.memberCommunities()])
-      .then(([stateRows, districtRows, wingRows, communityRows]) => {
+      .then(async ([stateRows, districtRows, wingRows, communityRows]) => {
         if (cancelled) return;
         setStates(stateRows);
-        const up = stateRows.find((item) => item.code === 'UP');
-        const upDistricts = up ? districtRows.filter((item) => item.state_id === up.id) : districtRows;
+        const up = stateRows.find((item) => item.code.toUpperCase() === 'UP');
+        const upDistricts = up ? districtRows.filter((item) => item.state_id === up.id) : [];
         setDistrictOptions(upDistricts);
         setWingOptions(wingRows);
         setCommunityOptions(communityRows);
-        const initialDistrict = upDistricts.find((item) => item.code === 'moradabad') || upDistricts[0];
+        if (up) setStateId(up.id);
+        const initialDistrict = upDistricts.find((item) => item.code.toLowerCase() === 'moradabad') || upDistricts[0];
         if (initialDistrict) {
           setDistrictId(initialDistrict.id);
           setDistrict(initialDistrict.name_en);
         }
         if (wingRows.some((item) => item.code === 'myl_cadre')) setWing('myl_cadre');
+        if (canViewDirectory) {
+          const rows = await memberService.listForAuthorizedUser();
+          if (!cancelled) {
+            setMembers(rows);
+            const approvedOrPending = rows[0] ?? null;
+            setCurrentMember(approvedOrPending);
+          }
+        }
         setLookupError('');
       })
       .catch((error: unknown) => {
         if (!cancelled) setLookupError(error instanceof Error ? error.message : 'Could not load reference data from Supabase.');
       });
     return () => { cancelled = true; };
-  }, []);
+  }, [canViewDirectory]);
 
   useEffect(() => {
     if (!districtId) {
@@ -127,47 +126,32 @@ export const MemberRegistration: React.FC<Props> = ({ lang, currentUser, onMembe
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!fullName || !phone) return;
-
-    const shouldApproveNow = canDirectApprove && directApprove;
-
-    const newMember = storageService.submitMemberApplication(
-      {
-        fullName,
-        fullNameHi: fullNameHi || fullName,
-        phone,
-        email: email || `${fullName.toLowerCase().replace(/\s+/g, '.')}@mylup.org`,
-        state: 'Uttar Pradesh',
-        district,
-        subDistrict,
-        wing,
-        designation: designation || 'Active Youth Cadre',
-        designationHi: wing === 'msf' ? 'छात्र कार्यकर्ता (MSF)' : 'सक्रिय युवा कार्यकर्ता (MYL)',
-        communityBackground,
-        bloodGroup,
-        education,
-        avatarUrl,
-      },
-      shouldApproveNow,
-      shouldApproveNow ? `${currentUser.name} (${currentUser.designation})` : ''
-    );
-
-    const updated = storageService.getMembers();
-    setMembers(updated);
-    setSubmittedRequest(newMember);
-    setCurrentMember(newMember);
-    setShowForm(false);
-    onMemberRegistered?.();
-
+    setSubmitError('');
+    if (!fullName.trim() || !phone.trim() || !stateId || !districtId || !wing) {
+      setSubmitError('Complete the required name, phone, state, district, and wing fields.');
+      return;
+    }
+    setIsSubmitting(true);
     try {
-      confetti({
-        particleCount: 70,
-        spread: 60,
-        origin: { y: 0.6 },
+      const newMember = await memberService.submitApplication({
+        fullName, fullNameHi, phone, email, stateId, districtId, subDistrictId,
+        wingCode: wing, designation: designation || 'Active Youth Volunteer',
+        designationHi: wing === 'msf' ? 'छात्र कार्यकर्ता (MSF)' : 'सक्रिय युवा कार्यकर्ता (MYL)',
+        communityBackground, bloodGroup, education,
       });
-    } catch {}
+      setSubmittedRequest(newMember);
+      setCurrentMember(newMember);
+      setShowForm(false);
+      if (canViewDirectory) setMembers(await memberService.listForAuthorizedUser());
+      onMemberRegistered?.();
+      try { confetti({ particleCount: 70, spread: 60, origin: { y: 0.6 } }); } catch {}
+    } catch (error) {
+      setSubmitError(error instanceof Error ? error.message : 'Application could not be submitted.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const filteredMembers = members.filter((m) => {
@@ -437,21 +421,7 @@ export const MemberRegistration: React.FC<Props> = ({ lang, currentUser, onMembe
                   </div>
                 </div>
 
-                {/* Direct approval checkbox for logged-in in-charges */}
-                {canDirectApprove && (
-                  <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-lg flex items-center gap-2 text-xs text-emerald-950">
-                    <input
-                      type="checkbox"
-                      id="direct-approve"
-                      checked={directApprove}
-                      onChange={(e) => setDirectApprove(e.target.checked)}
-                      className="rounded text-emerald-700"
-                    />
-                    <label htmlFor="direct-approve" className="font-semibold cursor-pointer">
-                      In-Charge Direct Approval: Issue Official Cadre ID immediately (Logged in as {currentUser.name})
-                    </label>
-                  </div>
-                )}
+                {submitError && <p role="alert" className="p-3 rounded bg-rose-50 border border-rose-200 text-rose-800">{submitError}</p>}
 
                 <div className="pt-3 flex items-center justify-end gap-2 border-t border-stone-100">
                   <button
@@ -463,9 +433,10 @@ export const MemberRegistration: React.FC<Props> = ({ lang, currentUser, onMembe
                   </button>
                   <button
                     type="submit"
-                    className="px-5 py-2 bg-emerald-700 hover:bg-emerald-800 text-white rounded font-bold shadow-sm cursor-pointer"
+                    disabled={isSubmitting}
+                    className="px-5 py-2 bg-emerald-700 disabled:opacity-50 hover:bg-emerald-800 text-white rounded font-bold shadow-sm cursor-pointer"
                   >
-                    {canDirectApprove && directApprove ? 'Approve & Issue ID Now' : 'Submit Application (Request Pending)'}
+                    {isSubmitting ? 'Submitting…' : 'Submit Application (Request Pending)'}
                   </button>
                 </div>
               </form>
@@ -489,110 +460,112 @@ export const MemberRegistration: React.FC<Props> = ({ lang, currentUser, onMembe
           )}
         </div>
 
-        {/* Right Column: Cadre Directory & Filter (6 cols) */}
-        <div className="lg:col-span-6 space-y-4">
-          <div className="p-5 bg-white border border-stone-200 rounded-xl space-y-4 shadow-sm">
-            <div className="flex items-center justify-between">
-              <h3 className="font-bold text-stone-900 text-sm flex items-center gap-1.5">
-                <UserCheck className="w-4 h-4 text-emerald-700" />
-                <span>{lang === 'hi' ? 'उत्तर प्रदेश कैडर रोस्टर' : 'Cadre Directory & Applications'}</span>
-              </h3>
-              <span className="text-xs text-stone-500">
-                {filteredMembers.length} {lang === 'hi' ? 'सदस्य/आवेदक' : 'records'}
-              </span>
-            </div>
-
-            {/* Filter / Search Bar */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs">
-              <div className="relative">
-                <Search className="w-3.5 h-3.5 text-stone-400 absolute left-2.5 top-2.5" />
-                <input
-                  type="text"
-                  placeholder={lang === 'hi' ? 'नाम या ज़िला खोजें...' : 'Search cadre or district...'}
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-8 pr-3 py-1.5 border border-stone-300 rounded text-xs focus:outline-none focus:border-emerald-600"
-                />
+        {canViewDirectory && (
+          {/* Right Column: Cadre Directory & Filter (6 cols) */}
+          <div className="lg:col-span-6 space-y-4">
+            <div className="p-5 bg-white border border-stone-200 rounded-xl space-y-4 shadow-sm">
+              <div className="flex items-center justify-between">
+                <h3 className="font-bold text-stone-900 text-sm flex items-center gap-1.5">
+                  <UserCheck className="w-4 h-4 text-emerald-700" />
+                  <span>{lang === 'hi' ? 'उत्तर प्रदेश कैडर रोस्टर' : 'Cadre Directory & Applications'}</span>
+                </h3>
+                <span className="text-xs text-stone-500">
+                  {filteredMembers.length} {lang === 'hi' ? 'सदस्य/आवेदक' : 'records'}
+                </span>
               </div>
-
-              <select
-                value={selectedDistrictFilter}
-                onChange={(e) => setSelectedDistrictFilter(e.target.value)}
-                className="w-full py-1.5 px-2.5 border border-stone-300 rounded text-xs bg-white"
-              >
-                <option value="all">All Districts (सभी ज़िले)</option>
-                {districtOptions.map((item) => (
-                  <option key={item.id} value={item.name_en}>{lang === 'hi' && item.name_hi ? item.name_hi : item.name_en}</option>
-                ))}
-              </select>
-            </div>
-
-            {/* Cadres List with Status Badges */}
-            <div className="divide-y divide-stone-100 max-h-[480px] overflow-y-auto">
-              {filteredMembers.map((m) => {
-                const isPending = m.status === 'pending';
-                return (
-                  <div
-                    key={m.id}
-                    onClick={() => {
-                      setCurrentMember(m);
-                      setShowForm(false);
-                      setSubmittedRequest(null);
-                    }}
-                    className={`py-3 px-2 flex items-center justify-between rounded hover:bg-stone-50 transition-colors cursor-pointer ${
-                      currentMember?.id === m.id ? 'bg-blue-50/60 border-l-2 border-blue-900' : ''
-                    }`}
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full overflow-hidden border border-blue-900/30 shrink-0 bg-stone-100">
-                        {m.avatarUrl ? (
-                          <img src={m.avatarUrl} alt={m.fullName} className="w-full h-full object-cover" />
-                        ) : (
-                          <span className="w-full h-full flex items-center justify-center font-bold text-blue-900">
-                            {m.fullName.charAt(0)}
-                          </span>
-                        )}
-                      </div>
-                      <div>
-                        <div className="font-bold text-xs text-stone-900 flex items-center gap-1.5">
-                          <span>{m.fullName}</span>
-                          {m.verified ? (
-                            <span title="Verified Cadre" className="inline-flex items-center">
-                              <Shield className="w-3 h-3 text-emerald-700 fill-emerald-700" />
-                            </span>
+  
+              {/* Filter / Search Bar */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs">
+                <div className="relative">
+                  <Search className="w-3.5 h-3.5 text-stone-400 absolute left-2.5 top-2.5" />
+                  <input
+                    type="text"
+                    placeholder={lang === 'hi' ? 'नाम या ज़िला खोजें...' : 'Search cadre or district...'}
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full pl-8 pr-3 py-1.5 border border-stone-300 rounded text-xs focus:outline-none focus:border-emerald-600"
+                  />
+                </div>
+  
+                <select
+                  value={selectedDistrictFilter}
+                  onChange={(e) => setSelectedDistrictFilter(e.target.value)}
+                  className="w-full py-1.5 px-2.5 border border-stone-300 rounded text-xs bg-white"
+                >
+                  <option value="all">All Districts (सभी ज़िले)</option>
+                  {districtOptions.map((item) => (
+                    <option key={item.id} value={item.name_en}>{lang === 'hi' && item.name_hi ? item.name_hi : item.name_en}</option>
+                  ))}
+                </select>
+              </div>
+  
+              {/* Cadres List with Status Badges */}
+              <div className="divide-y divide-stone-100 max-h-[480px] overflow-y-auto">
+                {filteredMembers.map((m) => {
+                  const isPending = m.status === 'pending';
+                  return (
+                    <div
+                      key={m.id}
+                      onClick={() => {
+                        setCurrentMember(m);
+                        setShowForm(false);
+                        setSubmittedRequest(null);
+                      }}
+                      className={`py-3 px-2 flex items-center justify-between rounded hover:bg-stone-50 transition-colors cursor-pointer ${
+                        currentMember?.id === m.id ? 'bg-blue-50/60 border-l-2 border-blue-900' : ''
+                      }`}
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-full overflow-hidden border border-blue-900/30 shrink-0 bg-stone-100">
+                          {m.avatarUrl ? (
+                            <img src={m.avatarUrl} alt={m.fullName} className="w-full h-full object-cover" />
                           ) : (
-                            <span title="Pending Approval" className="inline-flex items-center">
-                              <Clock className="w-3 h-3 text-amber-600" />
+                            <span className="w-full h-full flex items-center justify-center font-bold text-blue-900">
+                              {m.fullName.charAt(0)}
                             </span>
                           )}
                         </div>
-                        <div className="text-[11px] text-stone-500">
-                          {m.designation} · {m.district} (UP)
+                        <div>
+                          <div className="font-bold text-xs text-stone-900 flex items-center gap-1.5">
+                            <span>{m.fullName}</span>
+                            {m.verified ? (
+                              <span title="Verified Cadre" className="inline-flex items-center">
+                                <Shield className="w-3 h-3 text-emerald-700 fill-emerald-700" />
+                              </span>
+                            ) : (
+                              <span title="Pending Approval" className="inline-flex items-center">
+                                <Clock className="w-3 h-3 text-amber-600" />
+                              </span>
+                            )}
+                          </div>
+                          <div className="text-[11px] text-stone-500">
+                            {m.designation} · {m.district} (UP)
+                          </div>
+                          {m.communityBackground && (
+                            <span className="text-[10px] text-blue-900 font-semibold block">
+                              {m.communityBackground.split('/')[0]}
+                            </span>
+                          )}
                         </div>
-                        {m.communityBackground && (
-                          <span className="text-[10px] text-blue-900 font-semibold block">
-                            {m.communityBackground.split('/')[0]}
-                          </span>
-                        )}
+                      </div>
+  
+                      <div className="text-right">
+                        <span className={`text-[10px] font-mono font-medium px-1.5 py-0.5 rounded block ${
+                          isPending ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-900'
+                        }`}>
+                          {m.id}
+                        </span>
+                        <span className="text-[10px] text-stone-400 mt-0.5 block">
+                          {isPending ? 'Pending Review' : 'Verified'}
+                        </span>
                       </div>
                     </div>
-
-                    <div className="text-right">
-                      <span className={`text-[10px] font-mono font-medium px-1.5 py-0.5 rounded block ${
-                        isPending ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-900'
-                      }`}>
-                        {m.id}
-                      </span>
-                      <span className="text-[10px] text-stone-400 mt-0.5 block">
-                        {isPending ? 'Pending Review' : 'Verified'}
-                      </span>
-                    </div>
-                  </div>
-                );
-              })}
+                  );
+                })}
+              </div>
             </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );
