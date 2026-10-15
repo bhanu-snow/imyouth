@@ -199,7 +199,7 @@ export const SocialBroadcastStudio: React.FC<Props> = ({
       contentHi: currentShareContent.textHi,
       hashtags: currentShareContent.hashtags,
       url: currentShareContent.url,
-      targetPlatforms: ['whatsapp', 'telegram', 'twitter', 'facebook', 'instagram'],
+      targetPlatforms: platformOptions.map((platform) => platform.code as SocialPlatform),
       createdAt: new Date().toISOString(),
       metrics: {
         shares: 1,
