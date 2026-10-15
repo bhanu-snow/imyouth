@@ -66,4 +66,5 @@ export const referenceDataService = {
       });
   },
   roles: () => activeRows<LookupOption>('roles', 'id,code,name_en,name_hi,sort_order'),
+  memberCommunities: () => activeRows<LookupOption>('member_communities', 'id,code,name_en,name_hi,sort_order'),
 };
