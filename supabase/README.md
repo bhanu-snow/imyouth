@@ -31,11 +31,13 @@ Do not run only the first migration: later migrations add row-level security, lo
 
 ## 3. Seed the initial FAQ content
 
-After all migrations are applied, run the complete `supabase/seed.sql` file in Supabase SQL Editor. It imports the existing bilingual FAQ content from `src/data/mythsFaqData.ts` into `faq_categories`, `myth_faqs`, and `faq_talking_points`. The seed is idempotent for the five bundled FAQ records and can be rerun to refresh those records.
+After all migrations are applied, run the complete `supabase/seed.sql` file in Supabase SQL Editor. It imports the existing bilingual FAQ content into `faq_categories`, `myth_faqs`, and `faq_talking_points`, plus the three bundled sample events and two bundled sample news posts with their tags. It also creates the aggregate-only `event_rsvp_counts` view used by the events page. The seed is idempotent for these bundled records and can be rerun to refresh them.
 
-The FAQ screen now reads, creates, edits, and deletes FAQ records through Supabase. It no longer uses browser localStorage for FAQ CRUD. The FAQ editor requires a signed-in user with an authorized `superadmin` or `content_manager` role.
+The FAQ, Events, and News pages now read and write through Supabase rather than browser localStorage. Event RSVP requires a signed-in Supabase user. The FAQ editor requires `superadmin` or `content_manager`; event/news publishing is gated by the page roles and enforced by database RLS.
 
-This seed only covers FAQ content. It does not create an Auth user, insert a password, or migrate other localStorage-backed modules such as members, events, news, or parliamentary history.
+Important: bundled events and news are prototype/sample content from the existing frontend. Verify every claim, event date, coordinator, and organizational detail before using them as official public announcements. Historical demo RSVP counts and news share counts are intentionally not imported as real engagement.
+
+This seed does not create an Auth user, insert a password, or migrate other localStorage-backed modules such as members, organizational leadership, social broadcasts, or parliamentary history.
 
 ## 4. Geography data is not complete yet
 
