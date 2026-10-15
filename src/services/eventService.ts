@@ -75,7 +75,7 @@ export const eventService = {
     if (countsResult.error) throw new Error(`Could not load event RSVP counts: ${countsResult.error.message}`);
 
     const counts = new Map<string, number>(
-      (countsResult.data ?? []).map((row) => [row.event_id as string, row.rsvp_count as number]),
+      (countsResult.data ?? []).map((row): [string, number] => [row.event_id as string, row.rsvp_count as number]),
     );
     let userRsvps = new Map<string, 'going' | 'maybe'>();
     const userId = userResult.data.user?.id;
@@ -86,7 +86,7 @@ export const eventService = {
         .eq('user_id', userId)
         .in('event_id', eventIds);
       if (rsvpError) throw new Error(`Could not load your event RSVPs: ${rsvpError.message}`);
-      userRsvps = new Map((rsvps ?? []).map((r) => [r.event_id as string, r.status as 'going' | 'maybe']));
+      userRsvps = new Map((rsvps ?? []).map((r): [string, 'going' | 'maybe'] => [r.event_id as string, r.status as 'going' | 'maybe']));
     }
     return rows.map((row) => toEvent(row, counts.get(row.id) ?? 0, userRsvps.get(row.id) ?? null));
   },
