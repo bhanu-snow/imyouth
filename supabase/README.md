@@ -45,10 +45,12 @@ Before production, import a verified, authoritative Uttar Pradesh dataset into s
 
 ## 5. Enable the first real administrator
 
-1. Create the first administrator account in Supabase Authentication → Users.
-2. Copy that user's UUID.
-3. In the SQL Editor, insert a matching user_profiles row with allow_login = true and is_active = true.
-4. Assign the superadmin role through user_roles using the matching role UUID from roles.
+1. Create the administrator account in Supabase Authentication → Users. Set a strong password there.
+2. Open `supabase/bootstrap_admin.sql` and replace `REPLACE_WITH_YOUR_ADMIN_EMAIL` with the exact email used in Supabase Auth. Update `target_name` if desired.
+3. Run the edited script in Supabase SQL Editor. It creates/activates the matching profile, assigns the existing `superadmin` role, and returns a verification row.
+4. Sign in through the website with that email and password.
+
+The bootstrap script deliberately does not create Auth users or passwords. Never insert passwords into application tables or put the Supabase `service_role` key in frontend code.
 
 Use the actual Auth user UUID and verify the resulting rows. Never store a password in user_profiles, application tables, or browser localStorage. Supabase Auth owns password verification.
 
