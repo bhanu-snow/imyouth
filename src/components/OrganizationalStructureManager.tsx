@@ -25,7 +25,7 @@ import { storageService } from '../services/storageService';
 import { LadderSymbolIcon, PartyFlagIcon } from './PartySymbol';
 import { TranslateButton } from './common/TranslateButton';
 import { translateEnglishToHindi } from '../utils/translationService';
-import { referenceDataService, type ZoneOption } from '../services/referenceDataService';
+import { referenceDataService, type ZoneOption, type LookupOption } from '../services/referenceDataService';
 
 interface Props {
   lang: Language;
@@ -40,6 +40,8 @@ export const OrganizationalStructureManager: React.FC<Props> = ({ lang, currentU
   const [wings, setWings] = useState<OrgWing[]>([]);
   const [districts, setDistricts] = useState<OrgDistrict[]>([]);
   const [zoneOptions, setZoneOptions] = useState<ZoneOption[]>([]);
+  const [designationLevelOptions, setDesignationLevelOptions] = useState<LookupOption[]>([]);
+  const [designationStatusOptions, setDesignationStatusOptions] = useState<LookupOption[]>([]);
   const [lookupError, setLookupError] = useState('');
 
   // Search & Filter
@@ -94,9 +96,20 @@ export const OrganizationalStructureManager: React.FC<Props> = ({ lang, currentU
   useEffect(() => {
     loadAllData();
     let cancelled = false;
-    void referenceDataService.zones()
-      .then((rows) => { if (!cancelled) { setZoneOptions(rows); setLookupError(''); } })
-      .catch((error: unknown) => { if (!cancelled) setLookupError(error instanceof Error ? error.message : 'Could not load zone reference data.'); });
+    void Promise.all([
+      referenceDataService.zones(),
+      referenceDataService.designationLevels(),
+      referenceDataService.designationStatuses(),
+    ])
+      .then(([zones, levels, statuses]) => {
+        if (!cancelled) {
+          setZoneOptions(zones);
+          setDesignationLevelOptions(levels);
+          setDesignationStatusOptions(statuses);
+          setLookupError('');
+        }
+      })
+      .catch((error: unknown) => { if (!cancelled) setLookupError(error instanceof Error ? error.message : 'Could not load organizational lookup data.'); });
     return () => { cancelled = true; };
   }, []);
 
@@ -806,11 +819,7 @@ export const OrganizationalStructureManager: React.FC<Props> = ({ lang, currentU
                     onChange={(e) => setPostLevel(e.target.value as any)}
                     className="w-full p-2 border border-stone-300 rounded-lg bg-white"
                   >
-                    <option value="state">State (प्रदेश)</option>
-                    <option value="zonal">Zonal (ज़ोनल)</option>
-                    <option value="district">District (ज़िला)</option>
-                    <option value="block">Block / Campus (ब्लॉक)</option>
-                    <option value="ward">Ward / Mohalla (वार्ड)</option>
+                    {designationLevelOptions.map((item) => <option key={item.id} value={item.code}>{lang === 'hi' && item.name_hi ? item.name_hi : item.name_en}</option>)}
                   </select>
                 </div>
                 <div>
@@ -831,9 +840,7 @@ export const OrganizationalStructureManager: React.FC<Props> = ({ lang, currentU
                     onChange={(e) => setPostStatus(e.target.value as any)}
                     className="w-full p-2 border border-stone-300 rounded-lg bg-white"
                   >
-                    <option value="active">Active</option>
-                    <option value="reserved">Reserved</option>
-                    <option value="vacant">Vacant</option>
+                    {designationStatusOptions.map((item) => <option key={item.id} value={item.code}>{lang === 'hi' && item.name_hi ? item.name_hi : item.name_en}</option>)}
                   </select>
                 </div>
               </div>
