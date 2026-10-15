@@ -176,7 +176,6 @@ export const MemberRegistration: React.FC<Props> = ({ lang, currentUser, onMembe
     return matchesSearch && matchesDistrict;
   });
 
-  const uniqueDistricts = Array.from(new Set(members.map((m) => m.district)));
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-8 space-y-8">
@@ -525,8 +524,8 @@ export const MemberRegistration: React.FC<Props> = ({ lang, currentUser, onMembe
                 className="w-full py-1.5 px-2.5 border border-stone-300 rounded text-xs bg-white"
               >
                 <option value="all">All Districts (सभी ज़िले)</option>
-                {uniqueDistricts.map((d) => (
-                  <option key={d} value={d}>{d}</option>
+                {districtOptions.map((item) => (
+                  <option key={item.id} value={item.name_en}>{lang === 'hi' && item.name_hi ? item.name_hi : item.name_en}</option>
                 ))}
               </select>
             </div>
