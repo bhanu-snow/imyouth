@@ -342,8 +342,10 @@ END:VCALENDAR`;
               <div className="flex items-center gap-1.5">
                 <button
                   type="button"
+                  disabled={currentUser.role === 'public'}
+                  title={currentUser.role === 'public' ? (lang === 'hi' ? 'RSVP के लिए पहले लॉगिन करें' : 'Sign in to RSVP') : undefined}
                   onClick={() => handleToggleRsvp(ev.id, 'going')}
-                  className={`px-3 py-1.5 text-xs font-semibold rounded transition-colors inline-flex items-center gap-1 ${
+                  className={`px-3 py-1.5 text-xs font-semibold rounded transition-colors inline-flex items-center gap-1 disabled:cursor-not-allowed disabled:opacity-50 ${
                     ev.userRsvp === 'going'
                       ? 'bg-emerald-700 text-white font-bold'
                       : 'bg-stone-100 text-stone-700 hover:bg-stone-200'
