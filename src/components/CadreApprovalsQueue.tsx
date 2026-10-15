@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   ShieldCheck, 
   Clock, 
@@ -17,6 +17,7 @@ import {
 import { Member, AuthUser, Language } from '../types';
 import { storageService } from '../services/storageService';
 import { DigitalIdCard } from './DigitalIdCard';
+import { referenceDataService, type DistrictOption } from '../services/referenceDataService';
 
 interface Props {
   lang: Language;
@@ -30,6 +31,8 @@ export const CadreApprovalsQueue: React.FC<Props> = ({
   onRefreshMembers 
 }) => {
   const [members, setMembers] = useState<Member[]>(storageService.getMembers());
+  const [districtOptions, setDistrictOptions] = useState<DistrictOption[]>([]);
+  const [lookupError, setLookupError] = useState('');
   const [activeTab, setActiveTab] = useState<'approvals' | 'public_verify'>('approvals');
   const [selectedDistrict, setSelectedDistrict] = useState<string>('all');
   const [verifyIdInput, setVerifyIdInput] = useState<string>('');
@@ -37,6 +40,14 @@ export const CadreApprovalsQueue: React.FC<Props> = ({
   const [viewingApprovedCard, setViewingApprovedCard] = useState<Member | null>(null);
 
   const isAuthorized = currentUser.role === 'state_admin' || currentUser.role === 'district_incharge';
+
+  useEffect(() => {
+    let cancelled = false;
+    void referenceDataService.districts()
+      .then((rows) => { if (!cancelled) { setDistrictOptions(rows); setLookupError(''); } })
+      .catch((error: unknown) => { if (!cancelled) setLookupError(error instanceof Error ? error.message : 'Could not load district reference data.'); });
+    return () => { cancelled = true; };
+  }, []);
 
   const handleApprove = (requestId: string) => {
     const updated = storageService.approveCadre(requestId, currentUser);
@@ -68,7 +79,7 @@ export const CadreApprovalsQueue: React.FC<Props> = ({
 
   const approvedMembers = members.filter((m) => m.status === 'approved');
 
-  const uniqueDistricts = Array.from(new Set(members.map((m) => m.district)));
+  
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-8 space-y-8">
@@ -164,10 +175,11 @@ export const CadreApprovalsQueue: React.FC<Props> = ({
                       className="px-2 py-1 border border-stone-300 rounded bg-white font-medium"
                     >
                       <option value="all">All Districts (सभी ज़िले)</option>
-                      {uniqueDistricts.map((d) => (
-                        <option key={d} value={d}>{d}</option>
+                      {districtOptions.map((item) => (
+                        <option key={item.id} value={item.name_en}>{lang === 'hi' && item.name_hi ? item.name_hi : item.name_en}</option>
                       ))}
                     </select>
+                    {lookupError && <p role="alert" className="mt-1 text-rose-700 text-[11px]">{lookupError}</p>}
                   </div>
                 )}
               </div>
