@@ -108,9 +108,11 @@ export const CadreApprovalsQueue: React.FC<Props> = ({
   const pendingMembers = members.filter((m) => {
     const isPending = m.status === 'pending';
     const matchesDistrict = 
-      currentUser.role === 'state_admin' 
+      currentUser.role === 'state_admin'
         ? selectedDistrict === 'all' || m.district === selectedDistrict
-        : m.district === currentUser.district;
+        : ['superadmin', 'state_president'].includes(currentUser.role)
+          ? true
+          : m.district === currentUser.district;
     return isPending && matchesDistrict;
   });
 
