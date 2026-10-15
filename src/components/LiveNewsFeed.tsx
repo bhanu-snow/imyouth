@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Newspaper, Share2, PlusCircle, Clock, Tag, ExternalLink, MessageSquare, Trash2, Lock } from 'lucide-react';
 import { NewsItem, Language, NewsCategory, AuthUser } from '../types';
-import { storageService } from '../services/storageService';
+import { newsService } from '../services/newsService';
 import { TranslateButton } from './common/TranslateButton';
 import { translateEnglishToHindi } from '../utils/translationService';
 import { referenceDataService, type LookupOption } from '../services/referenceDataService';
@@ -14,6 +14,7 @@ interface Props {
 
 export const LiveNewsFeed: React.FC<Props> = ({ lang, currentUser, onOpenSocialBroadcast }) => {
   const [news, setNews] = useState<NewsItem[]>([]);
+  const [dataError, setDataError] = useState('');
   const [categoryOptions, setCategoryOptions] = useState<LookupOption[]>([]);
   const [lookupError, setLookupError] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
@@ -31,16 +32,23 @@ export const LiveNewsFeed: React.FC<Props> = ({ lang, currentUser, onOpenSocialB
   const [tagsInput, setTagsInput] = useState('YouthWing, GroundAction, Rozgar');
 
   useEffect(() => {
-    const list = storageService.getNews();
-    setNews(list);
     let cancelled = false;
+    void newsService.list()
+      .then((rows) => { if (!cancelled) { setNews(rows); setDataError(''); } })
+      .catch((error: unknown) => { if (!cancelled) setDataError(error instanceof Error ? error.message : 'Could not load news from Supabase.'); });
     void referenceDataService.newsCategories()
       .then((rows) => { if (!cancelled) { setCategoryOptions(rows); setLookupError(''); } })
       .catch((error: unknown) => { if (!cancelled) setLookupError(error instanceof Error ? error.message : 'Could not load news categories.'); });
     return () => { cancelled = true; };
   }, []);
 
-  const handlePublishSubmit = (e: React.FormEvent) => {
+  const refreshNews = async () => {
+    const rows = await newsService.list();
+    setNews(rows);
+    setDataError('');
+  };
+
+  const handlePublishSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!titleEn || !titleHi) return;
 
@@ -56,29 +64,34 @@ export const LiveNewsFeed: React.FC<Props> = ({ lang, currentUser, onOpenSocialB
         name: { en: 'Central Youth Media Desk', hi: 'केंद्रीय युवा मीडिया डेस्क' },
         role: { en: 'Official Spokesperson', hi: 'आधिकारिक प्रवक्ता' },
       },
-      shareCount: 1,
+      shareCount: 0,
       tags: tagsInput.split(',').map((t) => t.trim()).filter(Boolean),
     };
 
-    const updated = storageService.saveNews(newItem);
-    setNews(updated);
-    setShowPublishModal(false);
-
-    // reset
-    setTitleEn('');
-    setTitleHi('');
-    setExcerptEn('');
-    setExcerptHi('');
-    setContentEn('');
-    setContentHi('');
+    try {
+      await newsService.save(newItem);
+      await refreshNews();
+      setShowPublishModal(false);
+      setTitleEn('');
+      setTitleHi('');
+      setExcerptEn('');
+      setExcerptHi('');
+      setContentEn('');
+      setContentHi('');
+    } catch (error) {
+      setDataError(error instanceof Error ? error.message : 'Could not publish news to Supabase.');
+    }
   };
 
   const canManagePress = currentUser.role === 'superadmin' || currentUser.role === 'press_release';
 
-  const handleDeleteNews = (id: string) => {
-    if (confirm(lang === 'hi' ? 'क्या आप इस प्रेस विज्ञप्ति को हटाना चाहते हैं?' : 'Are you sure you want to delete this press item?')) {
-      const updated = storageService.deleteNews(id);
-      setNews(updated);
+  const handleDeleteNews = async (id: string) => {
+    if (!confirm(lang === 'hi' ? 'क्या आप इस प्रेस विज्ञप्ति को हटाना चाहते हैं?' : 'Are you sure you want to delete this press item?')) return;
+    try {
+      await newsService.remove(id);
+      await refreshNews();
+    } catch (error) {
+      setDataError(error instanceof Error ? error.message : 'Could not delete news item.');
     }
   };
 
@@ -89,6 +102,7 @@ export const LiveNewsFeed: React.FC<Props> = ({ lang, currentUser, onOpenSocialB
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-8">
+      {dataError && <div role="alert" className="mb-4 rounded-lg border border-rose-200 bg-rose-50 p-3 text-sm text-rose-800">{dataError}</div>}
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
         <div>
