@@ -120,7 +120,7 @@ export const HeroSection: React.FC<Props> = ({
                   </span>
                 </div>
                 <span className="text-[11px] font-mono text-emerald-300">
-                  imyouth.vercel.app
+                  {typeof window !== 'undefined' && window.location.host ? window.location.host : 'mylup.org'}
                 </span>
               </div>
 

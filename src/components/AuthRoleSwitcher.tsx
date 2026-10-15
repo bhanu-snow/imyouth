@@ -67,6 +67,14 @@ export const AuthRoleSwitcher: React.FC<Props> = ({
 
   const getRoleBadge = (role: AuthUser['role']) => {
     switch (role) {
+      case 'superadmin':
+        return <span className="bg-rose-100 text-rose-800 text-[10px] font-black px-1.5 py-0.5 rounded border border-rose-300">SUPER ADMIN</span>;
+      case 'state_president':
+        return <span className="bg-purple-100 text-purple-900 text-[10px] font-black px-1.5 py-0.5 rounded border border-purple-300">STATE PRESIDENT</span>;
+      case 'press_release':
+        return <span className="bg-amber-100 text-amber-900 text-[10px] font-black px-1.5 py-0.5 rounded border border-amber-300">PRESS RELEASE</span>;
+      case 'content_manager':
+        return <span className="bg-cyan-100 text-cyan-900 text-[10px] font-black px-1.5 py-0.5 rounded border border-cyan-300">CONTENT MGR</span>;
       case 'state_admin':
         return <span className="bg-emerald-100 text-emerald-800 text-[10px] font-black px-1.5 py-0.5 rounded">STATE ADMIN</span>;
       case 'district_incharge':

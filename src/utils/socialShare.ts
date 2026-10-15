@@ -224,8 +224,9 @@ export function generateInstagramBanner(content: ShareContent): string {
   ctx.fillText('हक़, इंसाफ़, तालीम और भाईचारा | @MYLUttarPradesh', 80, 985);
 
   ctx.fillStyle = '#6ee7b7';
-  ctx.font = 'bold 24px system-ui, sans-serif';
-  ctx.fillText('imyouth.vercel.app', 770, 985);
+  ctx.font = 'bold 22px system-ui, sans-serif';
+  const displayHost = typeof window !== 'undefined' && window.location.host ? window.location.host : 'mylup.org';
+  ctx.fillText(displayHost, 740, 985);
 
   return canvas.toDataURL('image/png');
 }

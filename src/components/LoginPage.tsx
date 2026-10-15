@@ -190,14 +190,20 @@ export const LoginPage: React.FC<Props> = ({
                   </div>
                 </div>
 
-                <span className={`text-[10px] font-extrabold px-2 py-0.5 rounded ${
-                  u.role === 'state_admin' 
-                    ? 'bg-emerald-100 text-emerald-800' 
+                <span className={`text-[10px] font-extrabold px-2 py-0.5 rounded uppercase ${
+                  u.role === 'superadmin'
+                    ? 'bg-rose-100 text-rose-800 border border-rose-300'
+                    : u.role === 'state_president'
+                    ? 'bg-purple-100 text-purple-900 border border-purple-300'
+                    : u.role === 'press_release'
+                    ? 'bg-amber-100 text-amber-900 border border-amber-300'
+                    : u.role === 'content_manager'
+                    ? 'bg-cyan-100 text-cyan-900 border border-cyan-300'
                     : u.role === 'district_incharge'
-                    ? 'bg-blue-100 text-blue-900'
+                    ? 'bg-blue-100 text-blue-900 border border-blue-300'
                     : 'bg-stone-200 text-stone-800'
                 }`}>
-                  {u.role === 'state_admin' ? 'STATE ADMIN' : u.role === 'district_incharge' ? 'DISTRICT' : 'CADRE'}
+                  {u.role.replace('_', ' ')}
                 </span>
               </button>
             ))}

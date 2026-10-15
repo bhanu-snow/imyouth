@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Building2, 
   Award, 
@@ -14,14 +14,22 @@ import {
   Landmark,
   User,
   Sparkles,
-  Info
+  Info,
+  Plus,
+  Edit3,
+  Trash2,
+  X,
+  Check,
+  Image as ImageIcon
 } from 'lucide-react';
-import { Language, ParliamentaryHouse, ParliamentaryLeader } from '../types';
-import { PARLIAMENTARY_LEADERS, IDEOLOGY_COMPARISONS } from '../data/parliamentaryHistoryData';
+import { Language, ParliamentaryHouse, ParliamentaryLeader, AuthUser } from '../types';
+import { IDEOLOGY_COMPARISONS } from '../data/parliamentaryHistoryData';
+import { storageService } from '../services/storageService';
 import { LadderSymbolIcon, PartyFlagIcon, PartySymbolCard } from './PartySymbol';
 
 interface Props {
   lang: Language;
+  currentUser: AuthUser;
 }
 
 // Lightweight portrait fallback wrapper
@@ -98,12 +106,124 @@ const LeaderPortrait: React.FC<{ leader: ParliamentaryLeader; size?: 'normal' | 
   );
 };
 
-export const ParliamentaryHistoryView: React.FC<Props> = ({ lang }) => {
+export const ParliamentaryHistoryView: React.FC<Props> = ({ lang, currentUser }) => {
+  const [leaders, setLeaders] = useState<ParliamentaryLeader[]>([]);
   const [activeTab, setActiveTab] = useState<'timeline' | 'ideology' | 'symbol' | 'coalitions'>('timeline');
   const [selectedHouse, setSelectedHouse] = useState<string>('all');
   const [searchFilter, setSearchFilter] = useState<string>('');
 
-  const filteredLeaders = PARLIAMENTARY_LEADERS.filter((leader) => {
+  // Content Manager Modal
+  const [showModal, setShowModal] = useState(false);
+  const [editingLeader, setEditingLeader] = useState<ParliamentaryLeader | null>(null);
+
+  // Form states
+  const [formHouse, setFormHouse] = useState<ParliamentaryHouse>('lok_sabha');
+  const [formNameEn, setFormNameEn] = useState('');
+  const [formNameHi, setFormNameHi] = useState('');
+  const [formConstituencyEn, setFormConstituencyEn] = useState('');
+  const [formConstituencyHi, setFormConstituencyHi] = useState('');
+  const [formTenure, setFormTenure] = useState('');
+  const [formIsSitting, setFormIsSitting] = useState(false);
+  const [formRolesEn, setFormRolesEn] = useState('');
+  const [formRolesHi, setFormRolesHi] = useState('');
+  const [formContributionsEn, setFormContributionsEn] = useState('');
+  const [formContributionsHi, setFormContributionsHi] = useState('');
+  const [formCitation, setFormCitation] = useState('');
+  const [photoMode, setPhotoMode] = useState<'wrapper' | 'url'>('wrapper');
+  const [formPhotoUrl, setFormPhotoUrl] = useState('');
+
+  const canEditContent = currentUser.role === 'superadmin' || currentUser.role === 'content_manager';
+
+  useEffect(() => {
+    loadLeaders();
+  }, []);
+
+  const loadLeaders = () => {
+    setLeaders(storageService.getParliamentaryLeaders());
+  };
+
+  const handleOpenAdd = () => {
+    setEditingLeader(null);
+    setFormHouse('lok_sabha');
+    setFormNameEn('');
+    setFormNameHi('');
+    setFormConstituencyEn('');
+    setFormConstituencyHi('');
+    setFormTenure('2024 - Present');
+    setFormIsSitting(true);
+    setFormRolesEn('');
+    setFormRolesHi('');
+    setFormContributionsEn('');
+    setFormContributionsHi('');
+    setFormCitation('Lok Sabha / Rajya Sabha Records');
+    setPhotoMode('wrapper');
+    setFormPhotoUrl('');
+    setShowModal(true);
+  };
+
+  const handleOpenEdit = (leader: ParliamentaryLeader) => {
+    setEditingLeader(leader);
+    setFormHouse(leader.house);
+    setFormNameEn(leader.nameEn);
+    setFormNameHi(leader.nameHi);
+    setFormConstituencyEn(leader.constituencyEn);
+    setFormConstituencyHi(leader.constituencyHi);
+    setFormTenure(leader.tenureYears);
+    setFormIsSitting(Boolean(leader.isSitting));
+    setFormRolesEn(leader.rolesEn.join('\n'));
+    setFormRolesHi(leader.rolesHi.join('\n'));
+    setFormContributionsEn(leader.keyContributionsEn.join('\n'));
+    setFormContributionsHi(leader.keyContributionsHi.join('\n'));
+    setFormCitation(leader.citationRecord);
+    if (leader.photoUrl) {
+      setPhotoMode('url');
+      setFormPhotoUrl(leader.photoUrl);
+    } else {
+      setPhotoMode('wrapper');
+      setFormPhotoUrl('');
+    }
+    setShowModal(true);
+  };
+
+  const handleDeleteLeader = (id: string) => {
+    if (confirm(lang === 'hi' ? 'क्या आप इस ऐतिहासिक रिकॉर्ड/नेता को हटाना चाहते हैं?' : 'Are you sure you want to delete this leader record?')) {
+      const updated = storageService.deleteLeader(id);
+      setLeaders(updated);
+    }
+  };
+
+  const handleSaveLeader = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!formNameEn || !formNameHi) return;
+
+    const rolesEnArr = formRolesEn.split('\n').map((r) => r.trim()).filter(Boolean);
+    const rolesHiArr = formRolesHi.split('\n').map((r) => r.trim()).filter(Boolean);
+    const contEnArr = formContributionsEn.split('\n').map((r) => r.trim()).filter(Boolean);
+    const contHiArr = formContributionsHi.split('\n').map((r) => r.trim()).filter(Boolean);
+
+    const leaderData: ParliamentaryLeader = {
+      id: editingLeader ? editingLeader.id : `leader-${Date.now()}`,
+      house: formHouse,
+      nameEn: formNameEn,
+      nameHi: formNameHi,
+      constituencyEn: formConstituencyEn,
+      constituencyHi: formConstituencyHi,
+      tenureYears: formTenure,
+      isSitting: formIsSitting,
+      rolesEn: rolesEnArr.length ? rolesEnArr : ['Party Leader'],
+      rolesHi: rolesHiArr.length ? rolesHiArr : ['पार्टी नेता'],
+      keyContributionsEn: contEnArr.length ? contEnArr : ['Public representation in constitutional house.'],
+      keyContributionsHi: contHiArr.length ? contHiArr : ['संवैधानिक सदन में जनहित की बात उठाना।'],
+      citationRecord: formCitation || 'Parliament of India / Assembly Archival Record',
+      photoUrl: photoMode === 'url' && formPhotoUrl.trim() ? formPhotoUrl.trim() : undefined,
+    };
+
+    const updated = storageService.saveLeader(leaderData);
+    setLeaders(updated);
+    setShowModal(false);
+  };
+
+  const filteredLeaders = leaders.filter((leader) => {
     const matchesHouse = selectedHouse === 'all' || leader.house === selectedHouse;
     const matchesSearch = 
       leader.nameEn.toLowerCase().includes(searchFilter.toLowerCase()) ||
@@ -119,15 +239,15 @@ export const ParliamentaryHistoryView: React.FC<Props> = ({ lang }) => {
       case 'lok_sabha':
         return <span className="bg-blue-100 text-blue-900 border border-blue-300 text-[10px] font-black px-2 py-0.5 rounded">LOK SABHA (LOWER HOUSE)</span>;
       case 'rajya_sabha':
-        return <span className="bg-purple-100 text-purple-950 border border-purple-300 text-[10px] font-black px-2 py-0.5 rounded">RAJYA SABHA (UPPER HOUSE)</span>;
+        return <span className="bg-purple-100 text-purple-900 border border-purple-300 text-[10px] font-black px-2 py-0.5 rounded">RAJYA SABHA (UPPER HOUSE)</span>;
       case 'union_ministry':
-        return <span className="bg-emerald-100 text-emerald-900 border border-emerald-300 text-[10px] font-black px-2 py-0.5 rounded">UNION CABINET MINISTER</span>;
+        return <span className="bg-rose-100 text-rose-950 border border-rose-300 text-[10px] font-black px-2 py-0.5 rounded">UNION MINISTRY CABINET</span>;
       case 'state_assembly':
-        return <span className="bg-slate-100 text-slate-800 border border-slate-300 text-[10px] font-bold px-2 py-0.5 rounded">STATE ASSEMBLY (KERALA / TN)</span>;
+        return <span className="bg-emerald-100 text-emerald-950 border border-emerald-300 text-[10px] font-black px-2 py-0.5 rounded">KERALA / TAMIL NADU ASSEMBLY</span>;
       case 'myl_national':
-        return <span className="bg-emerald-700 text-white text-[10px] font-extrabold px-2 py-0.5 rounded">MYL NATIONAL COMMITTEE</span>;
+        return <span className="bg-emerald-800 text-white text-[10px] font-black px-2 py-0.5 rounded">MYL NATIONAL COMMITTEE</span>;
       case 'myl_state_up':
-        return <span className="bg-blue-900 text-white text-[10px] font-extrabold px-2 py-0.5 rounded">MYL UP STATE COMMITTEE</span>;
+        return <span className="bg-emerald-700 text-emerald-100 border border-emerald-500 text-[10px] font-black px-2 py-0.5 rounded">MYL UTTAR PRADESH STATE</span>;
       default:
         return null;
     }
@@ -135,87 +255,90 @@ export const ParliamentaryHistoryView: React.FC<Props> = ({ lang }) => {
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-8 space-y-8">
-      {/* Header Banner */}
-      <div className="bg-gradient-to-r from-emerald-950 via-slate-900 to-blue-950 text-white rounded-3xl p-6 sm:p-8 shadow-md relative overflow-hidden">
-        {/* Subtle background decoration */}
-        <div className="absolute top-0 right-0 p-6 opacity-10 pointer-events-none">
-          <LadderSymbolIcon size={140} />
-        </div>
-
-        <div className="relative z-10 max-w-3xl space-y-3">
-          <div className="flex flex-wrap items-center gap-2">
-            <span className="flex items-center gap-1.5 px-2.5 py-1 bg-white/10 backdrop-blur-xs rounded-lg text-[11px] font-bold text-emerald-300 border border-white/10">
-              <LadderSymbolIcon size={16} />
-              <span>{lang === 'hi' ? 'संसदीय एवं संगठनात्मक अभिलेखागार' : 'Parliamentary & Cadre Archival Records'}</span>
-            </span>
-            <span className="px-2.5 py-1 bg-blue-500/20 rounded-lg text-[11px] font-bold text-blue-200 border border-blue-400/20">
-              {lang === 'hi' ? 'दस्तावेजी प्रमाण व साक्ष्य' : 'Official Documentary Evidence'}
-            </span>
+      {/* Header */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-emerald-800 mb-1">
+            <Landmark className="w-4 h-4 text-emerald-700" />
+            <span>{lang === 'hi' ? 'संसदीय एवं विधायी दस्तावेज' : 'Parliamentary Archival Evidence'}</span>
+            <span aria-hidden="true">·</span>
+            <span>{lang === 'hi' ? '1946 से आज तक का प्रामाणिक इतिहास' : 'Constitutional Hansard Evidence (1946–2026)'}</span>
           </div>
-
-          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black tracking-tight leading-tight">
-            {lang === 'hi'
-              ? 'संविधान सभा, संसद से लेकर उत्तर प्रदेश यूथ विंग तक: ऐतिहासिक नेतृत्व एवं साक्ष्य'
-              : 'From Constituent Assembly & Parliament to UP Youth Wing: Leaders, Tenures & Evidence'}
+          <h1 className="text-3xl font-extrabold text-stone-900 tracking-tight">
+            {lang === 'hi' ? 'संसदीय इतिहास, संस्थापक एवं वैचारिक स्पष्टता' : 'Founders, Parliamentary History & Ideological Evidence'}
           </h1>
-
-          <p className="text-xs sm:text-sm text-stone-300 leading-relaxed max-w-2xl">
+          <p className="text-stone-600 text-xs sm:text-sm max-w-3xl mt-1 leading-relaxed">
             {lang === 'hi'
-              ? 'संविधान सभा (1946-50), लोकसभा व राज्यसभा के सभी वर्तमान व ऐतिहासिक सांसदों (एड. हारिस बीरान, पी.वी. अब्दुल वहाब, ई.टी. मोहम्मद बशीर, डॉ. समदानी, क़ायदे-मिल्लत) सहित मुस्लिम यूथ लीग (MYL) राष्ट्रीय व उत्तर प्रदेश नेतृत्व की प्रामाणिक सूची।'
-              : 'Comprehensive chronological evidence spanning the Constituent Assembly, Lok Sabha, Rajya Sabha (sitting MPs Adv. Haris Beeran, P.V. Abdul Wahab, Basheer, Samadani, Navas Kani), State Assemblies, and Muslim Youth League (MYL) National and UP State Committees.'}
+              ? 'संविधान सभा, लोकसभा, राज्यसभा और राज्य विधानसभाओं में इंडियन यूनियन मुस्लिम लीग के ऐतिहासिक योगदान का दस्तावेजी प्रमाण। भारतीय धर्मनिरपेक्ष लोकतंत्र में हमारा अडिग विश्वास।'
+              : 'Official hansard archives of IUML in India’s Constituent Assembly, Lok Sabha, Rajya Sabha, and State Assemblies. A transparent record of 75+ years of constitutional patriotism.'}
           </p>
         </div>
+
+        {/* Action Button for Content Manager */}
+        {canEditContent && (
+          <button
+            type="button"
+            onClick={handleOpenAdd}
+            className="px-4 py-2 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold rounded-xl transition-all shadow-xs flex items-center gap-1.5 cursor-pointer self-start md:self-auto shrink-0"
+          >
+            <Plus className="w-4 h-4" />
+            <span>{lang === 'hi' ? '+ नया नेता/रिकॉर्ड जोड़ें' : '+ Add Leader Record'}</span>
+          </button>
+        )}
       </div>
 
-      {/* Main Section Navigation Tabs */}
-      <div className="flex items-center gap-2 border-b border-stone-200 overflow-x-auto pb-1 text-xs">
+      {/* Main Mode Sub-Tabs */}
+      <div className="flex items-center gap-2 overflow-x-auto pb-2 border-b border-stone-200">
         <button
           type="button"
           onClick={() => setActiveTab('timeline')}
-          className={`px-4 py-2.5 font-extrabold whitespace-nowrap transition-colors border-b-2 cursor-pointer ${
+          className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all flex items-center gap-2 cursor-pointer ${
             activeTab === 'timeline'
-              ? 'border-emerald-700 text-emerald-800'
-              : 'border-transparent text-stone-500 hover:text-stone-900'
+              ? 'bg-emerald-800 text-white shadow-xs'
+              : 'bg-white border border-stone-200 text-stone-600 hover:text-stone-900'
           }`}
         >
-          {lang === 'hi' ? '1. सभी सदनों व युवा नेतृत्व की सूची (Leaders & Tenures)' : '1. Leaders, MPs & MYL Committees'}
+          <Landmark className="w-4 h-4" />
+          <span>{lang === 'hi' ? '1. सदनवार नेता व कार्यकाल (Tenures)' : '1. House-Wise Leaders & Tenures'}</span>
         </button>
 
         <button
           type="button"
           onClick={() => setActiveTab('symbol')}
-          className={`px-4 py-2.5 font-extrabold whitespace-nowrap transition-colors border-b-2 cursor-pointer flex items-center gap-1.5 ${
+          className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all flex items-center gap-2 cursor-pointer ${
             activeTab === 'symbol'
-              ? 'border-emerald-700 text-emerald-800'
-              : 'border-transparent text-stone-500 hover:text-stone-900'
+              ? 'bg-emerald-800 text-white shadow-xs'
+              : 'bg-white border border-stone-200 text-stone-600 hover:text-stone-900'
           }`}
         >
-          <LadderSymbolIcon size={16} />
-          <span>{lang === 'hi' ? '2. पार्टी चुनाव चिन्ह: "सीढ़ी" (Ladder Symbol)' : '2. Party Symbol: "The Ladder"'}</span>
+          <LadderSymbolIcon size={18} />
+          <span>{lang === 'hi' ? '2. पार्टी चिन्ह: सीढ़ी (The Ladder)' : '2. Party Symbol: The Ladder'}</span>
         </button>
 
         <button
           type="button"
           onClick={() => setActiveTab('ideology')}
-          className={`px-4 py-2.5 font-extrabold whitespace-nowrap transition-colors border-b-2 cursor-pointer ${
+          className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all flex items-center gap-2 cursor-pointer ${
             activeTab === 'ideology'
-              ? 'border-blue-900 text-blue-900'
-              : 'border-transparent text-stone-500 hover:text-stone-900'
+              ? 'bg-emerald-800 text-white shadow-xs'
+              : 'bg-white border border-stone-200 text-stone-600 hover:text-stone-900'
           }`}
         >
-          {lang === 'hi' ? '3. अन्य विचारधाराओं व दलों से अंतर (Ideology Comparison)' : '3. How Our Ideology Differs'}
+          <Scale className="w-4 h-4" />
+          <span>{lang === 'hi' ? '3. विचारधारा तुलना व अन्य दल' : '3. Ideology vs Other Parties'}</span>
         </button>
 
         <button
           type="button"
           onClick={() => setActiveTab('coalitions')}
-          className={`px-4 py-2.5 font-extrabold whitespace-nowrap transition-colors border-b-2 cursor-pointer ${
+          className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all flex items-center gap-2 cursor-pointer ${
             activeTab === 'coalitions'
-              ? 'border-emerald-700 text-emerald-800'
-              : 'border-transparent text-stone-500 hover:text-stone-900'
+              ? 'bg-blue-900 text-white shadow-xs'
+              : 'bg-white border border-stone-200 text-stone-600 hover:text-stone-900'
           }`}
         >
-          {lang === 'hi' ? '4. दलित + अल्पसंख्यक सर्वसमाज मोर्चा (Coalitions)' : '4. Dalit + Alpsankhyak Alliances'}
+          <ShieldCheck className="w-4 h-4" />
+          <span>{lang === 'hi' ? '4. दलित + अल्पसंख्यक एकता' : '4. Dalit + Alpsankhyak Unity'}</span>
         </button>
       </div>
 
@@ -297,10 +420,31 @@ export const ParliamentaryHistoryView: React.FC<Props> = ({ lang }) => {
                     </div>
                   </div>
 
-                  <div className="text-left sm:text-right self-start sm:self-center shrink-0">
+                  <div className="flex items-center gap-2 self-start sm:self-center shrink-0">
                     <span className="text-xs font-mono font-bold text-stone-700 bg-stone-100 px-3 py-1.5 rounded-lg inline-block border border-stone-200">
                       {leader.tenureYears}
                     </span>
+
+                    {canEditContent && (
+                      <div className="flex items-center gap-1">
+                        <button
+                          type="button"
+                          onClick={() => handleOpenEdit(leader)}
+                          className="p-1.5 text-stone-600 hover:text-emerald-700 hover:bg-emerald-50 rounded-lg transition-colors cursor-pointer"
+                          title="Edit Leader / Record"
+                        >
+                          <Edit3 className="w-4 h-4" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleDeleteLeader(leader.id)}
+                          className="p-1.5 text-stone-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer"
+                          title="Delete Leader"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    )}
                   </div>
                 </div>
 
@@ -351,44 +495,60 @@ export const ParliamentaryHistoryView: React.FC<Props> = ({ lang }) => {
 
       {/* TAB 2: PARTY SYMBOL: THE LADDER */}
       {activeTab === 'symbol' && (
-        <PartySymbolCard lang={lang} />
+        <div className="space-y-6">
+          <PartySymbolCard lang={lang} />
+        </div>
       )}
 
       {/* TAB 3: IDEOLOGY COMPARISON */}
       {activeTab === 'ideology' && (
         <div className="space-y-6">
-          <div className="grid grid-cols-1 gap-6">
+          <div className="p-5 bg-gradient-to-r from-emerald-950 via-slate-900 to-blue-950 rounded-2xl text-white space-y-2">
+            <span className="text-xs font-bold uppercase tracking-wider text-emerald-300">
+              {lang === 'hi' ? 'संवैधानिक धर्मनिरपेक्षता बनाम अवसरवाद' : 'Constitutional Secularism vs Other Paradigms'}
+            </span>
+            <h2 className="text-2xl font-black text-white">
+              {lang === 'hi'
+                ? 'आईयूएमएल की विचारधारा अन्य प्रमुख दलों से कैसे भिन्न है?'
+                : 'How IUML’s Ideology Differs from Other Political Streams'}
+            </h2>
+            <p className="text-stone-300 text-xs sm:text-sm leading-relaxed max-w-3xl">
+              {lang === 'hi'
+                ? 'हम न तो कट्टरपंथ का समर्थन करते हैं और न ही तथाकथित धर्मनिरपेक्ष दलों के छलावे का। हमारा दर्शन है: लोकतांत्रिक आत्मसम्मान, कानूनी लड़ाई, गुणवत्तापूर्ण शिक्षा और सर्वसमाज समरसता।'
+                : 'Rejecting both extremism and opportunistic tokenism. Grounded in constructive democratic participation, rule of law, backward class literacy, and mutual respect.'}
+            </p>
+          </div>
+
+          <div className="space-y-5">
             {IDEOLOGY_COMPARISONS.map((comp) => (
               <div
                 key={comp.id}
-                className="p-6 bg-white border border-stone-200 rounded-2xl space-y-4 shadow-xs"
+                className="p-6 bg-white border border-stone-200 rounded-2xl space-y-4 hover:border-emerald-600 transition-colors shadow-xs"
               >
                 <div>
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-blue-900">
+                  <span className="text-[11px] font-extrabold uppercase tracking-wider text-emerald-800 bg-emerald-50 px-2.5 py-0.5 rounded">
                     {lang === 'hi' ? comp.topicHi : comp.topicEn}
                   </span>
-                  <h3 className="text-lg font-bold text-stone-900 mt-0.5">
+                  <h3 className="text-lg font-black text-stone-900 mt-1">
                     {lang === 'hi' ? comp.titleHi : comp.titleEn}
                   </h3>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
-                  {/* Our Stance */}
-                  <div className="p-4 bg-emerald-50/70 border border-emerald-300 rounded-xl space-y-1.5">
-                    <div className="flex items-center gap-1.5 font-bold text-emerald-950">
-                      <ShieldCheck className="w-4 h-4 text-emerald-700" />
-                      <span>{lang === 'hi' ? 'IUML / मुस्लिम यूथ लीग का संवैधानिक रुख' : 'Our Principled Constitutional Stance'}</span>
+                  <div className="p-4 bg-emerald-50/70 border border-emerald-200 rounded-xl space-y-2">
+                    <div className="font-extrabold text-emerald-950 flex items-center gap-2">
+                      <LadderSymbolIcon size={18} />
+                      <span>{lang === 'hi' ? 'आईयूएमएल व मुस्लिम यूथ लीग का रुख:' : 'IUML & MYL Principle / Stance:'}</span>
                     </div>
                     <p className="text-stone-700 leading-relaxed">
                       {lang === 'hi' ? comp.ourStanceHi : comp.ourStanceEn}
                     </p>
                   </div>
 
-                  {/* Other Parties */}
-                  <div className="p-4 bg-rose-50/60 border border-rose-200 rounded-xl space-y-1.5">
-                    <div className="flex items-center gap-1.5 font-bold text-rose-950">
-                      <Scale className="w-4 h-4 text-rose-700" />
-                      <span>{lang === 'hi' ? 'अन्य दलों व उग्रवादी तत्वों का अवसरवादी रुख' : 'Other Ideologies / Opportunistic Stance'}</span>
+                  <div className="p-4 bg-stone-50 border border-stone-200 rounded-xl space-y-2">
+                    <div className="font-extrabold text-stone-800 flex items-center gap-2">
+                      <Scale className="w-4 h-4 text-stone-500" />
+                      <span>{lang === 'hi' ? 'अन्य दलों व छद्म-धर्मनिरपेक्षता से अंतर:' : 'Contrast with Other Political Parties:'}</span>
                     </div>
                     <p className="text-stone-700 leading-relaxed">
                       {lang === 'hi' ? comp.otherPartiesHi : comp.otherPartiesEn}
@@ -396,7 +556,6 @@ export const ParliamentaryHistoryView: React.FC<Props> = ({ lang }) => {
                   </div>
                 </div>
 
-                {/* Coalition & Action Context */}
                 <div className="p-3.5 bg-stone-50 rounded-xl border border-stone-200 text-xs text-stone-700">
                   <strong className="text-stone-900 block mb-0.5">
                     {lang === 'hi' ? 'ऐतिहासिक गठबंधन व ज़मीनी समन्वय अनुभव:' : 'Historical Collaboration & Coalition Precedents:'}
@@ -461,6 +620,251 @@ export const ParliamentaryHistoryView: React.FC<Props> = ({ lang }) => {
                   : 'Advancing inter-faith harmony, compassionate community relief, and non-violent civic action across Uttar Pradesh.'}
               </p>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* CONTENT MANAGER ADD / EDIT LEADER MODAL */}
+      {showModal && (
+        <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4 overflow-y-auto">
+          <div className="bg-white rounded-2xl max-w-2xl w-full p-6 space-y-4 shadow-2xl border border-stone-200 my-8">
+            <div className="flex items-center justify-between border-b pb-3">
+              <div>
+                <h3 className="font-black text-lg text-stone-900">
+                  {editingLeader 
+                    ? (lang === 'hi' ? 'संसदीय नेता / साक्ष्य रिकॉर्ड संपादित करें' : 'Edit Historical Leader / Archival Record')
+                    : (lang === 'hi' ? 'नया संसदीय नेता / साक्ष्य जोड़ें' : 'Add Historical Leader / Record')}
+                </h3>
+                <span className="text-xs text-emerald-800 font-semibold">
+                  Constitutional Hansard & Organizational Documentation
+                </span>
+              </div>
+              <button 
+                type="button" 
+                onClick={() => setShowModal(false)}
+                className="text-stone-400 hover:text-stone-700"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveLeader} className="space-y-4 text-xs">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block font-bold text-stone-700 mb-1">House / Category *</label>
+                  <select
+                    value={formHouse}
+                    onChange={(e) => setFormHouse(e.target.value as ParliamentaryHouse)}
+                    className="w-full p-2 border border-stone-300 rounded-lg bg-white"
+                  >
+                    <option value="lok_sabha">Lok Sabha (Lower House)</option>
+                    <option value="rajya_sabha">Rajya Sabha (Upper House)</option>
+                    <option value="constituent_assembly">Constituent Assembly of India (1946–50)</option>
+                    <option value="union_ministry">Union Ministry Cabinet</option>
+                    <option value="state_assembly">State Assembly (Kerala / Tamil Nadu)</option>
+                    <option value="myl_national">MYL National Committee</option>
+                    <option value="myl_state_up">MYL Uttar Pradesh State Committee</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block font-bold text-stone-700 mb-1">Tenure / Years *</label>
+                  <input
+                    type="text"
+                    required
+                    value={formTenure}
+                    onChange={(e) => setFormTenure(e.target.value)}
+                    placeholder="e.g. 2024 - Present or 1952 - 1972"
+                    className="w-full p-2 border border-stone-300 rounded-lg font-mono"
+                  />
+                </div>
+              </div>
+
+              {/* Name Inputs */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block font-bold text-stone-700 mb-1">Leader Name (English) *</label>
+                  <input
+                    type="text"
+                    required
+                    value={formNameEn}
+                    onChange={(e) => setFormNameEn(e.target.value)}
+                    placeholder="e.g. Adv. Haris Beeran"
+                    className="w-full p-2 border border-stone-300 rounded-lg"
+                  />
+                </div>
+                <div>
+                  <label className="block font-bold text-stone-700 mb-1">नेता का नाम (हिंदी) *</label>
+                  <input
+                    type="text"
+                    required
+                    value={formNameHi}
+                    onChange={(e) => setFormNameHi(e.target.value)}
+                    placeholder="उदा. एड. हारिस बीरान"
+                    className="w-full p-2 border border-stone-300 rounded-lg"
+                  />
+                </div>
+              </div>
+
+              {/* Constituency / Unit */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block font-bold text-stone-700 mb-1">Constituency / House (English) *</label>
+                  <input
+                    type="text"
+                    required
+                    value={formConstituencyEn}
+                    onChange={(e) => setFormConstituencyEn(e.target.value)}
+                    placeholder="e.g. Rajya Sabha (Kerala) or Ponnani"
+                    className="w-full p-2 border border-stone-300 rounded-lg"
+                  />
+                </div>
+                <div>
+                  <label className="block font-bold text-stone-700 mb-1">सदन / निर्वाचन क्षेत्र (हिंदी) *</label>
+                  <input
+                    type="text"
+                    required
+                    value={formConstituencyHi}
+                    onChange={(e) => setFormConstituencyHi(e.target.value)}
+                    placeholder="उदा. राज्यसभा (केरल) या पोन्नानी"
+                    className="w-full p-2 border border-stone-300 rounded-lg"
+                  />
+                </div>
+              </div>
+
+              {/* Photo Choice: Existing Lightweight Wrapper vs Custom URL */}
+              <div className="p-3 bg-stone-50 border border-stone-200 rounded-xl space-y-2">
+                <label className="block font-bold text-stone-800">
+                  Portrait Display Style (तस्वीर अथवा लाइटवेट क्लासिक रैपर):
+                </label>
+                <div className="flex items-center gap-4">
+                  <label className="flex items-center gap-1.5 cursor-pointer">
+                    <input
+                      type="radio"
+                      name="photoMode"
+                      checked={photoMode === 'wrapper'}
+                      onChange={() => setPhotoMode('wrapper')}
+                    />
+                    <span className="font-semibold text-emerald-900">
+                      Lightweight Typographic Wrapper (Default Monogram)
+                    </span>
+                  </label>
+
+                  <label className="flex items-center gap-1.5 cursor-pointer">
+                    <input
+                      type="radio"
+                      name="photoMode"
+                      checked={photoMode === 'url'}
+                      onChange={() => setPhotoMode('url')}
+                    />
+                    <span className="font-semibold text-blue-900">
+                      Custom Archival Photo URL
+                    </span>
+                  </label>
+                </div>
+
+                {photoMode === 'url' && (
+                  <div className="pt-2">
+                    <input
+                      type="url"
+                      placeholder="https://example.com/archival-portrait.jpg"
+                      value={formPhotoUrl}
+                      onChange={(e) => setFormPhotoUrl(e.target.value)}
+                      className="w-full p-2 border border-stone-300 rounded-lg font-mono text-xs"
+                    />
+                  </div>
+                )}
+              </div>
+
+              {/* Sitting Status Checkbox */}
+              <div>
+                <label className="flex items-center gap-2 cursor-pointer font-bold text-stone-700">
+                  <input
+                    type="checkbox"
+                    checked={formIsSitting}
+                    onChange={(e) => setFormIsSitting(e.target.checked)}
+                    className="w-4 h-4 text-emerald-600 rounded"
+                  />
+                  <span>Currently Active / Sitting Member (वर्तमान सक्रिय सांसद / नेता)</span>
+                </label>
+              </div>
+
+              {/* Roles */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block font-bold text-stone-700 mb-1">Roles / Portfolios (English, 1 per line)</label>
+                  <textarea
+                    rows={2}
+                    value={formRolesEn}
+                    onChange={(e) => setFormRolesEn(e.target.value)}
+                    placeholder="Member of Parliament&#10;Supreme Court Advocate"
+                    className="w-full p-2 border border-stone-300 rounded-lg"
+                  />
+                </div>
+                <div>
+                  <label className="block font-bold text-stone-700 mb-1">भूमिकाएं / दायित्व (हिंदी, प्रति पंक्ति एक)</label>
+                  <textarea
+                    rows={2}
+                    value={formRolesHi}
+                    onChange={(e) => setFormRolesHi(e.target.value)}
+                    placeholder="संसद सदस्य (राज्यसभा)&#10;सर्वोच्च न्यायालय अधिवक्ता"
+                    className="w-full p-2 border border-stone-300 rounded-lg"
+                  />
+                </div>
+              </div>
+
+              {/* Contributions */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block font-bold text-stone-700 mb-1">Key Contributions (English, 1 per line)</label>
+                  <textarea
+                    rows={3}
+                    value={formContributionsEn}
+                    onChange={(e) => setFormContributionsEn(e.target.value)}
+                    placeholder="Raised national minority education rights...&#10;Championed democratic constitutional principles..."
+                    className="w-full p-2 border border-stone-300 rounded-lg"
+                  />
+                </div>
+                <div>
+                  <label className="block font-bold text-stone-700 mb-1">मुख्य योगदान (हिंदी, प्रति पंक्ति एक)</label>
+                  <textarea
+                    rows={3}
+                    value={formContributionsHi}
+                    onChange={(e) => setFormContributionsHi(e.target.value)}
+                    placeholder="सदन में अल्पसंख्यकों के अधिकारों को उठाया...&#10;संविधान की रक्षा में सक्रिय भूमिका..."
+                    className="w-full p-2 border border-stone-300 rounded-lg"
+                  />
+                </div>
+              </div>
+
+              {/* Citation */}
+              <div>
+                <label className="block font-bold text-stone-700 mb-1">Official Hansard / Citation Reference</label>
+                <input
+                  type="text"
+                  value={formCitation}
+                  onChange={(e) => setFormCitation(e.target.value)}
+                  placeholder="e.g. Rajya Sabha Official Debates, July 2024; Lok Sabha Archival Gazette"
+                  className="w-full p-2 border border-stone-300 rounded-lg font-mono text-xs"
+                />
+              </div>
+
+              <div className="flex items-center justify-end gap-2 pt-3 border-t">
+                <button
+                  type="button"
+                  onClick={() => setShowModal(false)}
+                  className="px-4 py-2 border border-stone-300 text-stone-700 rounded-lg font-bold hover:bg-stone-100"
+                >
+                  {lang === 'hi' ? 'रद्द करें' : 'Cancel'}
+                </button>
+                <button
+                  type="submit"
+                  className="px-5 py-2 bg-emerald-700 hover:bg-emerald-800 text-white font-bold rounded-lg shadow-xs"
+                >
+                  {editingLeader ? (lang === 'hi' ? 'अपडेट सहेजें' : 'Save Updates') : (lang === 'hi' ? 'रिकॉर्ड जोड़ें' : 'Add Record')}
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}

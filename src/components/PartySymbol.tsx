@@ -56,19 +56,19 @@ export const PartyFlagIcon: React.FC<{ className?: string }> = ({ className = "w
       fill="none" 
       xmlns="http://www.w3.org/2000/svg"
       className={`${className} border border-stone-300 rounded-xs shadow-xs`}
-      aria-label="Official Party Flag"
+      aria-label="Official Party Flag of Indian Union Muslim League"
     >
       {/* Deep Emerald Green Field */}
       <rect width="72" height="48" fill="#047857" />
       
-      {/* Top Hoist White Crescent */}
+      {/* Top Hoist Canton White Crescent - Facing upper-right fly */}
       <path 
-        d="M20 12 A8 8 0 1 0 20 28 A7 7 0 1 1 20 12 Z" 
+        d="M 12 21 C 8.2 17.2 8.4 11.2 12.4 7.4 C 15 4.9 18.6 4.2 21.8 5.3 C 18.2 7 16.2 10.4 16.6 14.2 C 16.9 17.6 19.4 20.4 22.8 21.2 C 19.2 23 14.8 22.8 12 21 Z" 
         fill="#ffffff" 
       />
-      {/* Five-pointed White Star */}
+      {/* Five-pointed White Star nestled in upper hoist opening */}
       <polygon 
-        points="25,17 26.5,21 31,21 27.5,23.5 29,28 25,25 21,28 22.5,23.5 19,21 23.5,21" 
+        points="23.2,8.4 24.2,10.6 26.6,10.7 24.7,12.2 25.4,14.5 23.3,13.2 21.2,14.5 21.9,12.2 20,10.7 22.4,10.6" 
         fill="#ffffff" 
       />
     </svg>

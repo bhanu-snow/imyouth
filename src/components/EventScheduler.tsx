@@ -46,7 +46,7 @@ export const EventScheduler: React.FC<Props> = ({
   const [coordinatorName, setCoordinatorName] = useState(currentUser.name || 'Adv. Sarfaraz Ahmed');
   const [coordinatorPhone, setCoordinatorPhone] = useState(currentUser.phone || '+91 98370 00112');
 
-  const isAuthorized = currentUser.role === 'state_admin' || currentUser.role === 'district_incharge';
+  const isAuthorized = currentUser.role === 'superadmin' || currentUser.role === 'press_release';
 
   useEffect(() => {
     const list = storageService.getEvents();
@@ -184,9 +184,13 @@ END:VCALENDAR`;
             <span>{lang === 'hi' ? 'नया कार्यक्रम जोड़ें' : 'Schedule New Event'}</span>
           </button>
         ) : (
-          <div className="p-2.5 bg-stone-100 border border-stone-200 rounded-lg text-xs text-stone-600 flex items-center gap-2">
-            <Lock className="w-3.5 h-3.5 text-stone-500" />
-            <span>Login as In-Charge to add/edit events</span>
+          <div className="p-2.5 bg-amber-50 border border-amber-200 rounded-lg text-xs text-amber-900 flex items-center gap-2">
+            <Lock className="w-3.5 h-3.5 text-amber-700 shrink-0" />
+            <span>
+              {lang === 'hi' 
+                ? 'केवल प्रेस रिलीज प्रभारी (press_release) या सुपर एडमिन ही कार्यक्रम व रैलियां प्रकाशित कर सकते हैं' 
+                : 'Only Press Release Role or Super Admin can publish/edit rallies (Public/Cadres can RSVP)'}
+            </span>
           </div>
         )}
       </div>

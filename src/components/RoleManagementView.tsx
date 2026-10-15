@@ -14,7 +14,11 @@ import {
   Sparkles,
   RefreshCw,
   Search,
-  Filter
+  Filter,
+  Eye,
+  EyeOff,
+  Radio,
+  FileText
 } from 'lucide-react';
 import { AuthUser, UserRole, Language } from '../types';
 import { storageService } from '../services/storageService';
@@ -24,16 +28,19 @@ interface Props {
   lang: Language;
   currentUser: AuthUser;
   onUserUpdated: () => void;
+  onNavigateToStructure?: () => void;
 }
 
 export const RoleManagementView: React.FC<Props> = ({ 
   lang, 
   currentUser, 
-  onUserUpdated 
+  onUserUpdated,
+  onNavigateToStructure
 }) => {
   const [users, setUsers] = useState<AuthUser[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedRoleFilter, setSelectedRoleFilter] = useState<string>('all');
+  const [showAllPasswords, setShowAllPasswords] = useState(false);
   
   // Modals state
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -59,8 +66,10 @@ export const RoleManagementView: React.FC<Props> = ({
   // Password reset form
   const [newResetPassword, setNewResetPassword] = useState('');
   const [resetSuccess, setResetSuccess] = useState(false);
+  const [resetError, setResetError] = useState<string | null>(null);
 
-  const isStateAdmin = currentUser.role === 'state_admin';
+  const isSuperAdmin = currentUser.role === 'superadmin';
+  const canManageRoles = isSuperAdmin;
 
   useEffect(() => {
     loadUsers();
@@ -91,7 +100,7 @@ export const RoleManagementView: React.FC<Props> = ({
     });
 
     if (res.success && res.user) {
-      setCreateSuccess(lang === 'hi' ? 'नया पदाधिकारी खाता सफलतापूर्वक बनाया गया!' : 'New cadre account created successfully!');
+      setCreateSuccess(lang === 'hi' ? 'नया खाता सफलतापूर्वक बनाया गया!' : 'New account created successfully!');
       loadUsers();
       onUserUpdated();
       setTimeout(() => {
@@ -117,16 +126,27 @@ export const RoleManagementView: React.FC<Props> = ({
 
   const handleResetPassword = (e: React.FormEvent) => {
     e.preventDefault();
+    setResetError(null);
     if (!passwordModalUser || !newResetPassword) return;
-    storageService.changeUserPassword(passwordModalUser.id, newResetPassword);
-    setResetSuccess(true);
-    loadUsers();
-    onUserUpdated();
-    setTimeout(() => {
-      setPasswordModalUser(null);
-      setResetSuccess(false);
-      setNewResetPassword('');
-    }, 1200);
+
+    const res = storageService.changeUserPasswordWithPermission(
+      currentUser,
+      passwordModalUser.id,
+      newResetPassword
+    );
+
+    if (res.success) {
+      setResetSuccess(true);
+      loadUsers();
+      onUserUpdated();
+      setTimeout(() => {
+        setPasswordModalUser(null);
+        setResetSuccess(false);
+        setNewResetPassword('');
+      }, 1200);
+    } else {
+      setResetError(res.error || 'Permission denied.');
+    }
   };
 
   const handleDeleteUser = (userId: string) => {
@@ -134,7 +154,7 @@ export const RoleManagementView: React.FC<Props> = ({
       alert("You cannot delete your own active account.");
       return;
     }
-    if (confirm("Are you sure you want to revoke and delete this account?")) {
+    if (confirm(lang === 'hi' ? 'क्या आप इस खाते को निरस्त व हटाना चाहते हैं?' : 'Are you sure you want to revoke and delete this account?')) {
       storageService.deleteUserAccount(userId);
       loadUsers();
       onUserUpdated();
@@ -151,6 +171,27 @@ export const RoleManagementView: React.FC<Props> = ({
     return matchesSearch && matchesRole;
   });
 
+  const getRoleBadge = (role: UserRole) => {
+    switch (role) {
+      case 'superadmin':
+        return <span className="text-[10px] font-black px-2 py-0.5 rounded uppercase bg-rose-100 text-rose-800 border border-rose-300">Super Admin</span>;
+      case 'state_president':
+        return <span className="text-[10px] font-black px-2 py-0.5 rounded uppercase bg-purple-100 text-purple-900 border border-purple-300">State President</span>;
+      case 'press_release':
+        return <span className="text-[10px] font-black px-2 py-0.5 rounded uppercase bg-amber-100 text-amber-900 border border-amber-300">Press / Media In-Charge</span>;
+      case 'content_manager':
+        return <span className="text-[10px] font-black px-2 py-0.5 rounded uppercase bg-cyan-100 text-cyan-900 border border-cyan-300">Content Manager</span>;
+      case 'state_admin':
+        return <span className="text-[10px] font-black px-2 py-0.5 rounded uppercase bg-emerald-100 text-emerald-800 border border-emerald-300">State Admin</span>;
+      case 'district_incharge':
+        return <span className="text-[10px] font-black px-2 py-0.5 rounded uppercase bg-blue-100 text-blue-900 border border-blue-300">District In-Charge</span>;
+      case 'cadre_volunteer':
+        return <span className="text-[10px] font-black px-2 py-0.5 rounded uppercase bg-stone-100 text-stone-700 border border-stone-300">Cadre Volunteer</span>;
+      default:
+        return <span className="text-[10px] font-black px-2 py-0.5 rounded uppercase bg-stone-100 text-stone-500">Public</span>;
+    }
+  };
+
   return (
     <div className="max-w-6xl mx-auto px-4 py-8 space-y-8">
       {/* Header */}
@@ -160,58 +201,82 @@ export const RoleManagementView: React.FC<Props> = ({
             <LadderSymbolIcon size={18} />
             <span>{lang === 'hi' ? 'सुरक्षित भूमिका एवं विशेषाधिकार प्रबंधन' : 'Post-Login Role & Access Control Desk'}</span>
             <span aria-hidden="true">·</span>
-            <span>{lang === 'hi' ? 'उत्तर प्रदेश समिति' : 'UP Committee'}</span>
+            <span className="font-bold text-rose-800">
+              {isSuperAdmin ? 'Super Admin Mode Active' : 'Restricted Role Mode'}
+            </span>
           </div>
           <h1 className="text-3xl font-extrabold text-stone-900 tracking-tight">
-            {lang === 'hi' ? 'भूमिका एवं कैडर अधिकार प्रबंधन' : 'Role Management & Cadre Permissions'}
+            {lang === 'hi' ? 'भूमिका एवं कैडर अधिकार प्रबंधन' : 'Role Management & Security Permissions'}
           </h1>
           <p className="text-stone-600 text-xs sm:text-sm max-w-2xl mt-1 leading-relaxed">
             {lang === 'hi'
-              ? 'लॉगिन पश्चात पदाधिकारियों, ज़िला संयोजकों और कार्यकर्ताओं के अधिकार स्तर, पासवर्ड रीसेट व नए खाते सृजन की केंद्रीय व्यवस्था।'
-              : 'Post-authentication dashboard to manage office-bearer tiers, assign district jurisdictions, configure passwords, and manage administrative capabilities.'}
+              ? 'सुपर एडमिन (Super Admin) सभी पासवर्ड देख सकते हैं और किसी भी खाते का पासवर्ड बदल सकते हैं। अन्य उपयोगकर्ता केवल अपना पासवर्ड बदल सकते हैं।'
+              : 'Super Admin has master privileges to see all passwords, change any password, and assign roles. Non-admin users can update their own password only.'}
           </p>
         </div>
 
-        {/* Action Button */}
-        {isStateAdmin && (
-          <button
-            type="button"
-            onClick={() => setShowCreateModal(true)}
-            className="px-4 py-2 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold rounded-xl transition-all shadow-xs flex items-center gap-1.5 cursor-pointer self-start md:self-auto"
-          >
-            <UserPlus className="w-4 h-4" />
-            <span>{lang === 'hi' ? '+ नया पदाधिकारी खाता जोड़ें' : '+ Create Office Bearer Login'}</span>
-          </button>
-        )}
+        {/* Action Buttons */}
+        <div className="flex items-center gap-2 self-start md:self-auto">
+          {onNavigateToStructure && (isSuperAdmin || currentUser.role === 'state_president') && (
+            <button
+              type="button"
+              onClick={onNavigateToStructure}
+              className="px-3.5 py-2 bg-stone-100 hover:bg-stone-200 text-stone-800 text-xs font-bold rounded-xl transition-all border border-stone-300 flex items-center gap-1.5 cursor-pointer"
+            >
+              <Building2 className="w-4 h-4 text-emerald-700" />
+              <span>{lang === 'hi' ? 'विंग्स व ज़िले CRUD' : 'Wings & Districts CRUD'}</span>
+            </button>
+          )}
+
+          {canManageRoles && (
+            <button
+              type="button"
+              onClick={() => setShowCreateModal(true)}
+              className="px-4 py-2 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold rounded-xl transition-all shadow-xs flex items-center gap-1.5 cursor-pointer"
+            >
+              <UserPlus className="w-4 h-4" />
+              <span>{lang === 'hi' ? '+ नया पदाधिकारी खाता' : '+ Create Account'}</span>
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Current Operator Session Strip */}
-      <div className="p-4 bg-white border border-stone-200 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs shadow-xs">
+      <div className="p-5 bg-white border border-stone-200 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs shadow-xs">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-emerald-100/80 text-emerald-900 font-extrabold flex items-center justify-center text-sm">
+          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-700 to-blue-900 text-white font-extrabold flex items-center justify-center text-lg shadow-xs shrink-0">
             {currentUser.name.charAt(0)}
           </div>
           <div>
             <div className="font-extrabold text-stone-900 text-sm flex items-center gap-2">
               <span>{currentUser.name}</span>
-              <span className={`text-[10px] font-black px-2 py-0.5 rounded uppercase ${
-                currentUser.role === 'state_admin' 
-                  ? 'bg-emerald-100 text-emerald-800' 
-                  : currentUser.role === 'district_incharge' 
-                  ? 'bg-blue-100 text-blue-900' 
-                  : 'bg-stone-200 text-stone-800'
-              }`}>
-                {currentUser.role.replace('_', ' ')}
-              </span>
+              {getRoleBadge(currentUser.role)}
             </div>
-            <div className="text-stone-500 text-[11px]">
-              {currentUser.designation} {currentUser.district && `(${currentUser.district} District)`} · {currentUser.email || currentUser.phone}
+            <div className="text-stone-500 text-xs mt-0.5">
+              {currentUser.designation} {currentUser.district && `(${currentUser.district} District)`} · <span className="font-mono">{currentUser.email || currentUser.phone}</span>
             </div>
           </div>
         </div>
 
-        <div className="text-stone-500 text-[11px] bg-stone-50 px-3 py-1.5 rounded-lg border border-stone-200">
-          <strong>Authentication Level:</strong> {currentUser.role === 'state_admin' ? 'Super Admin (All UP)' : 'District Executive'}
+        <div className="flex items-center gap-2">
+          {isSuperAdmin ? (
+            <div className="text-rose-800 bg-rose-50 px-3 py-1.5 rounded-lg border border-rose-200 text-xs font-bold flex items-center gap-1.5">
+              <ShieldCheck className="w-4 h-4 text-rose-600" />
+              <span>Super Admin Authority: Master Password & Role Access</span>
+            </div>
+          ) : (
+            <button
+              type="button"
+              onClick={() => {
+                setPasswordModalUser(currentUser);
+                setNewResetPassword('');
+              }}
+              className="px-3.5 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-bold rounded-lg border border-emerald-300 text-xs flex items-center gap-1.5 cursor-pointer"
+            >
+              <Key className="w-3.5 h-3.5 text-emerald-700" />
+              <span>{lang === 'hi' ? 'मेरा पासवर्ड बदलें' : 'Change My Password'}</span>
+            </button>
+          )}
         </div>
       </div>
 
@@ -226,48 +291,69 @@ export const RoleManagementView: React.FC<Props> = ({
           <table className="w-full text-left text-xs border-collapse">
             <thead>
               <tr className="border-b border-stone-200 text-[11px] font-bold uppercase text-stone-400 bg-stone-50">
-                <th className="p-3">Platform Capability</th>
-                <th className="p-3 text-emerald-800">State Admin (Super Admin)</th>
+                <th className="p-3">Capability / Feature</th>
+                <th className="p-3 text-rose-800">Super Admin</th>
+                <th className="p-3 text-purple-900">State President</th>
+                <th className="p-3 text-amber-900">Press Release</th>
+                <th className="p-3 text-cyan-900">Content Manager</th>
                 <th className="p-3 text-blue-900">District In-Charge</th>
                 <th className="p-3 text-stone-700">Cadre Volunteer</th>
-                <th className="p-3 text-stone-400">Public / Guest</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-stone-100 text-[11px] text-stone-700">
               <tr>
-                <td className="p-3 font-semibold text-stone-900">Approve Cadre Applications</td>
-                <td className="p-3 text-emerald-700 font-bold">✓ All 75 UP Districts</td>
-                <td className="p-3 text-blue-800 font-bold">✓ Assigned District Only</td>
-                <td className="p-3 text-rose-500">✕ Restricted</td>
-                <td className="p-3 text-rose-500">✕ Restricted</td>
+                <td className="p-3 font-semibold text-stone-900">View All Passwords</td>
+                <td className="p-3 text-rose-700 font-bold">✓ Full visibility</td>
+                <td className="p-3 text-stone-400">✕ Own only</td>
+                <td className="p-3 text-stone-400">✕ Own only</td>
+                <td className="p-3 text-stone-400">✕ Own only</td>
+                <td className="p-3 text-stone-400">✕ Own only</td>
+                <td className="p-3 text-stone-400">✕ Own only</td>
               </tr>
               <tr>
-                <td className="p-3 font-semibold text-stone-900">Add / Edit / Delete Rallies & Events</td>
-                <td className="p-3 text-emerald-700 font-bold">✓ Statewide full control</td>
-                <td className="p-3 text-blue-800 font-bold">✓ District level events</td>
-                <td className="p-3 text-stone-500">RSVP only</td>
-                <td className="p-3 text-stone-500">View only</td>
+                <td className="p-3 font-semibold text-stone-900">Change Any User's Password</td>
+                <td className="p-3 text-rose-700 font-bold">✓ Master override</td>
+                <td className="p-3 text-stone-400">✕ Own only</td>
+                <td className="p-3 text-stone-400">✕ Own only</td>
+                <td className="p-3 text-stone-400">✕ Own only</td>
+                <td className="p-3 text-stone-400">✕ Own only</td>
+                <td className="p-3 text-stone-400">✕ Own only</td>
               </tr>
               <tr>
-                <td className="p-3 font-semibold text-stone-900">Record Leadership Tenures & Appointments</td>
+                <td className="p-3 font-semibold text-stone-900">Posts, Wings & Districts CRUD</td>
+                <td className="p-3 text-emerald-700 font-bold">✓ Full access</td>
+                <td className="p-3 text-purple-800 font-bold">✓ Full access</td>
+                <td className="p-3 text-stone-400">✕ Restricted</td>
+                <td className="p-3 text-stone-400">✕ Restricted</td>
+                <td className="p-3 text-stone-400">✕ Restricted</td>
+                <td className="p-3 text-stone-400">✕ Restricted</td>
+              </tr>
+              <tr>
+                <td className="p-3 font-semibold text-stone-900">Press Release & Event Publishing</td>
+                <td className="p-3 text-emerald-700 font-bold">✓ Full access</td>
+                <td className="p-3 text-stone-400">✕ Restricted</td>
+                <td className="p-3 text-amber-800 font-bold">✓ Add/Edit/Delete</td>
+                <td className="p-3 text-stone-400">✕ Restricted</td>
+                <td className="p-3 text-stone-400">RSVP only</td>
+                <td className="p-3 text-stone-400">RSVP only</td>
+              </tr>
+              <tr>
+                <td className="p-3 font-semibold text-stone-900">FAQ & Leader Content Editing</td>
+                <td className="p-3 text-emerald-700 font-bold">✓ Full access</td>
+                <td className="p-3 text-stone-400">✕ Restricted</td>
+                <td className="p-3 text-stone-400">✕ Restricted</td>
+                <td className="p-3 text-cyan-800 font-bold">✓ Bilingual Editor</td>
+                <td className="p-3 text-stone-400">✕ Restricted</td>
+                <td className="p-3 text-stone-400">✕ Restricted</td>
+              </tr>
+              <tr>
+                <td className="p-3 font-semibold text-stone-900">Cadre Approvals & Official ID</td>
                 <td className="p-3 text-emerald-700 font-bold">✓ Statewide</td>
-                <td className="p-3 text-blue-800 font-bold">✓ District & Tehsil units</td>
-                <td className="p-3 text-rose-500">✕ Restricted</td>
-                <td className="p-3 text-rose-500">✕ Restricted</td>
-              </tr>
-              <tr>
-                <td className="p-3 font-semibold text-stone-900">User Role & Password Management</td>
-                <td className="p-3 text-emerald-700 font-bold">✓ Full management</td>
-                <td className="p-3 text-stone-500">Self password only</td>
-                <td className="p-3 text-stone-500">Self password only</td>
-                <td className="p-3 text-rose-500">✕ Restricted</td>
-              </tr>
-              <tr>
-                <td className="p-3 font-semibold text-stone-900">Social Studio 1-Shot Broadcast</td>
-                <td className="p-3 text-emerald-700 font-bold">✓ Verified Broadcast</td>
-                <td className="p-3 text-blue-800 font-bold">✓ Verified Broadcast</td>
-                <td className="p-3 text-emerald-700 font-bold">✓ WhatsApp / Social Share</td>
-                <td className="p-3 text-stone-500">Public share</td>
+                <td className="p-3 text-purple-800 font-bold">✓ Statewide</td>
+                <td className="p-3 text-stone-400">✕ Restricted</td>
+                <td className="p-3 text-stone-400">✕ Restricted</td>
+                <td className="p-3 text-blue-800 font-bold">✓ District Only</td>
+                <td className="p-3 text-emerald-700 font-bold">Verified Card</td>
               </tr>
             </tbody>
           </table>
@@ -279,19 +365,30 @@ export const RoleManagementView: React.FC<Props> = ({
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-stone-100">
           <div>
             <h3 className="font-bold text-stone-900 text-sm">
-              {lang === 'hi' ? 'सक्रिय पदाधिकारी एवं कैडर खाते' : 'Office Bearer & Cadre User Accounts'}
+              {lang === 'hi' ? 'सक्रिय पदाधिकारी एवं कैडर खाते' : 'Registered Accounts & Password Master Directory'}
             </h3>
             <span className="text-xs text-stone-500">
-              {filteredUsers.length} {lang === 'hi' ? 'पंजीकृत खाते' : 'accounts active'}
+              {filteredUsers.length} {lang === 'hi' ? 'खाते सूचीबद्ध' : 'accounts listed'}
             </span>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
+            {isSuperAdmin && (
+              <button
+                type="button"
+                onClick={() => setShowAllPasswords(!showAllPasswords)}
+                className="px-2.5 py-1.5 text-xs font-bold text-rose-800 bg-rose-50 hover:bg-rose-100 rounded-lg border border-rose-200 transition-colors flex items-center gap-1.5 cursor-pointer"
+              >
+                {showAllPasswords ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                <span>{showAllPasswords ? 'Mask Passwords' : 'Show All Passwords'}</span>
+              </button>
+            )}
+
             <div className="relative">
               <Search className="w-3.5 h-3.5 text-stone-400 absolute left-2.5 top-2.5" />
               <input
                 type="text"
-                placeholder="Search by name, district..."
+                placeholder="Search name, phone, email..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-8 pr-3 py-1.5 border border-stone-300 rounded-lg text-xs focus:outline-none focus:border-emerald-700"
@@ -304,7 +401,10 @@ export const RoleManagementView: React.FC<Props> = ({
               className="px-2.5 py-1.5 border border-stone-300 rounded-lg text-xs bg-white font-medium"
             >
               <option value="all">All Roles (सभी)</option>
-              <option value="state_admin">State Admin</option>
+              <option value="superadmin">Super Admin</option>
+              <option value="state_president">State President</option>
+              <option value="press_release">Press / Media In-Charge</option>
+              <option value="content_manager">Content Manager</option>
               <option value="district_incharge">District In-Charge</option>
               <option value="cadre_volunteer">Cadre Volunteer</option>
             </select>
@@ -314,60 +414,71 @@ export const RoleManagementView: React.FC<Props> = ({
         <div className="divide-y divide-stone-100">
           {filteredUsers.map((u) => {
             const isSelf = u.id === currentUser.id;
+            const canChangeThisPassword = isSuperAdmin || isSelf;
+
             return (
-              <div key={u.id} className="py-3 flex flex-col md:flex-row md:items-center justify-between gap-3 text-xs">
+              <div key={u.id} className="py-3.5 flex flex-col md:flex-row md:items-center justify-between gap-3 text-xs hover:bg-stone-50/60 p-2 rounded-xl transition-colors">
                 <div className="flex items-start gap-3">
                   <div className="w-9 h-9 rounded-lg bg-stone-100 border border-stone-200 flex items-center justify-center font-bold text-stone-700 shrink-0 mt-0.5">
                     {u.name.charAt(0)}
                   </div>
                   <div>
-                    <div className="font-bold text-stone-900 flex items-center gap-2">
-                      <span>{u.name}</span>
+                    <div className="font-bold text-stone-900 flex items-center gap-2 flex-wrap">
+                      <span className="text-sm">{u.name}</span>
                       {isSelf && (
                         <span className="text-[10px] font-bold text-emerald-800 bg-emerald-50 px-1.5 py-0.2 rounded border border-emerald-200">
-                          YOU
+                          LOGGED IN
                         </span>
                       )}
-                      <span className={`text-[10px] font-bold px-1.5 py-0.2 rounded uppercase ${
-                        u.role === 'state_admin' 
-                          ? 'bg-emerald-100 text-emerald-800' 
-                          : u.role === 'district_incharge' 
-                          ? 'bg-blue-100 text-blue-900' 
-                          : 'bg-stone-100 text-stone-700'
-                      }`}>
-                        {u.role.replace('_', ' ')}
-                      </span>
+                      {getRoleBadge(u.role)}
                     </div>
 
                     <div className="text-stone-500 text-[11px] flex flex-wrap items-center gap-x-2 gap-y-0.5 mt-0.5">
                       <span>{u.designation}</span>
                       {u.district && <span>· District: <strong>{u.district}</strong></span>}
                       <span>· Phone: <span className="font-mono">{u.phone || 'N/A'}</span></span>
-                      {u.email && <span>· Email: <span className="font-mono">{u.email}</span></span>}
+                      {u.email && <span>· Email: <span className="font-mono text-stone-600">{u.email}</span></span>}
                     </div>
 
-                    <div className="text-[10px] text-stone-400 mt-0.5">
-                      Password: <span className="font-mono text-stone-600 font-bold">{u.password || '******'}</span> · Last Login: {u.lastLogin || 'Recent'}
+                    {/* Password display: Super Admin sees all passwords */}
+                    <div className="mt-1 flex items-center gap-2">
+                      <span className="text-[11px] text-stone-500 font-semibold">Password:</span>
+                      {isSuperAdmin || isSelf ? (
+                        <span className="font-mono text-xs font-bold text-rose-800 bg-rose-50 px-2 py-0.5 rounded border border-rose-200">
+                          {isSuperAdmin && !showAllPasswords && !isSelf ? '••••••••' : u.password || 'not set'}
+                        </span>
+                      ) : (
+                        <span className="font-mono text-xs text-stone-400">•••••••• (Hidden)</span>
+                      )}
+                      <span className="text-[10px] text-stone-400">· Last Active: {u.lastLogin || 'Recent'}</span>
                     </div>
                   </div>
                 </div>
 
                 {/* Actions */}
                 <div className="flex items-center gap-2 self-end md:self-center shrink-0">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setPasswordModalUser(u);
-                      setNewResetPassword('');
-                    }}
-                    className="px-2.5 py-1 text-xs text-stone-700 hover:bg-stone-100 rounded border border-stone-300 transition-colors flex items-center gap-1 cursor-pointer"
-                    title="Change Password"
-                  >
-                    <Key className="w-3 h-3 text-stone-500" />
-                    <span>Password</span>
-                  </button>
+                  {canChangeThisPassword ? (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setPasswordModalUser(u);
+                        setNewResetPassword('');
+                        setResetError(null);
+                      }}
+                      className="px-3 py-1.5 text-xs text-stone-800 hover:bg-stone-100 rounded-lg border border-stone-300 transition-colors flex items-center gap-1.5 cursor-pointer font-bold"
+                      title={isSuperAdmin && !isSelf ? "Change this user's password (Super Admin)" : "Change your password"}
+                    >
+                      <Key className="w-3.5 h-3.5 text-emerald-700" />
+                      <span>{isSelf ? 'Change Password' : 'Reset Password'}</span>
+                    </button>
+                  ) : (
+                    <span className="text-[11px] text-stone-400 italic flex items-center gap-1">
+                      <Lock className="w-3 h-3" />
+                      <span>Protected</span>
+                    </span>
+                  )}
 
-                  {isStateAdmin && (
+                  {canManageRoles && (
                     <>
                       <button
                         type="button"
@@ -377,10 +488,10 @@ export const RoleManagementView: React.FC<Props> = ({
                           setEditDistrict(u.district || 'Moradabad');
                           setEditDesignation(u.designation);
                         }}
-                        className="px-2.5 py-1 text-xs text-blue-900 hover:bg-blue-50 rounded border border-blue-300 transition-colors flex items-center gap-1 cursor-pointer"
+                        className="px-2.5 py-1.5 text-xs text-blue-900 hover:bg-blue-50 rounded-lg border border-blue-300 transition-colors flex items-center gap-1 cursor-pointer font-bold"
                         title="Edit Role & District"
                       >
-                        <Edit3 className="w-3 h-3" />
+                        <Edit3 className="w-3.5 h-3.5" />
                         <span>Edit Role</span>
                       </button>
 
@@ -388,7 +499,7 @@ export const RoleManagementView: React.FC<Props> = ({
                         <button
                           type="button"
                           onClick={() => handleDeleteUser(u.id)}
-                          className="p-1 text-rose-600 hover:bg-rose-50 rounded border border-rose-200 transition-colors cursor-pointer"
+                          className="p-1.5 text-rose-600 hover:bg-rose-50 rounded-lg border border-rose-200 transition-colors cursor-pointer"
                           title="Revoke Account"
                         >
                           <Trash2 className="w-3.5 h-3.5" />
@@ -443,7 +554,7 @@ export const RoleManagementView: React.FC<Props> = ({
                   placeholder="e.g. Adv. Tariq Masood"
                   value={newName}
                   onChange={(e) => setNewName(e.target.value)}
-                  className="w-full p-2 border border-stone-300 rounded focus:border-emerald-700 focus:outline-none"
+                  className="w-full p-2 border border-stone-300 rounded-lg focus:border-emerald-700 focus:outline-none"
                 />
               </div>
 
@@ -451,35 +562,34 @@ export const RoleManagementView: React.FC<Props> = ({
                 <div>
                   <label className="block font-semibold text-stone-700 mb-1">Phone Number *</label>
                   <input
-                    type="tel"
+                    type="text"
                     required
-                    placeholder="+91 98370 54321"
+                    placeholder="+91 98370 XXXXX"
                     value={newPhone}
                     onChange={(e) => setNewPhone(e.target.value)}
-                    className="w-full p-2 border border-stone-300 rounded focus:border-emerald-700 focus:outline-none font-mono"
+                    className="w-full p-2 border border-stone-300 rounded-lg font-mono"
                   />
                 </div>
                 <div>
                   <label className="block font-semibold text-stone-700 mb-1">Email</label>
                   <input
                     type="email"
-                    placeholder="tariq@mylup.org"
+                    placeholder="name@mylup.org"
                     value={newEmail}
                     onChange={(e) => setNewEmail(e.target.value)}
-                    className="w-full p-2 border border-stone-300 rounded focus:border-emerald-700 focus:outline-none"
+                    className="w-full p-2 border border-stone-300 rounded-lg font-mono"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block font-semibold text-stone-700 mb-1">Password *</label>
+                <label className="block font-semibold text-stone-700 mb-1">Initial Password *</label>
                 <input
                   type="text"
                   required
-                  placeholder="Create password"
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
-                  className="w-full p-2 border border-stone-300 rounded focus:border-emerald-700 focus:outline-none font-mono"
+                  className="w-full p-2 border border-stone-300 rounded-lg focus:border-emerald-700 focus:outline-none font-mono"
                 />
               </div>
 
@@ -489,10 +599,13 @@ export const RoleManagementView: React.FC<Props> = ({
                   <select
                     value={newRole}
                     onChange={(e) => setNewRole(e.target.value as UserRole)}
-                    className="w-full p-2 border border-stone-300 rounded bg-white"
+                    className="w-full p-2 border border-stone-300 rounded-lg bg-white font-medium"
                   >
+                    <option value="superadmin">Super Admin (Main Settings)</option>
+                    <option value="state_president">State President (UP)</option>
+                    <option value="press_release">Press / Media In-Charge</option>
+                    <option value="content_manager">Content Manager</option>
                     <option value="district_incharge">District In-Charge</option>
-                    <option value="state_admin">State Admin</option>
                     <option value="cadre_volunteer">Cadre Volunteer</option>
                   </select>
                 </div>
@@ -502,7 +615,7 @@ export const RoleManagementView: React.FC<Props> = ({
                     type="text"
                     value={newDistrict}
                     onChange={(e) => setNewDistrict(e.target.value)}
-                    className="w-full p-2 border border-stone-300 rounded"
+                    className="w-full p-2 border border-stone-300 rounded-lg"
                   />
                 </div>
               </div>
@@ -513,21 +626,22 @@ export const RoleManagementView: React.FC<Props> = ({
                   type="text"
                   value={newDesignation}
                   onChange={(e) => setNewDesignation(e.target.value)}
-                  className="w-full p-2 border border-stone-300 rounded"
+                  placeholder="e.g. Media Coordinator, Sambhal District"
+                  className="w-full p-2 border border-stone-300 rounded-lg"
                 />
               </div>
 
-              <div className="flex items-center justify-end gap-2 pt-2">
+              <div className="flex items-center justify-end gap-2 pt-2 border-t">
                 <button
                   type="button"
                   onClick={() => setShowCreateModal(false)}
-                  className="px-3 py-1.5 bg-stone-100 hover:bg-stone-200 text-stone-700 rounded text-xs"
+                  className="px-3.5 py-2 bg-stone-100 hover:bg-stone-200 text-stone-700 rounded-lg text-xs font-semibold"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white font-bold rounded text-xs cursor-pointer"
+                  className="px-4 py-2 bg-emerald-700 hover:bg-emerald-800 text-white font-bold rounded-lg text-xs cursor-pointer shadow-xs"
                 >
                   Create Account
                 </button>
@@ -543,7 +657,7 @@ export const RoleManagementView: React.FC<Props> = ({
           <div className="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl space-y-4">
             <div className="flex items-center justify-between pb-2 border-b border-stone-100">
               <h3 className="font-bold text-stone-900 text-sm">
-                Edit Role: {editingUser.name}
+                Edit Role & Designation: {editingUser.name}
               </h3>
               <button 
                 onClick={() => setEditingUser(null)}
@@ -555,49 +669,52 @@ export const RoleManagementView: React.FC<Props> = ({
 
             <form onSubmit={handleUpdateRole} className="space-y-3 text-xs">
               <div>
-                <label className="block font-semibold text-stone-700 mb-1">Role</label>
+                <label className="block font-semibold text-stone-700 mb-1">System Role</label>
                 <select
                   value={editRole}
                   onChange={(e) => setEditRole(e.target.value as UserRole)}
-                  className="w-full p-2 border border-stone-300 rounded bg-white"
+                  className="w-full p-2 border border-stone-300 rounded-lg bg-white font-semibold"
                 >
-                  <option value="state_admin">State Admin (Super Admin)</option>
+                  <option value="superadmin">Super Admin (All Passwords & Settings)</option>
+                  <option value="state_president">State President (Org Structure CRUD)</option>
+                  <option value="press_release">Press / Media In-Charge (Events & News)</option>
+                  <option value="content_manager">Content Manager (FAQ & Evidence)</option>
                   <option value="district_incharge">District In-Charge</option>
                   <option value="cadre_volunteer">Cadre Volunteer</option>
                 </select>
               </div>
 
               <div>
-                <label className="block font-semibold text-stone-700 mb-1">District</label>
+                <label className="block font-semibold text-stone-700 mb-1">Assigned District</label>
                 <input
                   type="text"
                   value={editDistrict}
                   onChange={(e) => setEditDistrict(e.target.value)}
-                  className="w-full p-2 border border-stone-300 rounded"
+                  className="w-full p-2 border border-stone-300 rounded-lg"
                 />
               </div>
 
               <div>
-                <label className="block font-semibold text-stone-700 mb-1">Designation</label>
+                <label className="block font-semibold text-stone-700 mb-1">Official Designation</label>
                 <input
                   type="text"
                   value={editDesignation}
                   onChange={(e) => setEditDesignation(e.target.value)}
-                  className="w-full p-2 border border-stone-300 rounded"
+                  className="w-full p-2 border border-stone-300 rounded-lg"
                 />
               </div>
 
-              <div className="flex items-center justify-end gap-2 pt-2">
+              <div className="flex items-center justify-end gap-2 pt-2 border-t">
                 <button
                   type="button"
                   onClick={() => setEditingUser(null)}
-                  className="px-3 py-1.5 bg-stone-100 text-stone-700 rounded text-xs"
+                  className="px-3 py-1.5 bg-stone-100 text-stone-700 rounded-lg text-xs"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-1.5 bg-blue-900 hover:bg-blue-800 text-white font-bold rounded text-xs cursor-pointer"
+                  className="px-4 py-1.5 bg-blue-900 hover:bg-blue-800 text-white font-bold rounded-lg text-xs cursor-pointer"
                 >
                   Save Changes
                 </button>
@@ -614,7 +731,11 @@ export const RoleManagementView: React.FC<Props> = ({
             <div className="flex items-center justify-between pb-2 border-b border-stone-100">
               <h3 className="font-bold text-stone-900 text-sm flex items-center gap-1.5">
                 <Key className="w-4 h-4 text-emerald-700" />
-                <span>Password Reset: {passwordModalUser.name}</span>
+                <span>
+                  {passwordModalUser.id === currentUser.id 
+                    ? 'Change My Password' 
+                    : `Super Admin Reset: ${passwordModalUser.name}`}
+                </span>
               </h3>
               <button 
                 onClick={() => setPasswordModalUser(null)}
@@ -631,10 +752,21 @@ export const RoleManagementView: React.FC<Props> = ({
               </div>
             )}
 
+            {resetError && (
+              <div className="p-2.5 bg-rose-50 border border-rose-200 text-rose-900 text-xs rounded-lg flex items-center gap-2">
+                <AlertCircle className="w-4 h-4 text-rose-600" />
+                <span>{resetError}</span>
+              </div>
+            )}
+
             <form onSubmit={handleResetPassword} className="space-y-3 text-xs">
+              <div className="p-2.5 bg-stone-50 rounded-lg text-[11px] text-stone-600 border border-stone-200">
+                User: <strong>{passwordModalUser.name}</strong> ({passwordModalUser.role})
+              </div>
+
               <div>
                 <label className="block font-semibold text-stone-700 mb-1">
-                  New Password
+                  Enter New Password *
                 </label>
                 <input
                   type="text"
@@ -642,21 +774,21 @@ export const RoleManagementView: React.FC<Props> = ({
                   placeholder="Enter new password"
                   value={newResetPassword}
                   onChange={(e) => setNewResetPassword(e.target.value)}
-                  className="w-full p-2 border border-stone-300 rounded font-mono focus:border-emerald-700 focus:outline-none"
+                  className="w-full p-2 border border-stone-300 rounded-lg font-mono focus:border-emerald-700 focus:outline-none"
                 />
               </div>
 
-              <div className="flex items-center justify-end gap-2 pt-2">
+              <div className="flex items-center justify-end gap-2 pt-2 border-t">
                 <button
                   type="button"
                   onClick={() => setPasswordModalUser(null)}
-                  className="px-3 py-1.5 bg-stone-100 text-stone-700 rounded text-xs"
+                  className="px-3 py-1.5 bg-stone-100 text-stone-700 rounded-lg text-xs"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white font-bold rounded text-xs cursor-pointer"
+                  className="px-4 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white font-bold rounded-lg text-xs cursor-pointer shadow-xs"
                 >
                   Update Password
                 </button>

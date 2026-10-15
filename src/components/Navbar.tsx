@@ -37,6 +37,9 @@ export const Navbar: React.FC<Props> = ({
     { key: 'membership', label: { en: 'Membership Request', hi: 'सदस्यता आवेदन' } },
     { key: 'districts', label: { en: 'UP Districts', hi: 'यूपी ज़िले' } },
     { key: 'events', label: { en: 'Events & News', hi: 'कार्यक्रम व प्रेस' } },
+    ...(currentUser.role === 'superadmin' || currentUser.role === 'state_president' ? [
+      { key: 'structure', label: { en: 'Wings & Posts CRUD', hi: 'विंग्स व पद CRUD' } }
+    ] : []),
     ...(isLoggedIn ? [
       { key: 'role-management', label: { en: 'Role Management', hi: 'भूमिका प्रबंधन' } }
     ] : []),

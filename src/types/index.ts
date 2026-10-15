@@ -1,8 +1,12 @@
 export type Language = 'hi' | 'en';
 
 export type UserRole = 
-  | 'state_admin'        // State Committee / Super Admin (Full permissions)
-  | 'district_incharge'   // District President / Secretary (District approvals & events)
+  | 'superadmin'         // Super Admin (Main Settings, View All Passwords, Change Any Password, Manage Roles)
+  | 'state_president'    // State President (Posts, Wings, Districts CRUD, Cadre Approvals)
+  | 'content_manager'    // Content Manager (Edit FAQ myths/facts, Leader & Evidence directory & photos in EN/HI)
+  | 'press_release'      // Press Release / Media In-Charge (Publish, edit, delete events/news)
+  | 'state_admin'        // State Committee Admin (Full Cadre Approvals & Admin)
+  | 'district_incharge'  // District President / Secretary (District approvals & events)
   | 'cadre_volunteer'    // Active Cadre Volunteer
   | 'public';            // Guest / Public Visitor
 
@@ -17,6 +21,48 @@ export interface AuthUser {
   designation: string;
   createdAt?: string;
   lastLogin?: string;
+}
+
+export interface PostDesignation {
+  id: string;
+  titleEn: string;
+  titleHi: string;
+  level: 'state' | 'zonal' | 'district' | 'block' | 'ward';
+  wingId?: string;
+  descriptionEn: string;
+  descriptionHi: string;
+  status: 'active' | 'reserved' | 'vacant';
+  termYears?: number;
+  updatedAt?: string;
+}
+
+export interface OrgWing {
+  id: string;
+  code: string;
+  nameEn: string;
+  nameHi: string;
+  color: string;
+  focusEn: string;
+  focusHi: string;
+  descriptionEn: string;
+  descriptionHi: string;
+  headLeaderName?: string;
+  badgeLabel?: string;
+  updatedAt?: string;
+}
+
+export interface OrgDistrict {
+  id: string;
+  nameEn: string;
+  nameHi: string;
+  zone: 'Western UP' | 'Rohilkhand' | 'Awadh' | 'Purvanchal' | 'Bundelkhand';
+  subDistricts: string[];
+  headquarters?: string;
+  inChargeName: string;
+  inChargePhone: string;
+  activeCadreCount: number;
+  status: 'active' | 'growing' | 'forming';
+  updatedAt?: string;
 }
 
 export type YouthWing = 

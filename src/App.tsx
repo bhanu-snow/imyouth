@@ -13,6 +13,7 @@ import { CadreApprovalsQueue } from './components/CadreApprovalsQueue';
 import { ParliamentaryHistoryView } from './components/ParliamentaryHistoryView';
 import { LoginPage } from './components/LoginPage';
 import { RoleManagementView } from './components/RoleManagementView';
+import { OrganizationalStructureManager } from './components/OrganizationalStructureManager';
 import { Language, NewsItem, PartyEvent, AuthUser, Member } from './types';
 import { storageService } from './services/storageService';
 import { 
@@ -263,11 +264,24 @@ export default function App() {
         )}
 
         {activeTab === 'parliamentary' && (
-          <ParliamentaryHistoryView lang={lang} />
+          <ParliamentaryHistoryView 
+            lang={lang} 
+            currentUser={currentUser} 
+          />
         )}
 
         {activeTab === 'faq' && (
-          <FaqMythBuster lang={lang} />
+          <FaqMythBuster 
+            lang={lang} 
+            currentUser={currentUser} 
+          />
+        )}
+
+        {activeTab === 'structure' && (
+          <OrganizationalStructureManager
+            lang={lang}
+            currentUser={currentUser}
+          />
         )}
 
         {activeTab === 'broadcast' && (
@@ -298,6 +312,7 @@ export default function App() {
             lang={lang}
             currentUser={currentUser}
             onUserUpdated={refreshMembers}
+            onNavigateToStructure={() => setActiveTab('structure')}
           />
         )}
 
@@ -326,6 +341,7 @@ export default function App() {
             <div className="border-t border-stone-200 pt-8">
               <LiveNewsFeed
                 lang={lang}
+                currentUser={currentUser}
                 onOpenSocialBroadcast={handleOpenSocialFromNews}
               />
             </div>
@@ -333,79 +349,118 @@ export default function App() {
         )}
       </main>
 
-      {/* Quiet Footer */}
+      {/* Official Footer with Codesquare.co.in and Kerala links */}
       <footer className="bg-white border-t border-stone-200 mt-16 text-stone-600 text-xs">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 flex flex-col md:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-2">
-            <span className="font-extrabold text-emerald-900">MUSLIM YOUTH LEAGUE (MYL)</span>
-            <span aria-hidden="true">·</span>
-            <span className="text-stone-700">{lang === 'hi' ? 'उत्तर प्रदेश राज्य समिति' : 'Uttar Pradesh State Committee'}</span>
-            <span aria-hidden="true">·</span>
-            <span className="text-blue-900 font-semibold">दलित, अल्पसंख्यक एवं सर्वसमाज एकता</span>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 space-y-6">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-4 border-b border-stone-100 pb-5">
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="font-extrabold text-emerald-950">MUSLIM YOUTH LEAGUE (MYL)</span>
+              <span aria-hidden="true">·</span>
+              <span className="text-stone-700">{lang === 'hi' ? 'उत्तर प्रदेश राज्य समिति' : 'Uttar Pradesh State Committee'}</span>
+              <span aria-hidden="true">·</span>
+              <span className="text-blue-900 font-semibold">दलित, अल्पसंख्यक एवं सर्वसमाज एकता</span>
+            </div>
+
+            {/* Official Kerala Portal Live Link */}
+            <div className="flex items-center gap-2 bg-emerald-50 px-3 py-1.5 rounded-lg border border-emerald-200">
+              <span className="text-stone-500 font-medium">Daily Updates:</span>
+              <a
+                href="https://www.iumlkerala.org/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-emerald-800 hover:text-emerald-950 font-black underline underline-offset-2 inline-flex items-center gap-1"
+              >
+                <span>IUML Kerala Official (iumlkerala.org)</span>
+                <span aria-hidden="true">↗</span>
+              </a>
+            </div>
           </div>
 
-          <div className="flex flex-wrap items-center gap-5">
-            <button
-              onClick={() => setActiveTab('workflow')}
-              className="hover:text-emerald-800 transition-colors"
-            >
-              {lang === 'hi' ? 'फील्ड वर्कफ़्लो' : 'Cadre Workflow'}
-            </button>
-            <button
-              onClick={() => setActiveTab('approvals')}
-              className="hover:text-emerald-800 transition-colors"
-            >
-              {lang === 'hi' ? 'सत्यापन व अनुमोदन' : 'Approvals Desk'}
-            </button>
-            <button
-              onClick={() => setActiveTab('parliamentary')}
-              className="hover:text-blue-900 transition-colors"
-            >
-              {lang === 'hi' ? 'संसदीय साक्ष्य' : 'Parliamentary Records'}
-            </button>
-            <button
-              onClick={() => setActiveTab('faq')}
-              className="hover:text-emerald-800 transition-colors"
-            >
-              {lang === 'hi' ? 'तथ्य बनाम भ्रम (FAQ)' : 'FAQ & Myths'}
-            </button>
-            <button
-              onClick={() => setActiveTab('broadcast')}
-              className="hover:text-emerald-800 transition-colors"
-            >
-              {lang === 'hi' ? 'सोशल स्टूडियो' : 'Social Studio'}
-            </button>
-            <button
-              onClick={() => setActiveTab('membership')}
-              className="hover:text-emerald-800 transition-colors"
-            >
-              {lang === 'hi' ? 'सदस्यता' : 'Membership'}
-            </button>
-            <button
-              onClick={() => setActiveTab('districts')}
-              className="hover:text-emerald-800 transition-colors"
-            >
-              {lang === 'hi' ? 'यूपी ज़िले' : 'UP Districts'}
-            </button>
-            {currentUser.role !== 'public' ? (
+          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+            <div className="flex flex-wrap items-center gap-4">
               <button
-                onClick={() => setActiveTab('role-management')}
-                className="hover:text-emerald-800 transition-colors font-bold text-emerald-800"
+                onClick={() => setActiveTab('workflow')}
+                className="hover:text-emerald-800 transition-colors"
               >
-                {lang === 'hi' ? 'भूमिका प्रबंधन' : 'Role Management'}
+                {lang === 'hi' ? 'फील्ड वर्कफ़्लो' : 'Cadre Workflow'}
               </button>
-            ) : (
               <button
-                onClick={() => setActiveTab('login')}
-                className="hover:text-emerald-800 transition-colors font-semibold text-emerald-700"
+                onClick={() => setActiveTab('approvals')}
+                className="hover:text-emerald-800 transition-colors"
               >
-                {lang === 'hi' ? 'पासवर्ड लॉगिन' : 'Password Login'}
+                {lang === 'hi' ? 'सत्यापन व अनुमोदन' : 'Approvals Desk'}
               </button>
-            )}
-          </div>
+              <button
+                onClick={() => setActiveTab('parliamentary')}
+                className="hover:text-blue-900 transition-colors"
+              >
+                {lang === 'hi' ? 'संसदीय साक्ष्य' : 'Parliamentary Records'}
+              </button>
+              <button
+                onClick={() => setActiveTab('faq')}
+                className="hover:text-emerald-800 transition-colors"
+              >
+                {lang === 'hi' ? 'तथ्य बनाम भ्रम (FAQ)' : 'FAQ & Myths'}
+              </button>
+              <button
+                onClick={() => setActiveTab('broadcast')}
+                className="hover:text-emerald-800 transition-colors"
+              >
+                {lang === 'hi' ? 'सोशल स्टूडियो' : 'Social Studio'}
+              </button>
+              <button
+                onClick={() => setActiveTab('membership')}
+                className="hover:text-emerald-800 transition-colors"
+              >
+                {lang === 'hi' ? 'सदस्यता' : 'Membership'}
+              </button>
+              <button
+                onClick={() => setActiveTab('districts')}
+                className="hover:text-emerald-800 transition-colors"
+              >
+                {lang === 'hi' ? 'यूपी ज़िले' : 'UP Districts'}
+              </button>
+              {(currentUser.role === 'superadmin' || currentUser.role === 'state_president') && (
+                <button
+                  onClick={() => setActiveTab('structure')}
+                  className="hover:text-emerald-800 transition-colors font-bold text-emerald-800"
+                >
+                  {lang === 'hi' ? 'विंग्स व पद CRUD' : 'Wings & Posts CRUD'}
+                </button>
+              )}
+              {currentUser.role !== 'public' ? (
+                <button
+                  onClick={() => setActiveTab('role-management')}
+                  className="hover:text-emerald-800 transition-colors font-bold text-stone-900"
+                >
+                  {lang === 'hi' ? 'भूमिका प्रबंधन' : 'Role Management'}
+                </button>
+              ) : (
+                <button
+                  onClick={() => setActiveTab('login')}
+                  className="hover:text-emerald-800 transition-colors font-semibold text-emerald-700"
+                >
+                  {lang === 'hi' ? 'पासवर्ड लॉगिन' : 'Password Login'}
+                </button>
+              )}
+            </div>
 
-          <div className="text-stone-400 text-[11px]">
-            © {new Date().getFullYear()} Muslim Youth League (MYL) & MSF Uttar Pradesh. Indian Union Muslim League.
+            {/* Created by Codesquare.co.in with Backlink */}
+            <div className="flex items-center gap-3 text-[11px] text-stone-500">
+              <span>
+                Created by{' '}
+                <a
+                  href="https://codesquare.co.in"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-extrabold text-stone-900 hover:text-emerald-700 underline underline-offset-2 transition-colors"
+                >
+                  Codesquare.co.in
+                </a>
+              </span>
+              <span aria-hidden="true">·</span>
+              <span>© {new Date().getFullYear()} Muslim Youth League (MYL) UP</span>
+            </div>
           </div>
         </div>
       </footer>

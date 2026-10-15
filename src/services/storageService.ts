@@ -1,24 +1,78 @@
-import { Member, PartyEvent, NewsItem, DistrictUnit, SocialBroadcastItem, AuthUser, UserRole } from '../types';
+import { 
+  Member, 
+  PartyEvent, 
+  NewsItem, 
+  DistrictUnit, 
+  SocialBroadcastItem, 
+  AuthUser, 
+  UserRole,
+  PostDesignation,
+  OrgWing,
+  OrgDistrict,
+  MythFaqItem,
+  ParliamentaryLeader
+} from '../types';
+import { MYTHS_AND_FAQS } from '../data/mythsFaqData';
+import { PARLIAMENTARY_LEADERS } from '../data/parliamentaryHistoryData';
 
 const STORAGE_KEYS = {
-  MEMBERS: 'myl_up_members_v3',
-  EVENTS: 'myl_up_events_v3',
-  NEWS: 'myl_up_news_v3',
-  DISTRICTS: 'myl_up_districts_v3',
-  BROADCASTS: 'myl_up_broadcasts_v3',
-  AUTH_USER: 'myl_up_auth_user_v3',
+  MEMBERS: 'myl_up_members_v4',
+  EVENTS: 'myl_up_events_v4',
+  NEWS: 'myl_up_news_v4',
+  DISTRICTS: 'myl_up_districts_v4',
+  BROADCASTS: 'myl_up_broadcasts_v4',
+  AUTH_USER: 'myl_up_auth_user_v5',
+  ALL_USERS: 'myl_up_all_users_v5',
+  POSTS: 'myl_up_posts_v1',
+  WINGS: 'myl_up_wings_v1',
+  ORG_DISTRICTS: 'myl_up_org_districts_v1',
+  FAQS: 'myl_up_faqs_v1',
+  LEADERS: 'myl_up_leaders_v1',
 };
 
 export const DEMO_USERS: AuthUser[] = [
   {
-    id: 'user-admin-1',
-    name: 'Adv. Sarfaraz Ahmed',
-    email: 'admin@mylup.org',
-    phone: '+91 98370 00112',
+    id: 'user-superadmin-1',
+    name: 'Adv. Sarfaraz Ahmed (Super Admin)',
+    email: 'superadmin@mylup.org',
+    phone: '+91 98370 00111',
     password: 'admin123',
-    role: 'state_admin',
-    designation: 'National President (MYL) & State Head UP',
+    role: 'superadmin',
+    designation: 'National President (MYL) & Supreme Admin',
     createdAt: '2024-01-01',
+    lastLogin: '2026-10-15',
+  },
+  {
+    id: 'user-president-1',
+    name: 'Dr. Masood Alam (State President)',
+    email: 'president@mylup.org',
+    phone: '+91 98370 00112',
+    password: 'president123',
+    role: 'state_president',
+    designation: 'State President (MYL Uttar Pradesh)',
+    createdAt: '2024-01-10',
+    lastLogin: '2026-10-15',
+  },
+  {
+    id: 'user-press-1',
+    name: 'Mohd. Irfan (Press & Media Secretary)',
+    email: 'press@mylup.org',
+    phone: '+91 98370 22334',
+    password: 'press123',
+    role: 'press_release',
+    designation: 'State Media In-Charge & Official Spokesperson',
+    createdAt: '2024-02-01',
+    lastLogin: '2026-10-15',
+  },
+  {
+    id: 'user-content-1',
+    name: 'Ziaur Rahman (Content & Ideology Desk)',
+    email: 'content@mylup.org',
+    phone: '+91 98370 33445',
+    password: 'content123',
+    role: 'content_manager',
+    designation: 'Ideology & Parliamentary Archives Editor',
+    createdAt: '2024-02-05',
     lastLogin: '2026-10-15',
   },
   {
@@ -26,7 +80,7 @@ export const DEMO_USERS: AuthUser[] = [
     name: 'Adv. Zeeshan Farooqui',
     email: 'moradabad@mylup.org',
     phone: '+91 98370 12345',
-    password: 'district123',
+    password: 'dist123',
     role: 'district_incharge',
     district: 'Moradabad',
     designation: 'District President (MYL Moradabad)',
@@ -456,6 +510,338 @@ const INITIAL_DISTRICTS: DistrictUnit[] = [
   },
 ];
 
+const INITIAL_POSTS: PostDesignation[] = [
+  {
+    id: 'post-1',
+    titleEn: 'State President',
+    titleHi: 'प्रदेश अध्यक्ष',
+    level: 'state',
+    wingId: 'myl_cadre',
+    descriptionEn: 'Apex constitutional and executive head of Muslim Youth League Uttar Pradesh committee.',
+    descriptionHi: 'मुस्लिम यूथ लीग उत्तर प्रदेश राज्य समिति के शीर्ष कार्यकारी व संगठनात्मक प्रमुख।',
+    status: 'active',
+    termYears: 3,
+  },
+  {
+    id: 'post-2',
+    titleEn: 'State General Secretary',
+    titleHi: 'प्रदेश महासचिव (संगठन)',
+    level: 'state',
+    wingId: 'myl_cadre',
+    descriptionEn: 'Coordinates district units, organizational rallies, cadre membership drives across 75 UP districts.',
+    descriptionHi: 'उत्तर प्रदेश के सभी 75 ज़िलों में संगठन विस्तार, सदस्यता अभियान और समन्वय।',
+    status: 'active',
+    termYears: 3,
+  },
+  {
+    id: 'post-3',
+    titleEn: 'State Media & Press Coordinator',
+    titleHi: 'प्रदेश मुख्य मीडिया व प्रेस प्रवक्ता',
+    level: 'state',
+    wingId: 'it_media',
+    descriptionEn: 'Official authorized spokesperson responsible for press releases, statements, television debates, and media relations.',
+    descriptionHi: 'आधिकारिक प्रेस विज्ञप्ति, मीडिया वक्तव्य, टीवी डिबेट्स व पत्रकार वार्ता का उत्तरदायित्व।',
+    status: 'active',
+    termYears: 2,
+  },
+  {
+    id: 'post-4',
+    titleEn: 'Content, Ideology & Archives Convener',
+    titleHi: 'वैचारिक दस्तावेज व साक्ष्य प्रमुख',
+    level: 'state',
+    wingId: 'general',
+    descriptionEn: 'Maintains historical parliamentary archives, FAQ clarifications, bilingual cadre literature.',
+    descriptionHi: 'संसदीय रिकॉर्ड, भ्रांतियों के दस्तावेजी निवारण व द्विभाषी साहित्य का संपादन।',
+    status: 'active',
+    termYears: 2,
+  },
+  {
+    id: 'post-5',
+    titleEn: 'District President',
+    titleHi: 'ज़िला अध्यक्ष',
+    level: 'district',
+    wingId: 'myl_cadre',
+    descriptionEn: 'Presides over district committee, local public outreach, tehsil committees, and approvals.',
+    descriptionHi: 'ज़िला समिति, तहसील इकाइयों के गठन और स्थानीय जनमुद्दों पर नेतृत्व।',
+    status: 'active',
+    termYears: 2,
+  },
+  {
+    id: 'post-6',
+    titleEn: 'MSF Campus President (University Unit)',
+    titleHi: 'एमएसएफ विश्वविद्यालय इकाई अध्यक्ष',
+    level: 'block',
+    wingId: 'msf',
+    descriptionEn: 'Represents student affairs, scholarship facilitation, campus democracy at AMU, Lucknow University, etc.',
+    descriptionHi: 'छात्रवृत्ति, कैंपस लोकतंत्र व छात्र कल्याण का विश्वविद्यालय स्तरीय नेतृत्व।',
+    status: 'active',
+    termYears: 1,
+  },
+  {
+    id: 'post-7',
+    titleEn: 'White Guard Disaster Seva Captain',
+    titleHi: 'व्हाइट गार्ड आपदा राहत कप्तान',
+    level: 'district',
+    wingId: 'white_guard',
+    descriptionEn: 'Coordinates flood relief, free ambulance service, hospital patient assistance, and communal peace teams.',
+    descriptionHi: 'बाढ़ राहत, निःशुल्क एम्बुलेंस, रक्तदान व सर्वसमाज शांति दल का समन्वय।',
+    status: 'active',
+    termYears: 2,
+  },
+  {
+    id: 'post-8',
+    titleEn: 'Legal Aid & Human Rights Cell Convener',
+    titleHi: 'विधिक प्रकोष्ठ व मानवाधिकार संयोजक',
+    level: 'state',
+    wingId: 'legal_cell',
+    descriptionEn: 'Senior advocates providing free legal consultation, bail aid, and constitutional defense for poor youth.',
+    descriptionHi: 'गरीब व प्रताड़ित युवाओं को निःशुल्क कानूनी सहायता, आरटीआई मार्गदर्शन व मानवाधिकार संरक्षण।',
+    status: 'active',
+    termYears: 2,
+  },
+];
+
+const INITIAL_WINGS: OrgWing[] = [
+  {
+    id: 'wing-1',
+    code: 'myl_cadre',
+    nameEn: 'Muslim Youth League (MYL)',
+    nameHi: 'मुस्लिम यूथ लीग (MYL)',
+    color: 'emerald',
+    focusEn: 'Youth Political Awakening & Democratic Rights',
+    focusHi: 'युवा राजनीतिक जागृति व लोकतांत्रिक अधिकार',
+    descriptionEn: 'The frontline youth vanguard of IUML working across Uttar Pradesh for civil rights, education, and equality.',
+    descriptionHi: 'आईयूएमएल का अग्रणी युवा संगठन जो पूरे यूपी में नागरिक अधिकारों और शिक्षा के लिए सक्रिय है।',
+    headLeaderName: 'Adv. Sarfaraz Ahmed',
+    badgeLabel: 'Primary Youth Wing',
+  },
+  {
+    id: 'wing-2',
+    code: 'msf',
+    nameEn: 'Muslim Students Federation (MSF)',
+    nameHi: 'मुस्लिम स्टूडेंट्स फेडरेशन (MSF)',
+    color: 'blue',
+    focusEn: 'Campus Democracy, Scholarships & Student Welfare',
+    focusHi: 'कैंपस लोकतंत्र, छात्रवृत्तियां एवं उच्च शिक्षा कल्याण',
+    descriptionEn: 'Historic student union founded in 1937 championing educational advancement and university democracy.',
+    descriptionHi: 'ऐतिहासिक छात्र संगठन जो प्रतियोगी परीक्षाओं, हॉस्टल व छात्रवृत्ति के अधिकारों की लड़ाई लड़ता है।',
+    headLeaderName: 'Shadab Ahmad Khan',
+    badgeLabel: 'Student Wing',
+  },
+  {
+    id: 'wing-3',
+    code: 'white_guard',
+    nameEn: 'White Guard Humanitarian Seva Brigade',
+    nameHi: 'व्हाइट गार्ड मानवतावादी सेवा दल',
+    color: 'stone',
+    focusEn: 'Disaster Relief, Ambulance Seva & Communal Harmony',
+    focusHi: 'आपदा राहत, एम्बुलेंस सेवा एवं सांप्रदायिक सौहार्द',
+    descriptionEn: 'Disciplined volunteer corp in white uniform serving all communities during medical crises, accidents, and calamities.',
+    descriptionHi: 'सफेद वर्दीधारी अनुशासित स्वयंसेवक जो बिना किसी भेदभाव के रक्तदान, राहत व सेवा कार्य करते हैं।',
+    headLeaderName: 'Simranjeet Singh',
+    badgeLabel: 'Relief Brigade',
+  },
+  {
+    id: 'wing-4',
+    code: 'life_lift',
+    nameEn: '"Life Lift" Career & Competitive Guidance Cell',
+    nameHi: '"लाइफ लिफ्ट" करियर व प्रतियोगी मार्गदर्शन प्रकोष्ठ',
+    color: 'amber',
+    focusEn: 'UPSC / UPPSC Mentorship, Skill Training & Placement',
+    focusHi: 'यूपीएससी, न्यायिक सेवा, डिजिटल कौशल व रोज़गार मार्गदर्शन',
+    descriptionEn: 'Empowering tier-2 and tier-3 UP youth with competitive exam coaching and modern technology skills.',
+    descriptionHi: 'तहसील व कस्बों के पिछड़े व अल्पसंख्यक युवाओं को प्रशासनिक परीक्षाओं की तैयारी व तकनीकी कौशल।',
+    headLeaderName: 'Dr. Masood Alam',
+    badgeLabel: 'Career Cell',
+  },
+  {
+    id: 'wing-5',
+    code: 'legal_cell',
+    nameEn: 'Constitutional Rights & Legal Aid Cell',
+    nameHi: 'संवैधानिक अधिकार व विधिक सहायता प्रकोष्ठ',
+    color: 'purple',
+    focusEn: 'Free Legal Defense, RTI Clinic & Civil Liberties',
+    focusHi: 'निःशुल्क विधिक रक्षा, आरटीआई क्लिनिक व नागरिक स्वतंत्रता',
+    descriptionEn: 'A network of advocates fighting against police harassment, illegal detentions, and constitutional violations.',
+    descriptionHi: 'अधिवक्ताओं का नेटवर्क जो बाबासाहेब आंबेडकर के संविधान के तहत विधिक सुरक्षा प्रदान करता है।',
+    headLeaderName: 'Adv. Zeeshan Farooqui',
+    badgeLabel: 'Legal Cell',
+  },
+  {
+    id: 'wing-6',
+    code: 'it_media',
+    nameEn: 'IT & Digital Media Broadcast Cell',
+    nameHi: 'आईटी व डिजिटल मीडिया प्रचार प्रकोष्ठ',
+    color: 'cyan',
+    focusEn: 'Cyber Vigilance, Fact Checking & Social Media Broadcast',
+    focusHi: 'साइबर सतर्कता, तथ्य-सत्यापन व सोशल मीडिया प्रसारण',
+    descriptionEn: 'Countering fake news, designing digital campaigns in Hindi and Urdu, running grassroots broadcast desks.',
+    descriptionHi: 'सोशल मीडिया पर भ्रामक प्रचार का खंडन और पार्टी के संदेश को जन-जन तक पहुंचाना।',
+    headLeaderName: 'Mohd. Irfan',
+    badgeLabel: 'Media Cell',
+  },
+  {
+    id: 'wing-7',
+    code: 'dalit_alpsankhyak',
+    nameEn: 'Dalit-Alpsankhyak Constitutional Unity Front',
+    nameHi: 'दलित-अल्पसंख्यक संवैधानिक एकता मंच',
+    color: 'indigo',
+    focusEn: 'Bahujan-Minority Brotherhood & Social Justice',
+    focusHi: 'बहुजन-अल्पसंख्यक भाईचारा एवं सामाजिक न्याय',
+    descriptionEn: 'Bridging Muslims, Dalits, Sikhs, Christians, and Buddhists on common social justice and constitutional rights platforms.',
+    descriptionHi: 'दलितों, मुसलमानों, सिखों, ईसाइयों व बौद्धों का संयुक्त सामाजिक न्याय व हक-इंसाफ का मंच।',
+    headLeaderName: 'Gautam Kumar Gautam',
+    badgeLabel: 'Unity Front',
+  },
+];
+
+const INITIAL_ORG_DISTRICTS: OrgDistrict[] = [
+  {
+    id: 'org-dist-1',
+    nameEn: 'Moradabad',
+    nameHi: 'मुरादाबाद',
+    zone: 'Rohilkhand',
+    subDistricts: ['Moradabad Sadar', 'Bilari', 'Kanth', 'Thakurdwara', 'Sambhal Road Ward'],
+    headquarters: 'Station Road, Moradabad',
+    inChargeName: 'Adv. Zeeshan Farooqui',
+    inChargePhone: '+91 98370 12345',
+    activeCadreCount: 384,
+    status: 'active',
+  },
+  {
+    id: 'org-dist-2',
+    nameEn: 'Sambhal',
+    nameHi: 'संभल',
+    zone: 'Rohilkhand',
+    subDistricts: ['Sambhal Sadar', 'Chandausi', 'Gunnaur', 'Bahjoi'],
+    headquarters: 'Choudhary Sarai, Sambhal',
+    inChargeName: 'Tariq Anwar',
+    inChargePhone: '+91 98371 99882',
+    activeCadreCount: 295,
+    status: 'active',
+  },
+  {
+    id: 'org-dist-3',
+    nameEn: 'Rampur',
+    nameHi: 'रामपुर',
+    zone: 'Rohilkhand',
+    subDistricts: ['Rampur Sadar', 'Bilaspur', 'Milak', 'Shahabad', 'Swar', 'Tanda'],
+    headquarters: 'Topkhana Gate, Rampur',
+    inChargeName: 'Akhtar Raza',
+    inChargePhone: '+91 94123 44556',
+    activeCadreCount: 310,
+    status: 'active',
+  },
+  {
+    id: 'org-dist-4',
+    nameEn: 'Bareilly',
+    nameHi: 'बरेली',
+    zone: 'Rohilkhand',
+    subDistricts: ['Bareilly Sadar', 'Aonla', 'Baheri', 'Faridpur', 'Mirganj', 'Nawabganj'],
+    headquarters: 'Civil Lines, Bareilly',
+    inChargeName: 'Wasim Akram',
+    inChargePhone: '+91 98372 77889',
+    activeCadreCount: 260,
+    status: 'active',
+  },
+  {
+    id: 'org-dist-5',
+    nameEn: 'Meerut',
+    nameHi: 'मेरठ',
+    zone: 'Western UP',
+    subDistricts: ['Meerut City', 'Meerut Cantt', 'Mawana', 'Sardhana'],
+    headquarters: 'Hapur Stand, Meerut',
+    inChargeName: 'Shahid Chaudhary',
+    inChargePhone: '+91 98971 66554',
+    activeCadreCount: 340,
+    status: 'active',
+  },
+  {
+    id: 'org-dist-6',
+    nameEn: 'Aligarh',
+    nameHi: 'अलीगढ़',
+    zone: 'Western UP',
+    subDistricts: ['Koil', 'Atrauli', 'Khair', 'Gabhana', 'Iglas', 'AMU Campus Unit'],
+    headquarters: 'Dodhpur, Aligarh',
+    inChargeName: 'Shadab Ahmad Khan',
+    inChargePhone: '+91 94150 99887',
+    activeCadreCount: 420,
+    status: 'active',
+  },
+  {
+    id: 'org-dist-7',
+    nameEn: 'Saharanpur',
+    nameHi: 'सहारनपुर',
+    zone: 'Western UP',
+    subDistricts: ['Saharanpur Sadar', 'Deoband', 'Behat', 'Nakur', 'Rampur Maniharan'],
+    headquarters: 'Court Road, Saharanpur',
+    inChargeName: 'Rizwan Usmani',
+    inChargePhone: '+91 98970 33221',
+    activeCadreCount: 375,
+    status: 'active',
+  },
+  {
+    id: 'org-dist-8',
+    nameEn: 'Muzaffarnagar',
+    nameHi: 'मुज़फ़्फ़रनगर',
+    zone: 'Western UP',
+    subDistricts: ['Muzaffarnagar Sadar', 'Budhana', 'Jansath', 'Khatauli'],
+    headquarters: 'Meenakshi Chowk, Muzaffarnagar',
+    inChargeName: 'Nadeem Ansari',
+    inChargePhone: '+91 98370 88776',
+    activeCadreCount: 280,
+    status: 'active',
+  },
+  {
+    id: 'org-dist-9',
+    nameEn: 'Lucknow',
+    nameHi: 'लखनऊ',
+    zone: 'Awadh',
+    subDistricts: ['Lucknow Sadar', 'Hazratganj', 'Bakshi Ka Talab', 'Malihabad', 'Mohanlalganj'],
+    headquarters: 'Kaiserbagh, Lucknow',
+    inChargeName: 'Simranjeet Singh',
+    inChargePhone: '+91 97190 88221',
+    activeCadreCount: 350,
+    status: 'active',
+  },
+  {
+    id: 'org-dist-10',
+    nameEn: 'Kanpur Nagar',
+    nameHi: 'कानपुर नगर',
+    zone: 'Awadh',
+    subDistricts: ['Kanpur Sadar', 'Chamanganj Unit', 'Bilhaur', 'Ghatampur'],
+    headquarters: 'Parade, Kanpur',
+    inChargeName: 'Hamza Siddiqui',
+    inChargePhone: '+91 94150 22331',
+    activeCadreCount: 290,
+    status: 'active',
+  },
+  {
+    id: 'org-dist-11',
+    nameEn: 'Agra',
+    nameHi: 'आगरा',
+    zone: 'Western UP',
+    subDistricts: ['Agra Sadar', 'Etmadpur', 'Fatehabad', 'Kheragarh', 'Bah'],
+    headquarters: 'Sanjay Place, Agra',
+    inChargeName: 'Faizan Qureshi',
+    inChargePhone: '+91 98972 11009',
+    activeCadreCount: 220,
+    status: 'active',
+  },
+  {
+    id: 'org-dist-12',
+    nameEn: 'Varanasi',
+    nameHi: 'वाराणसी',
+    zone: 'Purvanchal',
+    subDistricts: ['Varanasi Sadar', 'Pindra', 'Rajatalab', 'Beniyabagh Unit'],
+    headquarters: 'Nadesar, Varanasi',
+    inChargeName: 'Amanullah Ansari',
+    inChargePhone: '+91 94500 88990',
+    activeCadreCount: 195,
+    status: 'active',
+  },
+];
+
 export const storageService = {
   // Auth Session
   getCurrentUser(): AuthUser {
@@ -475,7 +861,7 @@ export const storageService = {
 
   getAllUsers(): AuthUser[] {
     try {
-      const data = localStorage.getItem('myl_up_all_users_v4');
+      const data = localStorage.getItem(STORAGE_KEYS.ALL_USERS);
       if (data) return JSON.parse(data);
     } catch {}
     return DEMO_USERS;
@@ -506,7 +892,7 @@ export const storageService = {
 
     const updatedList = users.map((u) => u.id === found.id ? updatedUser : u);
     try {
-      localStorage.setItem('myl_up_all_users_v4', JSON.stringify(updatedList));
+      localStorage.setItem(STORAGE_KEYS.ALL_USERS, JSON.stringify(updatedList));
     } catch {}
 
     return { success: true, user: updatedUser };
@@ -524,7 +910,7 @@ export const storageService = {
       };
     });
     try {
-      localStorage.setItem('myl_up_all_users_v4', JSON.stringify(updated));
+      localStorage.setItem(STORAGE_KEYS.ALL_USERS, JSON.stringify(updated));
     } catch {}
 
     const current = this.getCurrentUser();
@@ -549,16 +935,21 @@ export const storageService = {
     };
     const updated = [...users, newUser];
     try {
-      localStorage.setItem('myl_up_all_users_v4', JSON.stringify(updated));
+      localStorage.setItem(STORAGE_KEYS.ALL_USERS, JSON.stringify(updated));
     } catch {}
     return { success: true, user: newUser };
+  },
+
+  canChangeUserPassword(actingUser: AuthUser, targetUserId: string): boolean {
+    if (actingUser.role === 'superadmin') return true;
+    return actingUser.id === targetUserId;
   },
 
   changeUserPassword(userId: string, newPassword: string): boolean {
     const users = this.getAllUsers();
     const updated = users.map((u) => u.id === userId ? { ...u, password: newPassword } : u);
     try {
-      localStorage.setItem('myl_up_all_users_v4', JSON.stringify(updated));
+      localStorage.setItem(STORAGE_KEYS.ALL_USERS, JSON.stringify(updated));
     } catch {}
     const current = this.getCurrentUser();
     if (current.id === userId) {
@@ -567,11 +958,22 @@ export const storageService = {
     return true;
   },
 
+  changeUserPasswordWithPermission(actingUser: AuthUser, targetUserId: string, newPassword: string): { success: boolean; error?: string } {
+    if (!this.canChangeUserPassword(actingUser, targetUserId)) {
+      return {
+        success: false,
+        error: 'Only Super Admin can change passwords for other accounts. Non-admin users can change their own password only.'
+      };
+    }
+    this.changeUserPassword(targetUserId, newPassword);
+    return { success: true };
+  },
+
   deleteUserAccount(userId: string): AuthUser[] {
     const users = this.getAllUsers();
     const updated = users.filter((u) => u.id !== userId);
     try {
-      localStorage.setItem('myl_up_all_users_v4', JSON.stringify(updated));
+      localStorage.setItem(STORAGE_KEYS.ALL_USERS, JSON.stringify(updated));
     } catch {}
     return updated;
   },
@@ -810,6 +1212,176 @@ export const storageService = {
     const updated = [item, ...list];
     try {
       localStorage.setItem(STORAGE_KEYS.BROADCASTS, JSON.stringify(updated));
+    } catch {}
+    return updated;
+  },
+
+  // Organizational Structure: Posts CRUD
+  getPosts(): PostDesignation[] {
+    try {
+      const data = localStorage.getItem(STORAGE_KEYS.POSTS);
+      if (data) return JSON.parse(data);
+    } catch {}
+    return INITIAL_POSTS;
+  },
+
+  savePost(post: PostDesignation): PostDesignation[] {
+    const list = this.getPosts();
+    const index = list.findIndex((p) => p.id === post.id);
+    let updated: PostDesignation[];
+    if (index >= 0) {
+      updated = [...list];
+      updated[index] = { ...post, updatedAt: new Date().toISOString().slice(0, 10) };
+    } else {
+      updated = [{ ...post, updatedAt: new Date().toISOString().slice(0, 10) }, ...list];
+    }
+    try {
+      localStorage.setItem(STORAGE_KEYS.POSTS, JSON.stringify(updated));
+    } catch {}
+    return updated;
+  },
+
+  deletePost(postId: string): PostDesignation[] {
+    const list = this.getPosts();
+    const updated = list.filter((p) => p.id !== postId);
+    try {
+      localStorage.setItem(STORAGE_KEYS.POSTS, JSON.stringify(updated));
+    } catch {}
+    return updated;
+  },
+
+  // Organizational Structure: Wings CRUD
+  getWings(): OrgWing[] {
+    try {
+      const data = localStorage.getItem(STORAGE_KEYS.WINGS);
+      if (data) return JSON.parse(data);
+    } catch {}
+    return INITIAL_WINGS;
+  },
+
+  saveWing(wing: OrgWing): OrgWing[] {
+    const list = this.getWings();
+    const index = list.findIndex((w) => w.id === wing.id);
+    let updated: OrgWing[];
+    if (index >= 0) {
+      updated = [...list];
+      updated[index] = { ...wing, updatedAt: new Date().toISOString().slice(0, 10) };
+    } else {
+      updated = [{ ...wing, updatedAt: new Date().toISOString().slice(0, 10) }, ...list];
+    }
+    try {
+      localStorage.setItem(STORAGE_KEYS.WINGS, JSON.stringify(updated));
+    } catch {}
+    return updated;
+  },
+
+  deleteWing(wingId: string): OrgWing[] {
+    const list = this.getWings();
+    const updated = list.filter((w) => w.id !== wingId);
+    try {
+      localStorage.setItem(STORAGE_KEYS.WINGS, JSON.stringify(updated));
+    } catch {}
+    return updated;
+  },
+
+  // Organizational Structure: Districts CRUD
+  getOrgDistricts(): OrgDistrict[] {
+    try {
+      const data = localStorage.getItem(STORAGE_KEYS.ORG_DISTRICTS);
+      if (data) return JSON.parse(data);
+    } catch {}
+    return INITIAL_ORG_DISTRICTS;
+  },
+
+  saveOrgDistrict(dist: OrgDistrict): OrgDistrict[] {
+    const list = this.getOrgDistricts();
+    const index = list.findIndex((d) => d.id === dist.id);
+    let updated: OrgDistrict[];
+    if (index >= 0) {
+      updated = [...list];
+      updated[index] = { ...dist, updatedAt: new Date().toISOString().slice(0, 10) };
+    } else {
+      updated = [{ ...dist, updatedAt: new Date().toISOString().slice(0, 10) }, ...list];
+    }
+    try {
+      localStorage.setItem(STORAGE_KEYS.ORG_DISTRICTS, JSON.stringify(updated));
+    } catch {}
+    return updated;
+  },
+
+  deleteOrgDistrict(districtId: string): OrgDistrict[] {
+    const list = this.getOrgDistricts();
+    const updated = list.filter((d) => d.id !== districtId);
+    try {
+      localStorage.setItem(STORAGE_KEYS.ORG_DISTRICTS, JSON.stringify(updated));
+    } catch {}
+    return updated;
+  },
+
+  // FAQ Myths & Facts Content CRUD
+  getFaqs(): MythFaqItem[] {
+    try {
+      const data = localStorage.getItem(STORAGE_KEYS.FAQS);
+      if (data) return JSON.parse(data);
+    } catch {}
+    return MYTHS_AND_FAQS;
+  },
+
+  saveFaq(faq: MythFaqItem): MythFaqItem[] {
+    const list = this.getFaqs();
+    const index = list.findIndex((f) => f.id === faq.id);
+    let updated: MythFaqItem[];
+    if (index >= 0) {
+      updated = [...list];
+      updated[index] = faq;
+    } else {
+      updated = [faq, ...list];
+    }
+    try {
+      localStorage.setItem(STORAGE_KEYS.FAQS, JSON.stringify(updated));
+    } catch {}
+    return updated;
+  },
+
+  deleteFaq(faqId: string): MythFaqItem[] {
+    const list = this.getFaqs();
+    const updated = list.filter((f) => f.id !== faqId);
+    try {
+      localStorage.setItem(STORAGE_KEYS.FAQS, JSON.stringify(updated));
+    } catch {}
+    return updated;
+  },
+
+  // Parliamentary Leaders & Evidence CRUD
+  getParliamentaryLeaders(): ParliamentaryLeader[] {
+    try {
+      const data = localStorage.getItem(STORAGE_KEYS.LEADERS);
+      if (data) return JSON.parse(data);
+    } catch {}
+    return PARLIAMENTARY_LEADERS;
+  },
+
+  saveLeader(leader: ParliamentaryLeader): ParliamentaryLeader[] {
+    const list = this.getParliamentaryLeaders();
+    const index = list.findIndex((l) => l.id === leader.id);
+    let updated: ParliamentaryLeader[];
+    if (index >= 0) {
+      updated = [...list];
+      updated[index] = leader;
+    } else {
+      updated = [leader, ...list];
+    }
+    try {
+      localStorage.setItem(STORAGE_KEYS.LEADERS, JSON.stringify(updated));
+    } catch {}
+    return updated;
+  },
+
+  deleteLeader(leaderId: string): ParliamentaryLeader[] {
+    const list = this.getParliamentaryLeaders();
+    const updated = list.filter((l) => l.id !== leaderId);
+    try {
+      localStorage.setItem(STORAGE_KEYS.LEADERS, JSON.stringify(updated));
     } catch {}
     return updated;
   },

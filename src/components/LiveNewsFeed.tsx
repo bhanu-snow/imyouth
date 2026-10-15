@@ -1,14 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { Newspaper, Share2, PlusCircle, Clock, Tag, ExternalLink, MessageSquare } from 'lucide-react';
-import { NewsItem, Language, NewsCategory } from '../types';
+import { Newspaper, Share2, PlusCircle, Clock, Tag, ExternalLink, MessageSquare, Trash2, Lock } from 'lucide-react';
+import { NewsItem, Language, NewsCategory, AuthUser } from '../types';
 import { storageService } from '../services/storageService';
 
 interface Props {
   lang: Language;
+  currentUser: AuthUser;
   onOpenSocialBroadcast: (news: NewsItem) => void;
 }
 
-export const LiveNewsFeed: React.FC<Props> = ({ lang, onOpenSocialBroadcast }) => {
+export const LiveNewsFeed: React.FC<Props> = ({ lang, currentUser, onOpenSocialBroadcast }) => {
   const [news, setNews] = useState<NewsItem[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [expandedNewsId, setExpandedNewsId] = useState<string | null>(null);
@@ -62,6 +63,15 @@ export const LiveNewsFeed: React.FC<Props> = ({ lang, onOpenSocialBroadcast }) =
     setContentHi('');
   };
 
+  const canManagePress = currentUser.role === 'superadmin' || currentUser.role === 'press_release';
+
+  const handleDeleteNews = (id: string) => {
+    if (confirm(lang === 'hi' ? 'क्या आप इस प्रेस विज्ञप्ति को हटाना चाहते हैं?' : 'Are you sure you want to delete this press item?')) {
+      const updated = storageService.deleteNews(id);
+      setNews(updated);
+    }
+  };
+
   const filteredNews = news.filter((item) => {
     if (selectedCategory === 'all') return true;
     return item.category === selectedCategory;
@@ -87,13 +97,24 @@ export const LiveNewsFeed: React.FC<Props> = ({ lang, onOpenSocialBroadcast }) =
           </p>
         </div>
 
-        <button
-          onClick={() => setShowPublishModal(true)}
-          className="px-4 py-2 bg-stone-900 hover:bg-stone-800 text-white font-bold text-xs rounded-lg transition-colors inline-flex items-center gap-1.5 shrink-0 cursor-pointer shadow-sm"
-        >
-          <PlusCircle className="w-3.5 h-3.5" />
-          <span>{lang === 'hi' ? 'नई प्रेस विज्ञप्ति जारी करें' : 'Publish Press Release'}</span>
-        </button>
+        {canManagePress ? (
+          <button
+            onClick={() => setShowPublishModal(true)}
+            className="px-4 py-2 bg-stone-900 hover:bg-stone-800 text-white font-bold text-xs rounded-lg transition-colors inline-flex items-center gap-1.5 shrink-0 cursor-pointer shadow-sm"
+          >
+            <PlusCircle className="w-3.5 h-3.5" />
+            <span>{lang === 'hi' ? 'नई प्रेस विज्ञप्ति जारी करें' : 'Publish Press Release'}</span>
+          </button>
+        ) : (
+          <div className="p-2.5 bg-amber-50 border border-amber-200 rounded-lg text-xs text-amber-900 flex items-center gap-2">
+            <Lock className="w-3.5 h-3.5 text-amber-700 shrink-0" />
+            <span>
+              {lang === 'hi'
+                ? 'केवल प्रेस रिलीज प्रभारी (press_release) या सुपर एडमिन ही प्रेस विज्ञप्ति जारी कर सकते हैं'
+                : 'Only Press Release Role or Super Admin can publish/edit official media releases'}
+            </span>
+          </div>
+        )}
       </div>
 
       {/* Filter Tabs */}
@@ -199,6 +220,17 @@ export const LiveNewsFeed: React.FC<Props> = ({ lang, onOpenSocialBroadcast }) =
                     <Share2 className="w-3.5 h-3.5" />
                     <span>{lang === 'hi' ? 'सोशल मीडिया पर भेजें' : 'Broadcast Release'}</span>
                   </button>
+
+                  {canManagePress && (
+                    <button
+                      type="button"
+                      onClick={() => handleDeleteNews(item.id)}
+                      className="p-1.5 text-stone-400 hover:text-rose-600 hover:bg-rose-50 rounded transition-colors"
+                      title="Delete Press Release"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  )}
                 </div>
               </div>
             </article>
