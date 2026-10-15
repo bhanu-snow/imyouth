@@ -13,7 +13,7 @@ import {
   ShieldAlert 
 } from 'lucide-react';
 import { PartyEvent, Language, EventCategory, AuthUser } from '../types';
-import { storageService } from '../services/storageService';
+import { eventService } from '../services/eventService';
 import { TranslateButton } from './common/TranslateButton';
 import { translateEnglishToHindi } from '../utils/translationService';
 import { referenceDataService, type DistrictOption, type LookupOption } from '../services/referenceDataService';
@@ -30,6 +30,7 @@ export const EventScheduler: React.FC<Props> = ({
   onOpenSocialBroadcast 
 }) => {
   const [events, setEvents] = useState<PartyEvent[]>([]);
+  const [dataError, setDataError] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingEvent, setEditingEvent] = useState<PartyEvent | null>(null);
@@ -56,10 +57,11 @@ export const EventScheduler: React.FC<Props> = ({
   const isAuthorized = currentUser.role === 'superadmin' || currentUser.role === 'press_release';
 
   useEffect(() => {
-    const list = storageService.getEvents();
-    setEvents(list);
-
     let cancelled = false;
+    void eventService.list()
+      .then((rows) => { if (!cancelled) { setEvents(rows); setDataError(''); } })
+      .catch((error: unknown) => { if (!cancelled) setDataError(error instanceof Error ? error.message : 'Could not load events from Supabase.'); });
+
     void Promise.all([referenceDataService.districts(), referenceDataService.eventCategories()])
       .then(([districtRows, categoryRows]) => {
         if (cancelled) return;
@@ -80,9 +82,19 @@ export const EventScheduler: React.FC<Props> = ({
     return () => { cancelled = true; };
   }, [currentUser.district]);
 
-  const handleToggleRsvp = (eventId: string, rsvpType: 'going' | 'maybe') => {
-    const updated = storageService.toggleRsvp(eventId, rsvpType);
-    setEvents(updated);
+  const refreshEvents = async () => {
+    const rows = await eventService.list();
+    setEvents(rows);
+    setDataError('');
+  };
+
+  const handleToggleRsvp = async (eventId: string, rsvpType: 'going' | 'maybe') => {
+    try {
+      await eventService.toggleRsvp(eventId, rsvpType);
+      await refreshEvents();
+    } catch (error) {
+      setDataError(error instanceof Error ? error.message : 'Could not save event RSVP.');
+    }
   };
 
   const handleOpenAdd = () => {
@@ -115,16 +127,19 @@ export const EventScheduler: React.FC<Props> = ({
     setShowAddModal(true);
   };
 
-  const handleDelete = (eventId: string) => {
-    if (window.confirm('Are you sure you want to delete this event schedule?')) {
-      const updated = storageService.deleteEvent(eventId);
-      setEvents(updated);
+  const handleDelete = async (eventId: string) => {
+    if (!window.confirm('Are you sure you want to delete this event schedule?')) return;
+    try {
+      await eventService.remove(eventId);
+      await refreshEvents();
+    } catch (error) {
+      setDataError(error instanceof Error ? error.message : 'Could not delete event.');
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!titleEn || !locationEn) return;
+    if (!titleEn || !locationEn || !districtId) return;
 
     const eventToSave: PartyEvent = {
       id: editingEvent ? editingEvent.id : `ev-up-${Date.now()}`,
@@ -136,8 +151,8 @@ export const EventScheduler: React.FC<Props> = ({
       location: { en: locationEn, hi: locationHi || locationEn },
       district,
       state: 'Uttar Pradesh',
-      rsvpCount: editingEvent ? editingEvent.rsvpCount : 1,
-      userRsvp: editingEvent ? editingEvent.userRsvp : 'going',
+      rsvpCount: editingEvent ? editingEvent.rsvpCount : 0,
+      userRsvp: editingEvent ? editingEvent.userRsvp : null,
       coordinator: {
         name: coordinatorName,
         phone: coordinatorPhone,
@@ -150,10 +165,14 @@ export const EventScheduler: React.FC<Props> = ({
       createdBy: currentUser.name,
     };
 
-    const updated = storageService.saveEvent(eventToSave);
-    setEvents(updated);
-    setShowAddModal(false);
-    setEditingEvent(null);
+    try {
+      await eventService.save(eventToSave);
+      await refreshEvents();
+      setShowAddModal(false);
+      setEditingEvent(null);
+    } catch (error) {
+      setDataError(error instanceof Error ? error.message : 'Could not save event.');
+    }
   };
 
   const downloadIcs = (event: PartyEvent) => {
@@ -185,6 +204,7 @@ END:VCALENDAR`;
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-8 space-y-6">
+      {dataError && <div role="alert" className="rounded-lg border border-rose-200 bg-rose-50 p-3 text-sm text-rose-800">{dataError}</div>}
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
