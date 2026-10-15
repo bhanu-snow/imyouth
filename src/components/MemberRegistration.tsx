@@ -36,7 +36,6 @@ export const MemberRegistration: React.FC<Props> = ({ lang, currentUser, onMembe
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
   const [stateId, setStateId] = useState('');
-  const [states, setStates] = useState<StateOption[]>([]);
   const [districtOptions, setDistrictOptions] = useState<DistrictOption[]>([]);
   const [subDistrictOptions, setSubDistrictOptions] = useState<SubDistrictOption[]>([]);
   const [wingOptions, setWingOptions] = useState<WingOption[]>([]);
@@ -61,7 +60,6 @@ export const MemberRegistration: React.FC<Props> = ({ lang, currentUser, onMembe
     void Promise.all([referenceDataService.states(), referenceDataService.districts(), referenceDataService.wings(), referenceDataService.memberCommunities()])
       .then(async ([stateRows, districtRows, wingRows, communityRows]) => {
         if (cancelled) return;
-        setStates(stateRows);
         const up = stateRows.find((item) => item.code.toUpperCase() === 'UP');
         const upDistricts = up ? districtRows.filter((item) => item.state_id === up.id) : [];
         setDistrictOptions(upDistricts);
@@ -461,7 +459,6 @@ export const MemberRegistration: React.FC<Props> = ({ lang, currentUser, onMembe
         </div>
 
         {canViewDirectory && (
-          {/* Right Column: Cadre Directory & Filter (6 cols) */}
           <div className="lg:col-span-6 space-y-4">
             <div className="p-5 bg-white border border-stone-200 rounded-xl space-y-4 shadow-sm">
               <div className="flex items-center justify-between">
