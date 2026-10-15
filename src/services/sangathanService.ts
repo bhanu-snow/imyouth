@@ -30,14 +30,11 @@ export interface SangathanTenure {
 export const sangathanService = {
   async districts(): Promise<SangathanDistrict[]> {
     const client = requireSupabase();
-    const [{ data: districts, error: districtError }, { data: units, error: unitError }] = await Promise.all([
-      client.from('sangathan_public_districts').select('district_id,district_code,name_en,name_hi,headquarters,in_charge_name,active_cadre_count,status,updated_at').order('name_en'),
-      Promise.resolve({ data: null, error: null }),
-    ]);
-    if (districtError) throw new Error(`Could not load district directory: ${districtError.message}`);
-    if (unitError) throw new Error(`Could not load organisational district records: ${unitError.message}`);
-    return (districts ?? []).map((row) => {
-      return {
+    const { data: districts, error } = await client.from('sangathan_public_districts')
+      .select('district_id,district_code,name_en,name_hi,headquarters,in_charge_name,active_cadre_count,status,updated_at')
+      .order('name_en');
+    if (error) throw new Error(`Could not load district directory: ${error.message}`);
+    return (districts ?? []).map((row) => ({
         id: row.district_id,
         code: row.district_code,
         nameEn: row.name_en,
@@ -48,8 +45,7 @@ export const sangathanService = {
         activeCadreCount: row.active_cadre_count ?? 0,
         status: row.status ?? 'forming',
         updatedAt: row.updated_at ?? null,
-      };
-    });
+      }));
   },
 
   async leadership(districtId: string): Promise<SangathanTenure[]> {
