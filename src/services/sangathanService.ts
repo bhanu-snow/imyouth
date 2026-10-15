@@ -31,34 +31,31 @@ export const sangathanService = {
   async districts(): Promise<SangathanDistrict[]> {
     const client = requireSupabase();
     const [{ data: districts, error: districtError }, { data: units, error: unitError }] = await Promise.all([
-      client.from('districts').select('id,code,name_en,name_hi').eq('is_active', true).order('name_en'),
-      client.from('organizational_districts')
-        .select('district_id,headquarters,in_charge_name,in_charge_phone,active_cadre_count,status,updated_at'),
+      client.from('sangathan_public_districts').select('district_id,district_code,name_en,name_hi,headquarters,in_charge_name,active_cadre_count,status,updated_at').order('name_en'),
+      Promise.resolve({ data: null, error: null }),
     ]);
     if (districtError) throw new Error(`Could not load district directory: ${districtError.message}`);
     if (unitError) throw new Error(`Could not load organisational district records: ${unitError.message}`);
-    const byDistrict = new Map((units ?? []).map((row) => [row.district_id, row]));
     return (districts ?? []).map((row) => {
-      const unit = byDistrict.get(row.id);
       return {
-        id: row.id,
-        code: row.code,
+        id: row.district_id,
+        code: row.district_code,
         nameEn: row.name_en,
         nameHi: row.name_hi ?? row.name_en,
-        headquarters: unit?.headquarters ?? null,
-        inChargeName: unit?.in_charge_name ?? null,
-        inChargePhone: unit?.in_charge_phone ?? null,
-        activeCadreCount: unit?.active_cadre_count ?? 0,
-        status: unit?.status ?? 'forming',
-        updatedAt: unit?.updated_at ?? null,
+        headquarters: row.headquarters ?? null,
+        inChargeName: row.in_charge_name ?? null,
+        inChargePhone: null,
+        activeCadreCount: row.active_cadre_count ?? 0,
+        status: row.status ?? 'forming',
+        updatedAt: row.updated_at ?? null,
       };
     });
   },
 
   async leadership(districtId: string): Promise<SangathanTenure[]> {
     const client = requireSupabase();
-    const { data, error } = await client.from('leadership_tenures')
-      .select('id,district_id,leader_name_en,leader_name_hi,post_title_en,post_title_hi,tenure_start,tenure_end,status,contact_phone,email')
+    const { data, error } = await client.from('sangathan_public_leadership')
+      .select('id,district_id,leader_name_en,leader_name_hi,post_title_en,post_title_hi,tenure_start,tenure_end,status')
       .eq('district_id', districtId)
       .order('tenure_start', { ascending: false });
     if (error) throw new Error(`Could not load leadership history: ${error.message}`);
@@ -72,8 +69,8 @@ export const sangathanService = {
       tenureStart: row.tenure_start,
       tenureEnd: row.tenure_end,
       status: row.status,
-      contactPhone: row.contact_phone,
-      email: row.email,
+      contactPhone: null,
+      email: null,
     }));
   },
 
