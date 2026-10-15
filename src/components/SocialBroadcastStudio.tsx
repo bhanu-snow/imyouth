@@ -75,9 +75,10 @@ export const SocialBroadcastStudio: React.FC<Props> = ({
     setEventsList(events);
     setBroadcastHistory(broadcasts);
     let cancelled = false;
-    void referenceDataService.socialPlatforms()
-      .then((rows) => { if (!cancelled) { setPlatformOptions(rows); setLookupError(''); } })
-      .catch((error: unknown) => { if (!cancelled) setLookupError(error instanceof Error ? error.message : 'Could not load social platforms.'); });
+    void referenceDataService.socialPlatforms().then(
+      (rows) => { if (!cancelled) { setPlatformOptions(rows); setLookupError(''); } },
+      (error: unknown) => { if (!cancelled) setLookupError(error instanceof Error ? error.message : 'Could not load social platforms.'); },
+    );
 
     if (preselectedNews) {
       setSourceType('news');
