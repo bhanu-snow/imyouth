@@ -550,4 +550,4 @@ values
  ('myl_state_up','MYL Uttar Pradesh','MYL उत्तर प्रदेश',7)
 on conflict(code) do update set name_en=excluded.name_en,name_hi=excluded.name_hi,sort_order=excluded.sort_order;
 
-commit();
+COMMIT;
