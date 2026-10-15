@@ -161,11 +161,16 @@ export const eventService = {
       if (error) throw new Error(`Could not remove RSVP: ${error.message}`);
       return;
     }
-    const { error } = await client.from('event_rsvps').upsert({
-      event_id: event.id,
-      user_id: userData.user.id,
-      status,
-    }, { onConflict: 'event_id,user_id' });
-    if (error) throw new Error(`Could not save RSVP: ${error.message}`);
+    if (existing) {
+      const { error } = await client.from('event_rsvps').update({ status }).eq('id', existing.id);
+      if (error) throw new Error(`Could not update RSVP: ${error.message}`);
+    } else {
+      const { error } = await client.from('event_rsvps').insert({
+        event_id: event.id,
+        user_id: userData.user.id,
+        status,
+      });
+      if (error) throw new Error(`Could not save RSVP: ${error.message}`);
+    }
   },
 };
