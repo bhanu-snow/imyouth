@@ -11,14 +11,14 @@ with check (
   and approved_at is null
   and exists (
     select 1 from public.districts d
-    where d.id = district_id
-      and d.state_id = state_id
+    where d.id = public.members.district_id
+      and d.state_id = public.members.state_id
       and d.is_active = true
   )
   and (sub_district_id is null or exists (
     select 1 from public.sub_districts sd
-    where sd.id = sub_district_id
-      and sd.district_id = district_id
+    where sd.id = public.members.sub_district_id
+      and sd.district_id = public.members.district_id
       and sd.is_active = true
   ))
 );
