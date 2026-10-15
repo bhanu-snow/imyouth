@@ -7,6 +7,7 @@ export interface LookupOption {
   name_hi?: string | null;
   sort_order?: number;
 }
+export interface StateOption extends LookupOption {}
 export interface ZoneOption extends LookupOption { state_id: string }
 export interface DistrictOption extends LookupOption { state_id: string; zone_id: string | null }
 export interface SubDistrictOption extends LookupOption { district_id: string; unit_type: string }
