@@ -83,7 +83,7 @@ export const CadreApprovalsQueue: React.FC<Props> = ({
     setMemberError('');
     try {
       await memberService.reject(requestId);
-      setMembers((previous) => previous.map((member) => member.id === requestId ? { ...member, status: 'rejected', verified: false } : member));
+      setMembers((previous) => previous.map((member) => member.id === requestId ? { ...member, status: 'rejected' as const, verified: false } : member));
       onRefreshMembers();
     } catch (error) {
       setMemberError(error instanceof Error ? error.message : 'Could not reject this application.');
@@ -451,7 +451,7 @@ export const CadreApprovalsQueue: React.FC<Props> = ({
                     </div>
                     <div>
                       <span className="text-stone-400 block text-[10px]">Approval Authority:</span>
-                      <span className="text-emerald-900 font-medium">{verifyResult.approvedBy || 'Pending State Approval'}</span>
+                      <span className="text-emerald-900 font-medium">{verifyResult.approvedBy || (verifyResult.status === 'approved' ? 'Authorized committee' : 'Pending State Approval')}</span>
                     </div>
                   </div>
 
