@@ -31,7 +31,7 @@ Do not run only the first migration: later migrations add row-level security, lo
 
 ## 3. Geography data is not complete yet
 
-The district directory migration seeds all 75 districts listed by the Government of Uttar Pradesh district portal. The generic "District HQ / Local Unit" entries are placeholders to let the district → local-unit dropdown graph function; they are not official tehsil/block records. Replace them with a verified tehsil/block/ward directory before production.
+The district directory migration seeds all 75 districts listed by the [Government of Uttar Pradesh district portal](https://uttarpradesh.s3waas.gov.in/). The generic "District HQ / Local Unit" entries are placeholders to let the district → local-unit dropdown graph function; they are not official tehsil/block records. Replace them with a verified tehsil/block/ward directory before production.
 
 Before production, import a verified, authoritative Uttar Pradesh dataset into states, zones, districts, and sub_districts. Keep stable codes and UUIDs, and ensure each sub-district references its correct district. Do not add fabricated tehsil names or office-bearer contact details.
 
