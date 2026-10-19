@@ -1,19 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { 
-  HelpCircle, 
   Search, 
   Share2, 
   CheckCircle2, 
-  AlertTriangle, 
   BookOpen, 
   ShieldCheck, 
   Plus, 
   Edit3, 
   Trash2, 
   X, 
-  Check, 
-  FileText,
-  Sparkles
+  Award,
+  Landmark,
+  Scale
 } from 'lucide-react';
 import { Language, MythFaqItem, AuthUser } from '../types';
 import { faqService } from '../services/faqService';
@@ -195,8 +193,8 @@ export const FaqMythBuster: React.FC<Props> = ({ lang, currentUser }) => {
 
           <p className="text-stone-700 text-sm sm:text-base max-w-3xl leading-relaxed font-normal">
             {lang === 'hi'
-              ? 'इंडियन यूनियन मुस्लिम लीग (IUML) और मुस्लिम यूथ लीग (MYL) के गठन (10 मार्च 1948 मद्रास), संविधान के प्रति निष्ठा, और उत्तर प्रदेश में हमारी भूमिका से जुड़े सभी सवालों के प्रामाणिक दस्तावेजी उत्तर।'
-              : 'Official documentation and factual clarity on IUML’s post-independence founding (10 March 1948 in Madras), Constituent Assembly legacy, secular democratic commitments, and the role of MYL in Uttar Pradesh.'}
+              ? 'आज़ाद भारत में 10 मार्च 1948 को मद्रास में गठन, संविधान सभा में बाबासाहेब डॉ. आंबेडकर के साथ भूमिका, केरल-तमिलनाडु की प्रशासनिक सफलता, राष्ट्रीय नेताओं के विचार और उत्तर प्रदेश में आरटीआई व संस्थागत अधिकारों के प्रामाणिक उत्तर।'
+              : 'Official documentation and factual clarity on IUML’s post-independence founding (10 March 1948 in Madras), Constituent Assembly collaboration with Dr. B.R. Ambedkar, governing experience, national leaders’ statements, and institutional solutions in Uttar Pradesh.'}
           </p>
         </div>
 
@@ -234,9 +232,11 @@ export const FaqMythBuster: React.FC<Props> = ({ lang, currentUser }) => {
           {[
             { key: 'all', label: { en: 'All Questions', hi: 'सभी प्रश्न' } },
             { key: 'history', label: { en: '1948 History', hi: '1948 इतिहास' } },
-            { key: 'up_focus', label: { en: 'UP Relevance', hi: 'यूपी में भूमिका' } },
-            { key: 'secularism', label: { en: 'Secularism', hi: 'धर्मनिरपेक्षता' } },
-            { key: 'wings', label: { en: 'MYL & Youth Programs', hi: 'MYL व युवा कार्यक्रम' } },
+            { key: 'ideology', label: { en: 'Ambedkar & Governance', hi: 'आंबेडकर व सुशासन' } },
+            { key: 'up_focus', label: { en: 'UP Relevance & Rights', hi: 'यूपी व संस्थागत अधिकार' } },
+            { key: 'secularism', label: { en: 'Quotes & Secularism', hi: 'नेताओं के विचार व सेक्युलरिज्म' } },
+            { key: 'culture_society', label: { en: 'Art & Culture', hi: 'कला, साहित्य व संस्कृति' } },
+            { key: 'wings', label: { en: 'Wings & Pan-India Seva', hi: 'विंग्स व देशव्यापी सेवा' } },
           ].map((cat) => (
             <button
               key={cat.key}
@@ -254,7 +254,7 @@ export const FaqMythBuster: React.FC<Props> = ({ lang, currentUser }) => {
         </div>
       </div>
 
-      {/* FAQ Accordion List with High Visibility Fonts */}
+      {/* FAQ Accordion List */}
       {faqError && (
         <div role="alert" className="rounded-xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-800">
           {faqError}
@@ -421,7 +421,11 @@ export const FaqMythBuster: React.FC<Props> = ({ lang, currentUser }) => {
                   onChange={(e) => setCategory(e.target.value as any)}
                   className="w-full p-2 border border-stone-300 rounded-lg bg-white"
                 >
-                  {categoryOptions.map((item) => <option key={item.id} value={item.code}>{lang === 'hi' && item.name_hi ? item.name_hi : item.name_en}</option>)}
+                  {categoryOptions.map((item) => (
+                    <option key={item.id} value={item.code}>
+                      {lang === 'hi' && item.name_hi ? item.name_hi : item.name_en}
+                    </option>
+                  ))}
                 </select>
                 {lookupError && <p role="alert" className="mt-1 text-rose-700">{lookupError}</p>}
               </div>

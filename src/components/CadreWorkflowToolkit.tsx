@@ -65,11 +65,11 @@ export const CadreWorkflowToolkit: React.FC<Props> = ({
   }, []);
 
   const steps = [
-    { step: 1, title: { en: 'Origins & purpose', hi: 'इतिहास व उद्देश्य' } },
-    { step: 2, title: { en: 'Kerala & public record', hi: 'केरल व सार्वजनिक रिकॉर्ड' } },
-    { step: 3, title: { en: 'UP & civic values', hi: 'यूपी व नागरिक मूल्य' } },
-    { step: 4, title: { en: 'Questions & answers', hi: 'सवाल-जवाब' } },
-    { step: 5, title: { en: 'Membership request', hi: 'सदस्यता अनुरोध' } },
+    { step: 1, title: { en: 'History, Founders & Mission', hi: 'इतिहास, संस्थापक व मिशन' } },
+    { step: 2, title: { en: 'Kerala, TN & Alliances', hi: 'केरल, तमिलनाडु व गठबंधन' } },
+    { step: 3, title: { en: 'UP & Institutional Rights', hi: 'यूपी व संस्थागत अधिकार' } },
+    { step: 4, title: { en: 'Questions & Answers', hi: 'सवाल-जवाब' } },
+    { step: 5, title: { en: 'Membership Request', hi: 'सदस्यता अनुरोध' } },
   ];
 
   const selectedFaq = faqs.find((faq) => faq.id === selectedFaqId);
@@ -80,19 +80,19 @@ export const CadreWorkflowToolkit: React.FC<Props> = ({
       <div className="bg-gradient-to-r from-emerald-900 via-blue-950 to-stone-900 text-white p-6 sm:p-8 rounded-2xl border border-emerald-800 shadow-md">
         <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-emerald-300 mb-2">
           <Compass className="w-4 h-4 text-emerald-400" />
-          <span>{lang === 'hi' ? 'संगठन परिचय व सदस्यता मार्गदर्शिका' : 'Organization Overview & Membership Guide'}</span>
+          <span>{lang === 'hi' ? 'मुस्लिम यूथ लीग (MYL) — जनसंपर्क व सदस्यता मार्गदर्शिका' : 'Muslim Youth League (MYL) — Outreach & Membership Guide'}</span>
           <span aria-hidden="true">·</span>
           <span>उत्तर प्रदेश (UP Unit)</span>
         </div>
         <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
           {lang === 'hi'
-            ? 'परिचय से सदस्यता अनुरोध तक'
-            : 'From an informed introduction to a membership request'}
+            ? 'संवैधानिक जागरूकता से सक्रिय सदस्यता तक'
+            : 'From Constitutional Awareness to Active Membership'}
         </h1>
         <p className="text-emerald-100 text-xs sm:text-sm max-w-2xl mt-2 leading-relaxed">
           {lang === 'hi'
-            ? 'इतिहास और सार्वजनिक रिकॉर्ड से शुरुआत करें, सवालों के लिए प्रकाशित स्रोत देखें, और रुचि होने पर ही व्यक्ति की सहमति से आवेदन दर्ज करें।'
-            : 'Start with the history and public record, use published sources to answer questions, and record an application only when the person chooses to proceed.'}
+            ? 'पार्टी के इतिहास, दक्षिण भारत में संस्थागत विकास और गठबंधन मॉडल को साझा करें, आरटीआई, पुलिस व मंत्रालयों के ज़रिए हक़ दिलाएं, और सहमति से MYL सदस्यता जोड़ें।'
+            : 'Introduce our 1948 founding, Kerala & Tamil Nadu governance record, alliances realizing Babasaheb’s dream, and empower UP youth with institutional remedies.'}
         </p>
 
         {/* Workflow Steps Indicator Bar */}
@@ -116,7 +116,7 @@ export const CadreWorkflowToolkit: React.FC<Props> = ({
         </div>
       </div>
 
-      {/* STEP 1: HISTORY, FOUNDERS, AND STATED PURPOSE */}
+      {/* STEP 1: HISTORY, FOUNDERS, MOTTO, VISION AND MISSION */}
       {activeStep === 1 && (
         <section className="space-y-5 animate-fade-in">
           <header className="rounded-2xl border border-stone-200 bg-white p-5 shadow-sm sm:p-7">
@@ -124,35 +124,35 @@ export const CadreWorkflowToolkit: React.FC<Props> = ({
               <span className="rounded-xl bg-emerald-50 p-2 text-emerald-800"><Landmark className="h-5 w-5" /></span>
               <div>
                 <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-700">
-                  {lang === 'hi' ? 'चरण 1: शुरुआत, संस्थापक और विचार' : 'Step 1: Origins, founders & stated purpose'}
+                  {lang === 'hi' ? 'चरण 1: इतिहास, संस्थापक, आदर्श वाक्य व मिशन' : 'Step 1: History, Founders, Motto, Vision & Mission'}
                 </span>
                 <h2 className="mt-1 text-xl font-bold text-stone-900">
-                  {lang === 'hi' ? 'इतिहास से शुरुआत करें — किसी तैयार भाषण से नहीं' : 'Start with the history, not a scripted pitch'}
+                  {lang === 'hi' ? 'बुनियाद और नेतृत्व की विरासत' : 'Foundational Heritage & Leadership'}
                 </h2>
               </div>
             </div>
             <p className="mt-4 max-w-4xl text-sm leading-relaxed text-stone-700">
               {lang === 'hi'
-                ? 'इंडियन यूनियन मुस्लिम लीग (IUML) का गठन 10 मार्च 1948 को मद्रास में हुआ। क़ायदे-मिल्लत मुहम्मद इस्माइल इसके संस्थापक अध्यक्ष थे। बी. पोकर साहब बहादुर सहित संविधान सभा और शुरुआती संसद से जुड़े नेताओं के रिकॉर्ड भी उपलब्ध हैं। इन प्रविष्टियों को उनके साथ दिए गए संदर्भों के साथ पढ़ें; असहमति हो तो मूल अभिलेख देखें।'
-                : 'The Indian Union Muslim League (IUML) was formed in Madras on 10 March 1948, with Quaid-e-Millath Muhammad Ismail as its founding president. Records also cover leaders such as B. Pocker Sahib Bahadur, who served in the Constituent Assembly and early Parliament. Read each entry alongside its citation, and consult the original record when a detail is disputed.'}
+                ? 'इंडियन यूनियन मुस्लिम लीग (IUML) की स्थापना आज़ाद भारत में 10 मार्च 1948 को मद्रास (चेन्नई) में कायदे-मिल्लत एम. मुहम्मद इस्माइल साहिब, के.एम. सीथी साहिब और बी. पोकर साहिब के नेतृत्व में हुई। बाद में बाफ़क़ी तंगल, सैय्यद मुहम्मदाली शिहाब तंगल और सी.एच. मुहम्मद कोया ने इसे शांति, सामाजिक सौहार्द और संस्थागत राजनीति का मज़बूत स्तम्भ बनाया। युवाओं, छात्रों और पेशेवरों को संगठित करने के लिए 1973 में मुस्लिम यूथ लीग (MYL) का गठन हुआ।'
+                : 'The Indian Union Muslim League (IUML) was founded in sovereign independent India on 10 March 1948 in Madras (Chennai) by visionary leaders led by Quaid-e-Millath M. Muhammad Ismail Sahib, alongside stalwarts like K.M. Seethi Sahib and B. Pocker Sahib. Following them, leaders like Panakkad Syed Ummer Bafaqy Thangal, Panakkad Syed Mohammadali Shihab Thangal, and C.H. Mohammed Koya strengthened its foundation of communal amity and institutional politics. In 1973, the Muslim Youth League (MYL) was formed to mobilize students, professionals, and youth.'}
             </p>
           </header>
 
           <div className="grid gap-4 md:grid-cols-2">
             <article className="rounded-xl border border-emerald-200 bg-emerald-50/70 p-5">
-              <h3 className="font-bold text-emerald-950">{lang === 'hi' ? 'किस उद्देश्य से?' : 'Why was it formed?'}</h3>
+              <h3 className="font-bold text-emerald-950">{lang === 'hi' ? 'आदर्श वाक्य व चुनाव चिन्ह' : 'Motto & Symbol'}</h3>
               <p className="mt-2 text-sm leading-relaxed text-stone-700">
                 {lang === 'hi'
-                  ? 'पार्टी का सार्वजनिक परिचय भारतीय संविधान, धर्मनिरपेक्ष लोकतंत्र, नागरिक अधिकारों और शिक्षा-सांस्कृतिक अधिकारों के दायरे में पढ़ें। इन्हें पार्टी के घोषित विचारों के रूप में प्रस्तुत करें; किसी ऐतिहासिक बहस या संस्थागत उपलब्धि का दावा करते समय स्रोत साथ रखें।'
-                  : 'Read the party’s public position in the context of the Constitution, secular democracy, civil rights, and educational and cultural rights. Present these as the party’s stated commitments; cite a source for claims about historical debates or institutional achievements.'}
+                  ? 'हमारा आदर्श वाक्य है: "एकता, सामाजिक सद्भाव और प्रगति"। हमारा प्रतीक "सीढ़ी" (Ladder) समाज के सबसे वंचित और पिछड़े वर्गों को शिक्षा, आत्मसम्मान और आर्थिक स्वावलंबन की सीढ़ियों के ज़रिए ऊपर उठाने का प्रतिनिधित्व करता है।'
+                  : '"Unity, Harmony, and Progress". Our symbol—the Ladder—represents the step-by-step socio-economic elevation, educational advancement, and empowerment of the most backward and marginalized sections.'}
               </p>
             </article>
             <article className="rounded-xl border border-blue-200 bg-blue-50/70 p-5">
-              <h3 className="font-bold text-blue-950">{lang === 'hi' ? 'दृष्टि व मिशन' : 'Stated vision & mission'}</h3>
+              <h3 className="font-bold text-blue-950">{lang === 'hi' ? 'दृष्टिकोण व मिशन' : 'Stated Vision & Mission'}</h3>
               <p className="mt-2 text-sm leading-relaxed text-stone-700">
                 {lang === 'hi'
-                  ? 'MYL, IUML का युवा संगठन है। उसका काम, कार्यक्रम और पद-संरचना स्थानीय रिकॉर्ड के अनुसार समझाएं। किसी सेवा, संस्था या उपलब्धि को MYL/IUML से जोड़ने से पहले उसका आधिकारिक दस्तावेज़ और तारीख जांचें।'
-                  : 'MYL is IUML’s youth organization. Explain its work, programs, and organizational structure using current local records. Before attributing a service, institution, or achievement to MYL/IUML, verify its official documentation and date.'}
+                  ? 'भारत के संविधान और लोकतांत्रिक संस्थाओं के दायरे में रहकर अल्पसंख्यकों, दलितों और शोषित वर्गों के अधिकारों की रक्षा करना; साम्प्रदायिक सद्भाव बनाना; और पिछड़े समुदायों को शिक्षित, संस्थागत रूप से प्रतिनिधित्व प्राप्त और आत्मनिर्भर नागरिक बनाना।'
+                  : 'To safeguard democratic and constitutional rights through dialogue and rule of law; to build communal peace; to turn backward minorities and marginalized groups into educated, institutionally represented, self-reliant citizens.'}
               </p>
             </article>
           </div>
@@ -160,8 +160,8 @@ export const CadreWorkflowToolkit: React.FC<Props> = ({
           <aside className="flex flex-col gap-3 rounded-xl border border-amber-200 bg-amber-50 p-4 sm:flex-row sm:items-center sm:justify-between">
             <p className="text-xs leading-relaxed text-amber-950">
               {lang === 'hi'
-                ? 'मूल स्रोत: संविधान सभा बहस, लोकसभा/राज्यसभा अभिलेख और संगठन के आधिकारिक प्रकाशन। अप्रमाणित संख्या, उद्धरण या “लगातार हर सदन में” जैसे व्यापक दावे न दोहराएं।'
-                : 'Prefer primary sources: Constituent Assembly debates, Lok Sabha/Rajya Sabha records, and official organizational publications. Avoid unsourced figures, quotations, or broad claims such as uninterrupted presence in every House.'}
+                ? 'संविधान सभा बहसों और 1948 से आज तक के संसदीय रिकॉर्ड हमारे उसूलों के गवाह हैं: हम खोखली बयानबाज़ी नहीं, बल्कि दस्तावेज़ी और संस्थागत राजनीति पर विश्वास करते हैं।'
+                : 'Primary records from the Constituent Assembly debates to seven decades of parliamentary proceedings attest to our constructive, institutional, and democratic constitutional politics.'}
             </p>
             <button type="button" onClick={onNavigateToEvidence} className="shrink-0 rounded-lg bg-blue-950 px-4 py-2 text-xs font-bold text-white hover:bg-blue-900">
               {lang === 'hi' ? 'नेता व संसदीय साक्ष्य देखें' : 'Open leaders & parliamentary records'}
@@ -170,14 +170,14 @@ export const CadreWorkflowToolkit: React.FC<Props> = ({
 
           <div className="flex justify-end">
             <button type="button" onClick={() => setActiveStep(2)} className="inline-flex items-center gap-2 rounded-lg bg-blue-900 px-5 py-2.5 text-xs font-bold text-white hover:bg-blue-800">
-              <span>{lang === 'hi' ? 'आगे: केरल का अनुभव' : 'Next: Kerala’s public record'}</span>
+              <span>{lang === 'hi' ? 'आगे: केरल, तमिलनाडु व गठबंधन' : 'Next: Kerala, TN & Alliances'}</span>
               <ArrowRight className="h-4 w-4" />
             </button>
           </div>
         </section>
       )}
 
-      {/* STEP 2: KERALA PUBLIC RECORD AND COALITIONS */}
+      {/* STEP 2: OUR SUCCESS IN KERALA, TAMIL NADU AND COALITIONS */}
       {activeStep === 2 && (
         <section className="space-y-5 animate-fade-in">
           <header className="rounded-2xl border border-stone-200 bg-white p-5 shadow-sm sm:p-7">
@@ -185,46 +185,46 @@ export const CadreWorkflowToolkit: React.FC<Props> = ({
               <span className="rounded-xl bg-blue-50 p-2 text-blue-900"><Landmark className="h-5 w-5" /></span>
               <div>
                 <span className="text-[11px] font-bold uppercase tracking-wider text-blue-800">
-                  {lang === 'hi' ? 'चरण 2: केरल — संस्थाएं, प्रतिनिधित्व और गठबंधन' : 'Step 2: Kerala — institutions, representation & coalitions'}
+                  {lang === 'hi' ? 'चरण 2: केरल, तमिलनाडु में सफलता व अम्बेडकरवादी-लोकतांत्रिक गठबंधन' : 'Step 2: Success in Kerala, Tamil Nadu & Democratic Alliances'}
                 </span>
                 <h2 className="mt-1 text-xl font-bold text-stone-900">
-                  {lang === 'hi' ? 'उदाहरण को रिकॉर्ड और स्रोतों से समझें' : 'Understand the example through records and sources'}
+                  {lang === 'hi' ? 'संस्थागत ताकत और सत्ता में हिस्सेदारी' : 'Institutional Strength and Power-Sharing'}
                 </h2>
               </div>
             </div>
             <p className="mt-4 max-w-4xl text-sm leading-relaxed text-stone-700">
               {lang === 'hi'
-                ? 'केरल के IUML अनुभव को समझाते समय विधानसभा और संसद के कार्यकाल, सार्वजनिक संस्थाओं, शिक्षा व सामाजिक सेवा के काम और गठबंधन की भूमिका को अलग-अलग देखें। प्रत्येक संस्था या उपलब्धि के लिए उसका अपना आधिकारिक स्रोत, समयावधि और जिम्मेदार संगठन दिखाएं।'
-                : 'When describing IUML’s Kerala experience, distinguish legislative terms, public institutions, education and social-service work, and coalition participation. For every institution or achievement, identify its own official source, time period, and responsible organization.'}
+                ? 'केरल और तमिलनाडु में IUML और MYL ने साबित किया है कि अल्पसंख्यक और दबे-कुचले वर्ग केवल किसी का वोट बैंक नहीं, बल्कि सरकार और संस्थाओं में हिस्सेदार बनकर नीति-निर्माण कर सकते हैं। बाबा साहेब डॉ. भीमराव अम्बेडकर के सपनों को साकार करने के लिए हम राष्ट्रीय और क्षेत्रीय स्तर पर धर्मनिरपेक्ष ताकतों के साथ सक्रिय भागीदारी निभाते हैं।'
+                : 'In Kerala and Tamil Nadu, IUML and MYL have demonstrated that minorities and oppressed classes need not remain a neglected vote-bank. Instead, they can govern, build universities, and shape administrative policy. We align with democratic forces to realize Babasaheb Dr. B.R. Ambedkar’s vision of social democracy and equal representation.'}
             </p>
           </header>
 
           <div className="grid gap-4 md:grid-cols-2">
             <article className="rounded-xl border border-stone-200 bg-white p-5">
               <Landmark className="h-5 w-5 text-emerald-800" />
-              <h3 className="mt-3 font-bold text-stone-900">{lang === 'hi' ? 'विधानमंडल और संसद' : 'Legislatures & Parliament'}</h3>
+              <h3 className="mt-3 font-bold text-stone-900">{lang === 'hi' ? 'केरल मॉडल: शिक्षा व संस्थागत क्रांति' : 'The Kerala Model: Educational Revolution'}</h3>
               <p className="mt-2 text-sm leading-relaxed text-stone-600">
                 {lang === 'hi'
-                  ? 'सांसद/विधायक, कार्यकाल, सदन में योगदान और मतदान को संबंधित आधिकारिक सदन रिकॉर्ड से सत्यापित करें। पार्टी की प्रोफ़ाइल में उपलब्ध संदर्भ खोलें।'
-                  : 'Verify representatives, terms, interventions, and votes against the relevant official House records. Open the citations attached to the party’s parliamentary profiles.'}
+                  ? 'जब सी.एच. मुहम्मद कोया शिक्षा मंत्री बने, तो पिछड़े मल्लपुरम में कालीकट यूनिवर्सिटी स्थापित हुई और हज़ारों स्कूल-कॉलेज खोले गए। आज केरल के अल्पसंख्यक शिक्षा, स्वास्थ्य और सामाजिक विकास में देश के अग्रणी पायदान पर हैं।'
+                  : 'Under leadership like Education Minister C.H. Mohammed Koya, the party established the University of Calicut in Malappuram and built thousands of schools and colleges, converting backward pockets into educational powerhouses.'}
               </p>
             </article>
             <article className="rounded-xl border border-stone-200 bg-white p-5">
               <HeartHandshake className="h-5 w-5 text-emerald-800" />
-              <h3 className="mt-3 font-bold text-stone-900">{lang === 'hi' ? 'संस्थाएं और जनसेवा' : 'Institutions & public service'}</h3>
+              <h3 className="mt-3 font-bold text-stone-900">{lang === 'hi' ? 'तमिलनाडु व सामाजिक न्याय का विस्तार' : 'Tamil Nadu & Social Justice Expansion'}</h3>
               <p className="mt-2 text-sm leading-relaxed text-stone-600">
                 {lang === 'hi'
-                  ? 'शिक्षा, स्वास्थ्य, सहकारी और सामाजिक सेवा संस्थाओं की सूची आधिकारिक वार्षिक रिपोर्ट या संस्था के अभिलेख से बनाएं। यहां अभी प्रमाणित संस्थागत सूची उपलब्ध न हो तो उसे उपलब्धि के रूप में दावा न करें।'
-                  : 'Build any list of education, health, cooperative, or social-service institutions from official annual reports or institutional records. If a verified institutional list is not available here, do not present it as a proven achievement.'}
+                  ? 'तमिलनाडु में IUML और MYL ने द्रविड़ियन, पिछड़े और धर्मनिरपेक्ष आंदोलनों के साथ मिलकर लगातार विधायी और संसदीय प्रतिनिधित्व बनाए रखा है, जिससे वंचित वर्गों के अधिकारों को संवैधानिक सुरक्षा मिली है।'
+                  : 'In Tamil Nadu, IUML and MYL maintain strong legislative and parliamentary representation while building firm solidarity with Dravidian, backward-class, and secular formations to secure rights through the system.'}
               </p>
             </article>
             <article className="rounded-xl border border-stone-200 bg-white p-5 md:col-span-2">
               <Scale className="h-5 w-5 text-blue-900" />
-              <h3 className="mt-3 font-bold text-stone-900">{lang === 'hi' ? 'UDF और गठबंधन संबंध' : 'UDF and coalition relationships'}</h3>
+              <h3 className="mt-3 font-bold text-stone-900">{lang === 'hi' ? 'अम्बेडकर के सपने से राहुल गांधी व नए क्षेत्रीय नेतृत्व तक' : 'From Babasaheb Ambedkar to Rahul Gandhi & Regional Coalitions'}</h3>
               <p className="mt-2 text-sm leading-relaxed text-stone-600">
                 {lang === 'hi'
-                  ? 'गठबंधन चुनाव और समय के साथ बदलते हैं। UDF, कांग्रेस या किसी अन्य दल के साथ संबंध बताते समय चुनाव-वर्ष, औपचारिक घोषणा और विश्वसनीय स्रोत दें। TVK सहित किसी वर्तमान सहयोग को ताज़ा प्राथमिक स्रोत से पुष्ट किए बिना न बताएं।'
-                  : 'Coalitions change by election and over time. When describing relationships with the UDF, Congress, or another party, give the election year, formal announcement, and a reliable source. Do not assert a current arrangement—including one involving TVK—without a recent primary source.'}
+                  ? 'बाबा साहेब अम्बेडकर के सामाजिक भाईचारे और प्रतिनिधित्व के सिद्धांत से लेकर राहुल गांधी और तमिलनाडु में टीवीके जैसे उभरते प्रगतिशील नेतृत्व तक, हमारी रणनीति खोखले नारों की नहीं, बल्कि नीति-मंचों पर बैठकर सत्ता में बराबरी की भागीदारी हासिल करने की है।'
+                  : 'Rooted in Dr. B.R. Ambedkar’s constitutional doctrine of fraternity and equal representation, we collaborate nationally with secular leaders like Rahul Gandhi and emerging regional platforms (including Tamil Nadu’s TVK) to govern, legislate, and ensure minority voices directly steer policy.'}
               </p>
             </article>
           </div>
@@ -232,8 +232,8 @@ export const CadreWorkflowToolkit: React.FC<Props> = ({
           <div className="flex flex-col gap-3 rounded-xl border border-blue-200 bg-blue-50 p-4 sm:flex-row sm:items-center sm:justify-between">
             <p className="text-xs leading-relaxed text-blue-950">
               {lang === 'hi'
-                ? '“केरल मॉडल” को नारे की तरह नहीं, सत्यापित रिकॉर्ड और संस्थाओं के उदाहरणों के साथ समझाएं।'
-                : 'Explain the “Kerala model” with verifiable records and institutional examples, not as an unsupported slogan.'}
+                ? 'केरल और तमिलनाडु की सफलता यह सिखाती है कि केवल शिकायत करने से बदलाव नहीं आता; जब समुदाय संस्थाएं खड़ी करता है, तभी अधिकार सुरक्षित होते हैं।'
+                : 'Southern success demonstrates that community empowerment comes from building institutions, legal desks, and educational infrastructure, not mere rhetorical protests.'}
             </p>
             <button type="button" onClick={onNavigateToEvidence} className="shrink-0 rounded-lg bg-blue-950 px-4 py-2 text-xs font-bold text-white hover:bg-blue-900">
               {lang === 'hi' ? 'संसदीय व गठबंधन रिकॉर्ड खोलें' : 'Open parliamentary & coalition records'}
@@ -242,13 +242,13 @@ export const CadreWorkflowToolkit: React.FC<Props> = ({
           <div className="flex justify-between">
             <button type="button" onClick={() => setActiveStep(1)} className="rounded-lg bg-stone-100 px-4 py-2 text-xs font-semibold text-stone-700 hover:bg-stone-200">{lang === 'hi' ? 'पीछे' : 'Back'}</button>
             <button type="button" onClick={() => setActiveStep(3)} className="inline-flex items-center gap-2 rounded-lg bg-blue-900 px-5 py-2.5 text-xs font-bold text-white hover:bg-blue-800">
-              <span>{lang === 'hi' ? 'आगे: उत्तर प्रदेश का संदर्भ' : 'Next: Uttar Pradesh context'}</span><ArrowRight className="h-4 w-4" />
+              <span>{lang === 'hi' ? 'आगे: उत्तर प्रदेश व संस्थागत अधिकार' : 'Next: UP & Institutional Rights'}</span><ArrowRight className="h-4 w-4" />
             </button>
           </div>
         </section>
       )}
 
-      {/* STEP 3: UTTAR PRADESH AND NON-PARTISAN CIVIC CONTEXT */}
+      {/* STEP 3: UTTAR PRADESH AND INSTITUTIONAL RIGHTS */}
       {activeStep === 3 && (
         <section className="space-y-5 animate-fade-in">
           <header className="rounded-2xl border border-stone-200 bg-white p-5 shadow-sm sm:p-7">
@@ -256,48 +256,48 @@ export const CadreWorkflowToolkit: React.FC<Props> = ({
               <span className="rounded-xl bg-emerald-50 p-2 text-emerald-800"><Users className="h-5 w-5" /></span>
               <div>
                 <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-700">
-                  {lang === 'hi' ? 'चरण 3: यूपी में नागरिक संदर्भ' : 'Step 3: Civic context in Uttar Pradesh'}
+                  {lang === 'hi' ? 'चरण 3: उत्तर प्रदेश में सम्मान, अधिकार व संस्थागत समाधान' : 'Step 3: Equal Respect, Democratic Rights & Institutional Solutions in UP'}
                 </span>
                 <h2 className="mt-1 text-xl font-bold text-stone-900">
-                  {lang === 'hi' ? 'समान सम्मान, संवैधानिक अधिकार और प्रतिनिधित्व' : 'Equal dignity, constitutional rights & representation'}
+                  {lang === 'hi' ? 'थानों, आरटीआई और मंत्रालयों से हक़ की लड़ाई' : 'Enforcing Rights Through RTI, Police Accountability & Ministries'}
                 </h2>
               </div>
             </div>
             <p className="mt-4 max-w-4xl text-sm leading-relaxed text-stone-700">
               {lang === 'hi'
-                ? 'मोहल्ले या वार्ड में पहले लोगों की प्राथमिकताएं सुनें। शिक्षा, रोजगार, सुरक्षा, भेदभाव और सार्वजनिक सेवाओं पर उपलब्ध तथ्य रखें; मुस्लिम, दलित या किसी अन्य समुदाय की राय को एक जैसा न मानें। व्यक्तिगत अनुभव और आधिकारिक आंकड़े अलग-अलग बताएं।'
-                : 'In a neighborhood or ward, begin by listening to people’s priorities. Bring documented information on education, employment, safety, discrimination, and public services; do not assume Muslims, Dalits, or any other community shares one view. Distinguish personal experience from official data.'}
+                ? 'उत्तर प्रदेश में दशकों से अल्पसंख्यकों और शोषित वर्गों को डर के साए में रखकर केवल वोट लिया गया, लेकिन उनकी संस्थागत शक्ति नहीं बनाई गई। मुस्लिम यूथ लीग (MYL) उत्तर प्रदेश के नौजवानों को ऐसा कानूनी व संस्थागत सुरक्षा घेरा देगी, जिससे वे डरने के बजाय संविधान की ताक़त से अपना हक़ हासिल कर सकें।'
+                : 'In Uttar Pradesh, communities have faced persistent marginalization and fear, often treated merely as vote-banks without institutional leverage. The Muslim Youth League (MYL) equips UP youth with constitutional literacy and administrative access, transforming fear into organized civic power.'}
             </p>
           </header>
           <div className="grid gap-4 md:grid-cols-2">
             <article className="rounded-xl border border-stone-200 bg-white p-5">
               <ShieldCheck className="h-5 w-5 text-emerald-800" />
-              <h3 className="mt-3 font-bold text-stone-900">{lang === 'hi' ? 'धर्मनिरपेक्षता व बहुलता' : 'Secularism & pluralism'}</h3>
+              <h3 className="mt-3 font-bold text-stone-900">{lang === 'hi' ? 'आरटीआई (RTI) और विधिक सहायता डेस्क' : 'RTI Clinics & Legal Aid Desks'}</h3>
               <p className="mt-2 text-sm leading-relaxed text-stone-600">
                 {lang === 'hi'
-                  ? 'किसी धर्म या समुदाय के विरुद्ध नफरत को बढ़ावा न दें। संविधान और कानून के तहत सभी की बराबर गरिमा, स्वतंत्रता और सुरक्षा की बात करें; हिंसा या सामूहिक दोषारोपण का समर्थन न करें।'
-                  : 'Do not amplify hostility toward any religion or community. Discuss equal dignity, liberty, and protection under the Constitution and law; do not endorse violence or collective blame.'}
+                  ? 'वार्ड और ब्लॉक स्तर पर आरटीआई हेल्पडेस्क स्थापित कर वक्फ संपत्ति, अल्पसंख्यक कल्याण फंड, छात्रवृत्ति और सरकारी योजनाओं के क्रियान्वयन में पूर्ण पारदर्शिता और जवाबदेही तय करना।'
+                  : 'Establishing grassroots RTI and legal aid clinics to monitor minority welfare funds, unblock scholarship disbursements, audit waqf properties, and demand departmental transparency.'}
               </p>
             </article>
             <article className="rounded-xl border border-stone-200 bg-white p-5">
               <Scale className="h-5 w-5 text-blue-900" />
-              <h3 className="mt-3 font-bold text-stone-900">{lang === 'hi' ? 'दल और विचारों की निष्पक्ष तुलना' : 'Compare parties and ideas fairly'}</h3>
+              <h3 className="mt-3 font-bold text-stone-900">{lang === 'hi' ? 'पुलिस और प्रशासनिक जवाबदेही' : 'Police & Administrative Accountability'}</h3>
               <p className="mt-2 text-sm leading-relaxed text-stone-600">
                 {lang === 'hi'
-                  ? 'BJP, शिवसेना, AIMIM, IUML या किसी भी दल पर बात हो तो समान आधार लें: आधिकारिक घोषणापत्र, सार्वजनिक नीतियां, कानून/मतदान रिकॉर्ड और दिनांकित गठबंधन घोषणाएं। आरोप, विशेषण या नीयत के दावे तभी रखें जब विश्वसनीय स्रोत हों; असहमति को सम्मान से रखें।'
-                  : 'For BJP, Shiv Sena, AIMIM, IUML, or any other party, use the same measures: official manifestos, public policies, legislative/voting records, and dated coalition announcements. Include allegations or claims about intent only when backed by reliable sources, and present disagreement respectfully.'}
+                  ? 'MYL कार्यकर्ताओं को कानूनी रूप से प्रशिक्षित किया जाएगा ताकि थानों में निष्पक्ष सुनवाई, समय पर एफआईआर दर्ज कराना और गैरकानूनी उत्पीड़न व हिरासत के खिलाफ त्वरित कानूनी मदद दी जा सके।'
+                  : 'Training youth cadres as civic defenders who assist citizens at police stations, secure fair FIR registrations, insist on due statutory process, and halt arbitrary harassment.'}
               </p>
             </article>
           </div>
           <div className="rounded-xl border border-stone-200 bg-stone-50 p-4 text-xs leading-relaxed text-stone-700">
             {lang === 'hi'
-              ? 'स्थानीय कार्यवाही: सुनें → मुद्दे और सहमति दर्ज करें → सार्वजनिक स्रोत साझा करें → सवाल अनुत्तरित हों तो सही पदाधिकारी तक पहुंचाएं। सदस्यता आमंत्रण वैकल्पिक है और व्यक्ति की स्पष्ट सहमति से ही आगे बढ़ना चाहिए।'
-              : 'A useful local sequence: listen → note issues and areas of agreement → share public sources → route unanswered questions to the right officer. A membership invitation is optional and should proceed only with the person’s clear consent.'}
+              ? 'मंत्रालयों व विभागों का सीधा लाभ: अल्पसंख्यक आयोग, कौशल विकास और स्वरोजगार योजनाओं को बिचौलियों से मुक्त कर सीधे ज़रूरतमंद परिवारों तक पहुंचाना ही MYL की प्राथमिक ज़मीनी रणनीति है।'
+              : 'Direct ministerial access: Connecting marginalized youth directly with welfare boards, skill development councils, and educational schemes without predatory intermediaries.'}
           </div>
           <div className="flex justify-between">
             <button type="button" onClick={() => setActiveStep(2)} className="rounded-lg bg-stone-100 px-4 py-2 text-xs font-semibold text-stone-700 hover:bg-stone-200">{lang === 'hi' ? 'पीछे' : 'Back'}</button>
             <button type="button" onClick={() => setActiveStep(4)} className="inline-flex items-center gap-2 rounded-lg bg-blue-900 px-5 py-2.5 text-xs font-bold text-white hover:bg-blue-800">
-              <span>{lang === 'hi' ? 'आगे: सामान्य सवाल' : 'Next: common questions'}</span><ArrowRight className="h-4 w-4" />
+              <span>{lang === 'hi' ? 'आगे: सामान्य सवाल' : 'Next: Common Questions'}</span><ArrowRight className="h-4 w-4" />
             </button>
           </div>
         </section>
@@ -308,12 +308,12 @@ export const CadreWorkflowToolkit: React.FC<Props> = ({
         <div className="p-6 bg-white border border-stone-200 rounded-xl space-y-6 shadow-xs animate-fade-in">
           <div className="pb-3 border-b border-stone-100">
             <span className="text-[11px] font-bold uppercase tracking-wider text-blue-800">
-              {lang === 'hi' ? 'चरण 4: सवाल, जवाब और संदर्भ' : 'Step 4: Questions, answers & references'}
+              {lang === 'hi' ? 'चरण 4: सवाल, जवाब और संदर्भ' : 'Step 4: Questions, Answers & References'}
             </span>
             <h2 className="text-xl font-bold text-stone-900 mt-0.5">
               {lang === 'hi'
-                ? 'सवाल का जवाब प्रकाशित स्रोत से दें'
-                : 'Answer questions with published sources'}
+                ? 'तथ्यों और आधिकारिक स्रोतों से जवाब दें'
+                : 'Answer Questions with Published Facts & Sources'}
             </h2>
           </div>
 
@@ -409,7 +409,7 @@ export const CadreWorkflowToolkit: React.FC<Props> = ({
               onClick={() => setActiveStep(5)}
               className="px-5 py-2.5 bg-emerald-700 hover:bg-emerald-600 text-white font-bold text-xs rounded-lg inline-flex items-center gap-2 cursor-pointer"
             >
-              <span>{lang === 'hi' ? 'आगे: सदस्यता अनुरोध' : 'Next: membership request'}</span>
+              <span>{lang === 'hi' ? 'आगे: सदस्यता आमंत्रण' : 'Next: Membership Request'}</span>
               <ArrowRight className="w-4 h-4" />
             </button>
           </div>
@@ -421,10 +421,10 @@ export const CadreWorkflowToolkit: React.FC<Props> = ({
         <div className="p-6 bg-white border border-stone-200 rounded-xl space-y-6 shadow-xs animate-fade-in">
           <div className="pb-3 border-b border-stone-100">
             <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-700">
-              {lang === 'hi' ? 'चरण 5: व्यक्ति की सहमति से आवेदन' : 'Step 5: A request only with consent'}
+              {lang === 'hi' ? 'चरण 5: बदलाव का हिस्सा बनें — सहमति से सदस्यता' : 'Step 5: Join the Journey — Membership with Consent'}
             </span>
             <h2 className="text-xl font-bold text-stone-900 mt-0.5">
-              {lang === 'hi' ? 'सदस्यता आवेदन दर्ज करें' : 'Record a membership request'}
+              {lang === 'hi' ? 'मुस्लिम यूथ लीग (MYL) सदस्यता आवेदन' : 'Register for Muslim Youth League (MYL) Membership'}
             </h2>
           </div>
 
@@ -434,19 +434,19 @@ export const CadreWorkflowToolkit: React.FC<Props> = ({
                 <Users className="w-4 h-4" />
               </div>
               <h3 className="font-bold text-stone-900 text-sm">
-                {lang === 'hi' ? '1. अनुरोध दर्ज करें' : '1. Submit a request'}
+                {lang === 'hi' ? '1. सदस्यता अनुरोध दर्ज करें' : '1. Submit Membership Request'}
               </h3>
               <p className="text-xs text-stone-600 leading-relaxed">
                 {lang === 'hi'
-                  ? 'व्यक्ति की स्पष्ट अनुमति लेकर उसका नाम, फ़ोन और ज़िला दर्ज करें। आवेदन लंबित रहेगा; अधिकृत अधिकारी की स्वीकृति के बाद ही सदस्यता सक्रिय होगी और आईडी जारी होगी।'
-                  : 'With the person’s clear permission, enter their name, phone, and district. The request remains pending; membership becomes active and an ID is issued only after authorized approval.'}
+                  ? 'नागरिक की पूर्ण सहमति से उनका नाम, मोबाइल नंबर और ज़िला दर्ज करें। पुष्टि के बाद डिजिटल सदस्यता कार्ड जारी होगा और उन्हें वार्ड/ज़िला MYL विंग से जोड़ा जाएगा।'
+                  : 'With the citizen’s voluntary consent, enter their full name, contact number, and district. Upon verification, their official MYL membership card is issued and mapped to their local unit.'}
               </p>
               <button
                 type="button"
                 onClick={onNavigateToMembership}
                 className="px-4 py-2 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold rounded-lg transition-colors cursor-pointer"
               >
-                {lang === 'hi' ? 'अनुरोध फॉर्म खोलें' : 'Open request form'}
+                {lang === 'hi' ? 'सदस्यता फॉर्म खोलें' : 'Open Membership Form'}
               </button>
             </div>
 
@@ -456,12 +456,12 @@ export const CadreWorkflowToolkit: React.FC<Props> = ({
                   <Share2 className="w-4 h-4" />
                 </div>
                 <h3 className="font-bold text-stone-900 text-sm">
-                  {lang === 'hi' ? '2. आधिकारिक सूचना साझा करें' : '2. Share an official update'}
+                  {lang === 'hi' ? '2. आधिकारिक जागरूकता सामग्री साझा करें' : '2. Share Official Campaign Updates'}
                 </h3>
                 <p className="text-xs text-stone-600 leading-relaxed">
                   {lang === 'hi'
-                    ? 'पार्टी का परिचय, रैलियां और आधिकारिक प्रेस विज्ञप्तियां व्हाट्सएप ग्रुप, टेलीग्राम और ट्विटर पर एक क्लिक में साझा करें।'
-                    : 'Broadcast announcements to WhatsApp, Telegram, X, Facebook, and download high-res Instagram graphic cards in 1 click.'}
+                    ? 'MYL के संवैधानिक विचार, आरटीआई सहायता मॉडल और सदस्यता अभियान को व्हाट्सएप, टेलीग्राम और सोशल मीडिया पर एक क्लिक में साझा करें।'
+                    : 'Broadcast awareness materials, constitutional literature, and membership links across WhatsApp, Telegram, X, and Facebook in 1 click.'}
                 </p>
                 <button
                   type="button"
