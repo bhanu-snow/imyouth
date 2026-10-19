@@ -164,7 +164,7 @@ export const DigitalIdCard: React.FC<Props> = ({ member, lang }) => {
   };
 
   const handleShareId = () => {
-    const text = `🇮🇳 I am an officially verified cadre member of Muslim Youth League (MYL) & MSF Uttar Pradesh!\n\nName: ${member.fullName}\nCadre ID: ${member.id}\nDistrict: ${member.district} (${member.subDistrict})\nWing: ${member.wing.toUpperCase()}\nDesignation: ${member.designation}\n\nUniting Dalits, Sikhs, Christians, Buddhists, and minorities for constitutional education & justice!\nVerify publicly: ${window.location.origin}`;
+    const text = `🇮🇳 I am an officially verified Primary Member of Muslim Youth League (MYL), Uttar Pradesh!\n\nName: ${member.fullName}\nCadre ID: ${member.id}\nDistrict: ${member.district} (${member.subDistrict})\nOrganization: Muslim Youth League (MYL)\nDesignation: ${member.designation}\n\nUniting communities for constitutional education and justice!\nVerify publicly: ${window.location.origin}`;
     const whatsappUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
     window.open(whatsappUrl, '_blank');
     setShared(true);

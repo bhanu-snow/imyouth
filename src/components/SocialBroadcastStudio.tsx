@@ -230,7 +230,7 @@ export const SocialBroadcastStudio: React.FC<Props> = ({
         </h1>
         <p className="text-stone-600 text-sm max-w-3xl leading-relaxed">
           {lang === 'hi'
-            ? 'मुस्लिम यूथ लीग (MYL) व MSF की गतिविधियों, बयानों और सम्मेलनों को एक साथ व्हाट्सएप, टेलीग्राम, एक्स (ट्विटर), फेसबुक और इंस्टाग्राम पर एक ही क्लिक में प्रसारित करें।'
+            ? 'मुस्लिम यूथ लीग (MYL) की गतिविधियों, बयानों और सम्मेलनों को एक साथ व्हाट्सएप, टेलीग्राम, एक्स (ट्विटर), फेसबुक और इंस्टाग्राम पर एक ही क्लिक में प्रसारित करें।'
             : 'Publish political press releases, rally schedules, and party declarations to WhatsApp, Telegram, X, Facebook, and Instagram simultaneously with a single action.'}
         </p>
       </div>

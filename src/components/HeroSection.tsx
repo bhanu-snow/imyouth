@@ -9,6 +9,7 @@ interface Props {
   onNavigateToBroadcast: () => void;
   onNavigateToWorkflow: () => void;
   onNavigateToFaq: () => void;
+  isLoggedIn: boolean;
 }
 
 export const HeroSection: React.FC<Props> = ({ 
@@ -17,6 +18,7 @@ export const HeroSection: React.FC<Props> = ({
   onNavigateToBroadcast,
   onNavigateToWorkflow,
   onNavigateToFaq,
+  isLoggedIn,
 }) => {
   return (
     <div className="relative overflow-hidden bg-white border-b border-stone-200">
@@ -61,8 +63,8 @@ export const HeroSection: React.FC<Props> = ({
 
             <p className="text-stone-600 text-sm md:text-base leading-relaxed max-w-2xl">
               {lang === 'hi'
-                ? 'इंडियन यूनियन मुस्लिम लीग (IUML) के आधिकारिक युवा मोर्चा (MYL) और छात्र संगठन (MSF) का गतिशील वैचारिक मंच। ज़मीनी कार्यकर्ताओं के लिए फील्ड वर्कफ़्लो, भ्रांतियों का तार्किक खंडन, डिजिटल पहचान पत्र, और सोशल मीडिया पर एक-क्लिक साझाकरण।'
-                : 'The official ideological and operational platform of Muslim Youth League (MYL) and Muslim Students Federation (MSF) in Uttar Pradesh. Equipped with field briefing workflows, myth-busting resources, instant cadre ID issuance, and 1-shot social syndication.'}
+                ? 'उत्तर प्रदेश में इंडियन यूनियन मुस्लिम लीग (IUML) के युवा संगठन मुस्लिम यूथ लीग (MYL) का सार्वजनिक सूचना, सदस्यता अनुरोध और सत्यापन मंच।'
+                : 'The public information, membership request, and verification portal for Muslim Youth League (MYL), the youth organization of IUML in Uttar Pradesh.'}
             </p>
 
             {/* CTAs */}
@@ -73,7 +75,7 @@ export const HeroSection: React.FC<Props> = ({
                 className="px-6 py-3 bg-emerald-700 hover:bg-emerald-800 text-white font-extrabold text-xs sm:text-sm rounded-lg shadow-md hover:shadow-emerald-700/20 transition-all inline-flex items-center gap-2 cursor-pointer"
               >
                 <Compass className="w-4 h-4 text-emerald-200" />
-                <span>{lang === 'hi' ? 'कार्यकर्ता फील्ड वर्कफ़्लो' : 'Cadre Outreach Workflow'}</span>
+                <span>{lang === 'hi' ? 'कैडर वर्कफ़्लो' : 'Cadre Workflow'}</span>
                 <ArrowRight className="w-4 h-4" />
               </button>
 
@@ -86,14 +88,14 @@ export const HeroSection: React.FC<Props> = ({
                 <span>{lang === 'hi' ? 'मिथक बनाम तथ्य (FAQ)' : 'Myths vs Facts (FAQ)'}</span>
               </button>
 
-              <button
+              {isLoggedIn && <button
                 type="button"
                 onClick={onNavigateToBroadcast}
                 className="px-4 py-3 bg-stone-100 hover:bg-stone-200 text-stone-800 font-bold text-xs sm:text-sm rounded-lg transition-colors inline-flex items-center gap-1.5 cursor-pointer"
               >
                 <Share2 className="w-4 h-4 text-emerald-700" />
                 <span>{lang === 'hi' ? 'सोशल स्टूडियो' : 'Social Studio'}</span>
-              </button>
+              </button>}
             </div>
 
             <div className="pt-2 flex items-center gap-4 text-xs text-stone-500 font-medium">
@@ -172,7 +174,7 @@ export const HeroSection: React.FC<Props> = ({
               35,000+
             </div>
             <div className="text-xs font-semibold text-stone-600 mt-0.5">
-              {lang === 'hi' ? 'सत्यापित MYL व MSF कार्यकर्ता' : 'Verified MYL & MSF Cadres'}
+              {lang === 'hi' ? 'सत्यापित MYL प्राथमिक सदस्य' : 'Verified MYL Primary Members'}
             </div>
           </div>
 

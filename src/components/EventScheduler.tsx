@@ -213,12 +213,12 @@ END:VCALENDAR`;
             <span>{lang === 'hi' ? 'उत्तर प्रदेश युवा संपर्क' : 'UP Ground Outreach'}</span>
           </div>
           <h1 className="text-3xl font-extrabold text-stone-900 tracking-tight">
-            {lang === 'hi' ? 'MYL व MSF कार्यक्रम एवं सभाएं' : 'MYL & MSF Youth Conferences & Rallies'}
+            {lang === 'hi' ? 'MYL कार्यक्रम एवं सभाएं' : 'MYL Youth Events & Rallies'}
           </h1>
           <p className="text-stone-600 text-xs max-w-2xl mt-1">
             {lang === 'hi'
               ? 'आगामी लाइफ लिफ्ट सम्मेलनों, छात्र पंचायतों और सेवा शिविरों में भागीदारी सुनिश्चित करें, आरएसवीपी दर्ज करें और सोशल मीडिया पर एक क्लिक में साझा करें।'
-              : 'Discover scheduled Life Lift career conclaves, MSF student conventions, and White Guard relief seva camps across UP.'}
+              : 'Discover MYL career guidance, education outreach, and community service events across UP.'}
           </p>
         </div>
 

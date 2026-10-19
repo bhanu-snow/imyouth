@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { UserCheck, Shield, Sparkles, Search, UserPlus, Clock, CheckCircle2, AlertCircle, Lock } from 'lucide-react';
-import { Member, Language, YouthWing, AuthUser } from '../types';
+import { Member, Language, AuthUser } from '../types';
 import { memberService } from '../services/memberService';
 import { DigitalIdCard } from './DigitalIdCard';
 import confetti from 'canvas-confetti';
@@ -12,12 +12,14 @@ interface Props {
   lang: Language;
   currentUser: AuthUser;
   onMemberRegistered?: () => void;
+  openRequestForm?: boolean;
+  onRequestFormOpened?: () => void;
 }
 
-export const MemberRegistration: React.FC<Props> = ({ lang, currentUser, onMemberRegistered }) => {
+export const MemberRegistration: React.FC<Props> = ({ lang, currentUser, onMemberRegistered, openRequestForm = false, onRequestFormOpened }) => {
   const [members, setMembers] = useState<Member[]>([]);
   const [currentMember, setCurrentMember] = useState<Member | null>(null);
-  const [showForm, setShowForm] = useState(false);
+  const [showForm, setShowForm] = useState(() => !['superadmin', 'state_admin', 'district_incharge'].includes(currentUser.role));
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedDistrictFilter, setSelectedDistrictFilter] = useState('all');
   const [submittedRequest, setSubmittedRequest] = useState<Member | null>(null);
@@ -35,14 +37,20 @@ export const MemberRegistration: React.FC<Props> = ({ lang, currentUser, onMembe
   const [districtId, setDistrictId] = useState('');
   const [subDistrictId, setSubDistrictId] = useState('');
   const [lookupError, setLookupError] = useState('');
-  const [wing, setWing] = useState<YouthWing>('myl_cadre');
-  const [designation, setDesignation] = useState('Active Youth Volunteer');
   const [communityBackground, setCommunityBackground] = useState('');
   const [bloodGroup, setBloodGroup] = useState('');
   const [education, setEducation] = useState('');
+  const [referredByCadreId, setReferredByCadreId] = useState('');
   const [submitError, setSubmitError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const canViewDirectory = ['superadmin', 'state_president', 'state_admin', 'district_incharge'].includes(currentUser.role);
+  const canViewDirectory = ['superadmin', 'state_admin', 'district_incharge'].includes(currentUser.role);
+
+  useEffect(() => {
+    if (openRequestForm) {
+      setShowForm(true);
+      onRequestFormOpened?.();
+    }
+  }, [openRequestForm, onRequestFormOpened]);
 
   useEffect(() => {
     let cancelled = false;
@@ -59,7 +67,6 @@ export const MemberRegistration: React.FC<Props> = ({ lang, currentUser, onMembe
         if (initialDistrict) {
           setDistrictId(initialDistrict.id);
         }
-        if (wingRows.some((item) => item.code === 'myl_cadre')) setWing('myl_cadre');
         if (canViewDirectory) {
           const rows = await memberService.listForAuthorizedUser();
           if (!cancelled) {
@@ -100,8 +107,8 @@ export const MemberRegistration: React.FC<Props> = ({ lang, currentUser, onMembe
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitError('');
-    if (!fullName.trim() || !phone.trim() || !stateId || !districtId || !wing) {
-      setSubmitError('Complete the required name, phone, state, district, and wing fields.');
+    if (!fullName.trim() || !phone.trim() || !stateId || !districtId || !wingOptions.some((item) => item.code === 'myl_cadre')) {
+      setSubmitError('Complete the required name, phone, state, and district fields; the active MYL wing must be available.');
       return;
     }
     setIsSubmitting(true);
@@ -110,9 +117,10 @@ export const MemberRegistration: React.FC<Props> = ({ lang, currentUser, onMembe
         fullName, fullNameHi, phone, email, stateId, districtId, subDistrictId,
         stateName: 'Uttar Pradesh', districtName: districtOptions.find((item) => item.id === districtId)?.name_en,
         subDistrictName: subDistrictOptions.find((item) => item.id === subDistrictId)?.name_en,
-        wingCode: wing, designation: designation || 'Active Youth Volunteer',
-        designationHi: wing === 'msf' ? 'छात्र कार्यकर्ता (MSF)' : 'सक्रिय युवा कार्यकर्ता (MYL)',
+        wingCode: 'myl_cadre', designation: 'Primary Member',
+        designationHi: 'प्राथमिक सदस्य',
         communityBackground, bloodGroup, education,
+        referredByCadreId,
       });
       setSubmittedRequest(newMember);
       setCurrentMember(newMember);
@@ -145,7 +153,7 @@ export const MemberRegistration: React.FC<Props> = ({ lang, currentUser, onMembe
           <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-emerald-800 mb-1">
             <span>{lang === 'hi' ? 'सदस्यता एवं कैडर ऑनबोर्डिंग' : 'Cadre Enrollment & Verification Lifecycle'}</span>
             <span aria-hidden="true">·</span>
-            <span>{lang === 'hi' ? 'मुस्लिम यूथ लीग व MSF उत्तर प्रदेश' : 'MYL & MSF UP'}</span>
+            <span>{lang === 'hi' ? 'मुस्लिम यूथ लीग (MYL), उत्तर प्रदेश' : 'Muslim Youth League (MYL), Uttar Pradesh'}</span>
           </div>
           <h1 className="text-3xl font-extrabold text-stone-900 tracking-tight">
             {lang === 'hi' ? 'कैडर सदस्यता आवेदन एवं आईडी कार्ड' : 'Cadre Membership Request & ID System'}
@@ -157,7 +165,7 @@ export const MemberRegistration: React.FC<Props> = ({ lang, currentUser, onMembe
           </p>
         </div>
 
-        <button
+        {canViewDirectory && <button
           onClick={() => {
             setShowForm(!showForm);
             setSubmittedRequest(null);
@@ -165,8 +173,8 @@ export const MemberRegistration: React.FC<Props> = ({ lang, currentUser, onMembe
           className="px-4 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs rounded-lg shadow-sm transition-colors flex items-center gap-2 shrink-0 cursor-pointer"
         >
           <UserPlus className="w-4 h-4" />
-          <span>{showForm ? (lang === 'hi' ? 'आईडी कार्ड देखें' : 'View Cadre ID') : (lang === 'hi' ? 'नया सदस्यता आवेदन भरें' : 'Submit Membership Request')}</span>
-        </button>
+          <span>{showForm ? (lang === 'hi' ? 'सदस्य सूची देखें' : 'View Member Directory') : (lang === 'hi' ? 'नया सदस्यता आवेदन भरें' : 'Submit Membership Request')}</span>
+        </button>}
       </div>
 
       {/* Submitted Acknowledgment Banner */}
@@ -212,7 +220,7 @@ export const MemberRegistration: React.FC<Props> = ({ lang, currentUser, onMembe
               <div className="flex items-center justify-between pb-3 border-b border-stone-100 mb-4">
                 <h2 className="text-base font-bold text-stone-900 flex items-center gap-2">
                   <Sparkles className="w-4 h-4 text-emerald-700" />
-                  <span>{lang === 'hi' ? 'MYL / MSF सदस्यता आवेदन प्रपत्र' : 'Cadre Membership Application (UP)'}</span>
+                  <span>{lang === 'hi' ? 'MYL प्राथमिक सदस्यता आवेदन' : 'MYL Primary Membership Request'}</span>
                 </h2>
                 <span className="text-[10px] font-mono font-bold bg-amber-100 text-amber-800 px-2 py-0.5 rounded">
                   APPROVAL WORKFLOW
@@ -258,6 +266,28 @@ export const MemberRegistration: React.FC<Props> = ({ lang, currentUser, onMembe
                       className="w-full px-3 py-2 border border-stone-300 rounded focus:outline-none focus:border-emerald-600"
                     />
                   </div>
+                </div>
+
+                <div>
+                  <label htmlFor="referring-cadre-id" className="block font-semibold text-stone-700 mb-1">
+                    {lang === 'hi' ? 'संदर्भ देने वाले MYL कैडर की आईडी (वैकल्पिक)' : 'Referring MYL cadre ID (optional)'}
+                  </label>
+                  <input
+                    id="referring-cadre-id"
+                    type="text"
+                    maxLength={64}
+                    autoCapitalize="characters"
+                    value={referredByCadreId}
+                    onChange={(event) => setReferredByCadreId(event.target.value.toUpperCase())}
+                    placeholder="MYL-UP-2026-XXXXXXXX"
+                    aria-describedby="referring-cadre-help"
+                    className="w-full px-3 py-2 border border-stone-300 rounded focus:outline-none focus:border-emerald-600 font-mono"
+                  />
+                  <p id="referring-cadre-help" className="mt-1 text-[11px] text-stone-500">
+                    {lang === 'hi'
+                      ? 'यदि किसी सक्रिय MYL कैडर ने परिचय कराया है, तो उनकी सत्यापित कैडर आईडी दर्ज करें। आईडी सर्वर पर जांची जाएगी; यह जानकारी केवल अधिकृत समीक्षकों को दिखेगी।'
+                      : 'If an active MYL cadre introduced the applicant, enter their verified cadre ID. It is checked by the server and shown only to authorized reviewers.'}
+                  </p>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -335,17 +365,14 @@ export const MemberRegistration: React.FC<Props> = ({ lang, currentUser, onMembe
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   <div>
-                    <label className="block font-semibold text-stone-700 mb-1">Organization Wing *</label>
-                    <select
-                      required
-                      value={wing}
-                      onChange={(e) => setWing(e.target.value as YouthWing)}
-                      disabled={wingOptions.length === 0}
-                      className="w-full px-2.5 py-2 border border-stone-300 rounded bg-white font-medium text-emerald-900 disabled:bg-stone-100"
-                    >
-                      <option value="">{lang === 'hi' ? 'विंग चुनें' : 'Select organization wing'}</option>
-                      {wingOptions.map((item) => <option key={item.id} value={item.code}>{lang === 'hi' && item.name_hi ? item.name_hi : item.name_en}</option>)}
-                    </select>
+                    <label className="block font-semibold text-stone-700 mb-1">
+                      {lang === 'hi' ? 'संगठन व सदस्यता *' : 'Organization & membership *'}
+                    </label>
+                    <div className={`w-full rounded border px-2.5 py-2 font-medium ${wingOptions.some((item) => item.code === 'myl_cadre') ? 'border-stone-300 bg-stone-50 text-emerald-900' : 'border-rose-300 bg-rose-50 text-rose-800'}`}>
+                      {wingOptions.find((item) => item.code === 'myl_cadre')?.[lang === 'hi' ? 'name_hi' : 'name_en']
+                        || (lang === 'hi' ? 'MYL विंग उपलब्ध नहीं है' : 'MYL wing is unavailable')}
+                      <span className="ml-2 text-xs font-normal text-stone-600">· {lang === 'hi' ? 'प्राथमिक सदस्य' : 'Primary Member'}</span>
+                    </div>
                     {lookupError && <p role="alert" className="mt-1 text-rose-700 text-[11px]">{lookupError}</p>}
                   </div>
 
@@ -367,13 +394,15 @@ export const MemberRegistration: React.FC<Props> = ({ lang, currentUser, onMembe
                 {submitError && <p role="alert" className="p-3 rounded bg-rose-50 border border-rose-200 text-rose-800">{submitError}</p>}
 
                 <div className="pt-3 flex items-center justify-end gap-2 border-t border-stone-100">
-                  <button
-                    type="button"
-                    onClick={() => setShowForm(false)}
-                    className="px-3.5 py-2 bg-stone-100 text-stone-700 rounded font-medium hover:bg-stone-200"
-                  >
-                    Cancel
-                  </button>
+                  {canViewDirectory && (
+                    <button
+                      type="button"
+                      onClick={() => setShowForm(false)}
+                      className="px-3.5 py-2 bg-stone-100 text-stone-700 rounded font-medium hover:bg-stone-200"
+                    >
+                      Cancel
+                    </button>
+                  )}
                   <button
                     type="submit"
                     disabled={isSubmitting}

@@ -29,6 +29,7 @@ export interface PostDesignation {
   titleHi: string;
   level: 'state' | 'zonal' | 'district' | 'block' | 'ward';
   wingId?: string;
+  committeeId?: string;
   descriptionEn: string;
   descriptionHi: string;
   status: 'active' | 'reserved' | 'vacant';
@@ -49,6 +50,67 @@ export interface OrgWing {
   headLeaderName?: string;
   badgeLabel?: string;
   updatedAt?: string;
+  isActive?: boolean;
+}
+
+export type CommitteeScope = 'state' | 'zonal' | 'district';
+export type CommitteeStatus = 'forming' | 'active' | 'closed';
+
+export interface OrganizationCommittee {
+  id: string;
+  code: string;
+  nameEn: string;
+  nameHi: string;
+  descriptionEn: string;
+  descriptionHi: string;
+  wingId: string;
+  scopeLevel: CommitteeScope;
+  stateId: string;
+  zoneId?: string;
+  districtId?: string;
+  startsOn: string;
+  endsOn?: string;
+  status: CommitteeStatus;
+}
+
+export type MembershipEndReason = 'joined_other_organization' | 'resigned' | 'other';
+export type AppointmentEndReason = 'term_ended' | 'resigned' | 'replaced' | 'other';
+
+export interface MemberMembership {
+  id: string;
+  memberId: string;
+  wingId: string;
+  startsOn: string;
+  endsOn?: string;
+  endReason?: MembershipEndReason;
+  endNotes?: string;
+}
+
+export interface MemberDesignationAppointment {
+  id: string;
+  memberId: string;
+  postDesignationId: string;
+  designationTitleEn: string;
+  designationTitleHi: string;
+  committeeId?: string;
+  committeeNameEn?: string;
+  scopeLevel: PostDesignation['level'];
+  stateId: string;
+  zoneId?: string;
+  districtId?: string;
+  subDistrictId?: string;
+  startsOn: string;
+  endsOn?: string;
+  endReason?: AppointmentEndReason;
+  endNotes?: string;
+}
+
+export interface MemberNotification {
+  id: string;
+  memberId: string;
+  notificationType: 'membership_request';
+  createdAt: string;
+  readAt?: string;
 }
 
 export interface OrgDistrict {
@@ -85,14 +147,18 @@ export interface Member {
   email: string;
   avatarUrl: string;
   state: string; // Uttar Pradesh
+  stateId?: string;
   district: string;
+  districtId?: string;
   subDistrict: string; // Tehsil / Block / Ward
+  subDistrictId?: string;
   wing: YouthWing;
   designation: string;
   designationHi: string;
   joinedAt: string;
   verified: boolean;
   status: MemberStatus;
+  referredByCadreId?: string;
   communityBackground?: string; // e.g. "Dalit / Alpsankhyak Unity (Muslim, Sikh, Christian, Buddhist)"
   approvedBy?: string;
   approvedAt?: string;

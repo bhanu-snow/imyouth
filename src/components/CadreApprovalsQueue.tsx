@@ -42,7 +42,7 @@ export const CadreApprovalsQueue: React.FC<Props> = ({
   const [verifyResult, setVerifyResult] = useState<Member | null | 'not_found'>(null);
   const [viewingApprovedCard, setViewingApprovedCard] = useState<Member | null>(null);
 
-  const isAuthorized = ['superadmin', 'state_president', 'state_admin', 'district_incharge'].includes(currentUser.role);
+  const isAuthorized = ['superadmin', 'state_admin', 'district_incharge'].includes(currentUser.role);
 
   useEffect(() => {
     let cancelled = false;
@@ -110,7 +110,7 @@ export const CadreApprovalsQueue: React.FC<Props> = ({
     const matchesDistrict = 
       currentUser.role === 'state_admin'
         ? selectedDistrict === 'all' || m.district === selectedDistrict
-        : ['superadmin', 'state_president'].includes(currentUser.role)
+        : currentUser.role === 'superadmin'
           ? true
           : m.district === currentUser.district;
     return isPending && matchesDistrict;
@@ -285,6 +285,12 @@ export const CadreApprovalsQueue: React.FC<Props> = ({
                               <span>·</span>
                               <span><strong>Wing:</strong> {m.wing.toUpperCase()}</span>
                             </div>
+
+                            {m.referredByCadreId && (
+                              <div className="text-[11px] text-blue-900">
+                                <strong>{lang === 'hi' ? 'संदर्भ कैडर आईडी:' : 'Referred by cadre ID:'}</strong> {m.referredByCadreId}
+                              </div>
+                            )}
 
                             {m.communityBackground && (
                               <div className="text-[11px] font-semibold text-blue-900 pt-0.5">

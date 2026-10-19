@@ -37,16 +37,102 @@ const toFaq = (row: FaqRow): MythFaqItem => {
   };
 };
 
+export interface PublishedFaqResult {
+  items: MythFaqItem[];
+  stale: boolean;
+  message?: string;
+}
+
+interface FaqCacheEntry {
+  revision: number;
+  items: MythFaqItem[];
+}
+
+const CACHE_KEY = 'mylup.published-faq.v1';
+let memoryCache: FaqCacheEntry | null = null;
+let pendingLoad: Promise<PublishedFaqResult> | null = null;
+
+function readCache(): FaqCacheEntry | null {
+  if (memoryCache) return memoryCache;
+  try {
+    const raw = window.localStorage.getItem(CACHE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as Partial<FaqCacheEntry>;
+    if (typeof parsed.revision !== 'number' || !Array.isArray(parsed.items)) return null;
+    memoryCache = { revision: parsed.revision, items: parsed.items as MythFaqItem[] };
+    return memoryCache;
+  } catch (error) {
+    console.warn('Could not read the cached FAQ content; refreshing from Supabase.', error);
+    return null;
+  }
+}
+
+function writeCache(entry: FaqCacheEntry): void {
+  memoryCache = entry;
+  try {
+    window.localStorage.setItem(CACHE_KEY, JSON.stringify(entry));
+  } catch (error) {
+    console.warn('FAQ content loaded but could not be saved for offline use.', error);
+  }
+}
+
+async function fetchPublishedFaqs(): Promise<MythFaqItem[]> {
+  const { data, error } = await requireSupabase()
+    .from('myth_faqs')
+    .select('id,legacy_id,myth_en,myth_hi,fact_en,fact_hi,detailed_explanation_en,detailed_explanation_hi,sort_order,faq_categories!inner(code),faq_talking_points(language_code,sort_order,talking_point)')
+    .eq('is_published', true)
+    .order('sort_order', { ascending: true });
+  if (error) throw new Error(`Could not load FAQs from Supabase: ${error.message}`);
+  return ((data ?? []) as unknown as FaqRow[]).map(toFaq);
+}
+
 export const faqService = {
+  async loadPublished(): Promise<PublishedFaqResult> {
+    if (pendingLoad) return pendingLoad;
+    const cached = readCache();
+    pendingLoad = (async () => {
+      const client = requireSupabase();
+      const { data: revisionRow, error: revisionError } = await client
+        .from('faq_content_revision')
+        .select('revision')
+        .eq('singleton', true)
+        .single();
+      if (revisionError) {
+        if (cached) {
+          return { items: cached.items, stale: true, message: 'Showing saved FAQ content; it could not be checked for updates.' };
+        }
+        throw new Error(`Could not check FAQ updates: ${revisionError.message}`);
+      }
+      const revision = Number(revisionRow.revision);
+      if (!Number.isSafeInteger(revision) || revision < 1) {
+        throw new Error('The FAQ revision returned by Supabase is invalid.');
+      }
+      if (cached?.revision === revision) return { items: cached.items, stale: false };
+
+      try {
+        const items = await fetchPublishedFaqs();
+        writeCache({ revision, items });
+        return { items, stale: false };
+      } catch (error) {
+        if (cached) {
+          return {
+            items: cached.items,
+            stale: true,
+            message: error instanceof Error ? `Showing saved FAQ content. ${error.message}` : 'Showing saved FAQ content because the latest version could not be loaded.',
+          };
+        }
+        throw error;
+      }
+    })();
+    try {
+      return await pendingLoad;
+    } finally {
+      pendingLoad = null;
+    }
+  },
+
   async list(): Promise<MythFaqItem[]> {
-    const client = requireSupabase();
-    const { data, error } = await client
-      .from('myth_faqs')
-      .select('id,legacy_id,myth_en,myth_hi,fact_en,fact_hi,detailed_explanation_en,detailed_explanation_hi,sort_order,faq_categories!inner(code),faq_talking_points(language_code,sort_order,talking_point)')
-      .eq('is_published', true)
-      .order('sort_order', { ascending: true });
-    if (error) throw new Error(`Could not load FAQs from Supabase: ${error.message}`);
-    return ((data ?? []) as unknown as FaqRow[]).map(toFaq);
+    return (await faqService.loadPublished()).items;
   },
 
   async save(faq: MythFaqItem): Promise<void> {
@@ -94,11 +180,15 @@ export const faqService = {
       const { error: pointsError } = await client.from('faq_talking_points').insert(points);
       if (pointsError) throw new Error(`FAQ saved, but talking points could not be saved: ${pointsError.message}`);
     }
+    memoryCache = null;
+    pendingLoad = null;
   },
 
   async remove(id: string): Promise<void> {
     const client = requireSupabase();
     const { error } = await client.from('myth_faqs').delete().eq('legacy_id', id);
     if (error) throw new Error(`Could not delete FAQ: ${error.message}`);
+    memoryCache = null;
+    pendingLoad = null;
   },
 };

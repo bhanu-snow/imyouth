@@ -32,6 +32,7 @@ export const FaqMythBuster: React.FC<Props> = ({ lang, currentUser }) => {
   const [categoryOptions, setCategoryOptions] = useState<LookupOption[]>([]);
   const [lookupError, setLookupError] = useState('');
   const [faqError, setFaqError] = useState('');
+  const [faqStaleMessage, setFaqStaleMessage] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [expandedId, setExpandedId] = useState<string | null>(null);
@@ -54,22 +55,29 @@ export const FaqMythBuster: React.FC<Props> = ({ lang, currentUser }) => {
   const canEditContent = currentUser.role === 'superadmin' || currentUser.role === 'content_manager';
 
   useEffect(() => {
-    loadFaqs();
+    void loadFaqs();
+    const handleFocus = () => { void loadFaqs(); };
+    window.addEventListener('focus', handleFocus);
     let cancelled = false;
     void referenceDataService.faqCategories()
       .then((rows) => { if (!cancelled) { setCategoryOptions(rows); setLookupError(''); } })
       .catch((error: unknown) => { if (!cancelled) setLookupError(error instanceof Error ? error.message : 'Could not load FAQ categories.'); });
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+      window.removeEventListener('focus', handleFocus);
+    };
   }, []);
 
   const loadFaqs = async () => {
     try {
-      const list = await faqService.list();
-      setFaqs(list);
+      const result = await faqService.loadPublished();
+      setFaqs(result.items);
       setFaqError('');
-      setExpandedId((current) => current && list.some((item) => item.id === current) ? current : (list[0]?.id ?? null));
+      setFaqStaleMessage(result.stale ? result.message ?? 'Showing saved FAQ content while the latest version is unavailable.' : '');
+      setExpandedId((current) => current && result.items.some((item) => item.id === current) ? current : (result.items[0]?.id ?? null));
     } catch (error) {
       setFaqError(error instanceof Error ? error.message : 'Could not load FAQs from Supabase.');
+      setFaqStaleMessage('');
     }
   };
 
@@ -188,7 +196,7 @@ export const FaqMythBuster: React.FC<Props> = ({ lang, currentUser }) => {
           <p className="text-stone-700 text-sm sm:text-base max-w-3xl leading-relaxed font-normal">
             {lang === 'hi'
               ? 'इंडियन यूनियन मुस्लिम लीग (IUML) और मुस्लिम यूथ लीग (MYL) के गठन (10 मार्च 1948 मद्रास), संविधान के प्रति निष्ठा, और उत्तर प्रदेश में हमारी भूमिका से जुड़े सभी सवालों के प्रामाणिक दस्तावेजी उत्तर।'
-              : 'Official documentation and factual clarity on IUML’s post-independence founding (10 March 1948 in Madras), Constituent Assembly legacy, secular democratic commitments, and the role of MYL and MSF in Uttar Pradesh.'}
+              : 'Official documentation and factual clarity on IUML’s post-independence founding (10 March 1948 in Madras), Constituent Assembly legacy, secular democratic commitments, and the role of MYL in Uttar Pradesh.'}
           </p>
         </div>
 
@@ -228,7 +236,7 @@ export const FaqMythBuster: React.FC<Props> = ({ lang, currentUser }) => {
             { key: 'history', label: { en: '1948 History', hi: '1948 इतिहास' } },
             { key: 'up_focus', label: { en: 'UP Relevance', hi: 'यूपी में भूमिका' } },
             { key: 'secularism', label: { en: 'Secularism', hi: 'धर्मनिरपेक्षता' } },
-            { key: 'wings', label: { en: 'MYL / MSF Wings', hi: 'संगठन विंग्स' } },
+            { key: 'wings', label: { en: 'MYL & Youth Programs', hi: 'MYL व युवा कार्यक्रम' } },
           ].map((cat) => (
             <button
               key={cat.key}
@@ -250,6 +258,11 @@ export const FaqMythBuster: React.FC<Props> = ({ lang, currentUser }) => {
       {faqError && (
         <div role="alert" className="rounded-xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-800">
           {faqError}
+        </div>
+      )}
+      {faqStaleMessage && (
+        <div role="status" className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
+          {faqStaleMessage}
         </div>
       )}
       {!faqError && faqs.length === 0 && (

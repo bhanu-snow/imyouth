@@ -7,12 +7,13 @@ type MemberRow = {
   district_id: string; sub_district_id: string | null; wing_id: string | null;
   designation_text: string | null; designation_hi: string | null; community_background: string | null;
   blood_group: string | null; education: string | null; bio: string | null;
+  referred_by_cadre_id: string | null;
   status: MemberStatus; verified: boolean; approved_by: string | null; approved_at: string | null; joined_at: string;
 };
 
 type LookupRow = { id: string; name_en: string; name_hi?: string | null; code?: string };
 
-const MEMBER_COLUMNS = 'id,cadre_id,auth_user_id,full_name,full_name_hi,phone,email,avatar_url,state_id,district_id,sub_district_id,wing_id,designation_text,designation_hi,community_background,blood_group,education,bio,status,verified,approved_by,approved_at,joined_at';
+const MEMBER_COLUMNS = 'id,cadre_id,auth_user_id,full_name,full_name_hi,phone,email,avatar_url,state_id,district_id,sub_district_id,wing_id,designation_text,designation_hi,community_background,blood_group,education,bio,referred_by_cadre_id,status,verified,approved_by,approved_at,joined_at';
 
 async function mapRows(rows: MemberRow[]): Promise<Member[]> {
   if (!rows.length) return [];
@@ -41,8 +42,11 @@ async function mapRows(rows: MemberRow[]): Promise<Member[]> {
     email: row.email ?? '',
     avatarUrl: row.avatar_url ?? '',
     state: states.get(row.state_id) ?? '',
+    stateId: row.state_id,
     district: districts.get(row.district_id) ?? '',
+    districtId: row.district_id,
     subDistrict: row.sub_district_id ? subDistricts.get(row.sub_district_id) ?? '' : '',
+    subDistrictId: row.sub_district_id ?? undefined,
     wing: (wings.get(row.wing_id ?? '') ?? 'general') as YouthWing,
     designation: row.designation_text ?? 'Cadre',
     designationHi: row.designation_hi ?? '',
@@ -50,6 +54,7 @@ async function mapRows(rows: MemberRow[]): Promise<Member[]> {
     verified: row.verified,
     status: row.status,
     communityBackground: row.community_background ?? undefined,
+    referredByCadreId: row.referred_by_cadre_id ?? undefined,
     approvedBy: row.approved_by ? approvers.get(row.approved_by) ?? 'Authorized committee' : undefined,
     approvedAt: row.approved_at ?? undefined,
     bloodGroup: row.blood_group ?? undefined,
@@ -71,8 +76,12 @@ export const memberService = {
     stateId: string; districtId: string; subDistrictId?: string; stateName?: string; districtName?: string; subDistrictName?: string; wingCode: string;
     designation: string; designationHi?: string; communityBackground?: string;
     bloodGroup?: string; education?: string;
+    referredByCadreId?: string;
   }): Promise<Member> {
     const client = requireSupabase();
+    if (input.wingCode !== 'myl_cadre') {
+      throw new Error('New membership requests must be for the Muslim Youth League.');
+    }
     const [{ data: wing, error: wingError }, { data: state, error: stateError }] = await Promise.all([
       client.from('org_wings').select('id').eq('code', input.wingCode).eq('is_active', true).maybeSingle(),
       client.from('states').select('id,name_en').eq('id', input.stateId).eq('is_active', true).maybeSingle(),
@@ -85,9 +94,10 @@ export const memberService = {
       id, cadre_id: null, full_name: input.fullName.trim(), full_name_hi: input.fullNameHi?.trim() || null,
       phone: input.phone.trim(), email: input.email?.trim() || null, state_id: input.stateId,
       district_id: input.districtId, sub_district_id: input.subDistrictId || null, wing_id: wing.id,
-      designation_text: input.designation.trim() || 'Active Youth Volunteer',
-      designation_hi: input.designationHi?.trim() || null,
+      designation_text: 'Primary Member',
+      designation_hi: 'प्राथमिक सदस्य',
       community_background: input.communityBackground || null,
+      referred_by_cadre_id: input.referredByCadreId?.trim().toUpperCase() || null,
       blood_group: input.bloodGroup || null, education: input.education || null,
       status: 'pending', verified: false, approved_by: null, approved_at: null,
     });
@@ -98,9 +108,13 @@ export const memberService = {
       id, recordId: id, fullName: input.fullName.trim(), fullNameHi: input.fullNameHi?.trim() || undefined,
       phone: input.phone.trim(), email: input.email?.trim() || '', avatarUrl: '',
       state: input.stateName ?? 'Uttar Pradesh', district: input.districtName ?? '', subDistrict: input.subDistrictName ?? '', wing: input.wingCode as YouthWing,
-      designation: input.designation.trim() || 'Active Youth Volunteer',
-      designationHi: input.designationHi?.trim() || '', joinedAt: new Date().toISOString().slice(0, 10),
+      designation: 'Primary Member',
+      designationHi: 'प्राथमिक सदस्य',
+      stateId: input.stateId,
+      districtId: input.districtId,
+      subDistrictId: input.subDistrictId || undefined, joinedAt: new Date().toISOString().slice(0, 10),
       verified: false, status: 'pending', communityBackground: input.communityBackground || undefined,
+      referredByCadreId: input.referredByCadreId?.trim().toUpperCase() || undefined,
       bloodGroup: input.bloodGroup || undefined, education: input.education || undefined,
     };
   },
@@ -110,21 +124,19 @@ export const memberService = {
     const officialId = `MYL-UP-${new Date().getFullYear()}-${crypto.randomUUID().slice(0, 8).toUpperCase()}`;
     const { data: authData } = await client.auth.getUser();
     if (!authData.user) throw new Error('Sign in again before approving an application.');
-    const { data, error } = await client.from('members').update({
-      cadre_id: officialId, status: 'approved', verified: true,
-      approved_by: authData.user.id, approved_at: new Date().toISOString(),
-    }).eq('id', requestId).eq('status', 'pending').select(MEMBER_COLUMNS).single();
+    const { data, error } = await client.rpc('approve_member_request', {
+      p_request_id: requestId,
+      p_cadre_id: officialId,
+    });
     if (error) throw new Error(`Could not approve application: ${error.message}`);
+    if (!data) throw new Error('Could not approve application: no approved member was returned.');
     return (await mapRows([data as unknown as MemberRow]))[0];
   },
 
   async reject(requestId: string): Promise<void> {
     const client = requireSupabase();
-    const { data, error } = await client.from('members').update({
-      status: 'rejected', verified: false,
-    }).eq('id', requestId).eq('status', 'pending').select('id').single();
+    const { error } = await client.rpc('reject_member_request', { p_request_id: requestId });
     if (error) throw new Error(`Could not reject application: ${error.message}`);
-    if (!data) throw new Error('Application is no longer pending.');
   },
 
   async verifyPublic(cadreId: string): Promise<Member | null> {

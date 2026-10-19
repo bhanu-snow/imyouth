@@ -30,8 +30,16 @@ Use the Supabase SQL Editor or Supabase CLI to apply these files in ascending ti
 10. migrations/20261016001000_sangathan_access.sql
 11. migrations/20261016001100_designation_status.sql
 12. migrations/20261016001200_sangathan_public_views.sql
+13. migrations/20261019000100_membership_committees.sql
+14. migrations/20261019000200_member_referrals.sql
 
 Do not run only the first migration: later migrations add row-level security, lookup data, and integrity constraints.
+
+The membership and committee migration deactivates every legacy organization wing except Muslim Youth League (`myl_cadre`), and new applications/approved member records are tied to that active wing. Approval creates a dated Primary Member period atomically. Administrators can record an explicit membership end date and reason, while post-designation appointments and state/zone/district special committees retain dated history. `superadmin` can manage all scopes, `state_admin` manages state and zone scopes, and `district_incharge` manages only their assigned district. The migration also adds private in-app application alerts and a public FAQ revision token used by the shared FAQ cache.
+
+Apply this migration only after all migrations above it. Test the role-specific approval, committee, membership-history, public verification, notification, and FAQ-refresh workflows in a non-production Supabase project before applying it to production.
+
+The referral migration adds an optional referring cadre ID to membership requests. It accepts only a different cadre with a currently active, verified Primary Member period in the active MYL wing; the ID is checked in the database and is available to authorized application reviewers. Apply this migration after the membership and committee migration before deploying the referral-enabled frontend.
 
 ## 3. Seed the initial FAQ content
 
@@ -62,6 +70,6 @@ Use the actual Auth user UUID and verify the resulting rows. Never store a passw
 
 ## 6. Important current migration boundary
 
-This branch has migrated FAQ, Events, News, Member Registration, Cadre Approvals, public approved-cadre verification, and the Sangathan directory/leadership records to Supabase. Organizational leadership, social broadcasts, and parliamentary history remain on legacy storage and are not yet protected by Supabase RLS. Member applications remain private under RLS; public verification exposes only approved status and non-sensitive identity fields. Local account creation and password reset are intentionally disabled until a server-side Supabase Auth admin workflow is implemented. Do not treat this branch as production-ready until those workflows are migrated.
+This branch has migrated FAQ, Events, News, Member Registration, Cadre Approvals, public approved-cadre verification, and the Sangathan directory/leadership records to Supabase. Organizational leadership, social broadcasts, and parliamentary history remain on legacy storage and are not yet protected by Supabase RLS. Member applications remain private under RLS; public verification exposes only approved active membership and limited identity fields. Membership periods and post-designation appointments are separate records; closing a membership closes its active appointments while preserving their dated history. Notifications are private in-app alerts, not email/SMS messages. Local account creation and password reset are intentionally disabled until a server-side Supabase Auth admin workflow is implemented. Do not treat this branch as production-ready until those workflows are migrated.
 
 After configuring Supabase, run npm run lint and npm run build, then test public application submission, role assignment, login, and each lookup chain in a non-production project before deployment.

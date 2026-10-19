@@ -5,7 +5,7 @@
 
 DO $$
 DECLARE
-  target_email text := 'REPLACE_WITH_YOUR_ADMIN_EMAIL';
+  target_email text := 'superadmin@mylup.org';
   target_name text := 'Portal Administrator';
   target_user_id uuid;
   target_role_id uuid;
@@ -51,4 +51,4 @@ FROM auth.users u
 JOIN public.user_profiles p ON p.user_id = u.id
 JOIN public.user_roles ur ON ur.user_id = u.id
 JOIN public.roles r ON r.id = ur.role_id
-WHERE lower(u.email) = lower('REPLACE_WITH_YOUR_ADMIN_EMAIL');
+WHERE lower(u.email) = lower('superadmin@mylup.org');

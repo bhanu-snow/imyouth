@@ -1,21 +1,21 @@
 import React from 'react';
-import { BookOpen, ShieldCheck, HeartHandshake, Compass, Users, CheckCircle2 } from 'lucide-react';
+import { BookOpen, ShieldCheck, HeartHandshake, Compass } from 'lucide-react';
 import { Language } from '../types';
 
 interface Props {
   lang: Language;
   onNavigateToMembership: () => void;
-  onNavigateToBroadcast: () => void;
   onNavigateToWorkflow: () => void;
   onNavigateToFaq: () => void;
+  isLoggedIn: boolean;
 }
 
 export const PartyIntroMission: React.FC<Props> = ({ 
   lang, 
   onNavigateToMembership, 
-  onNavigateToBroadcast,
   onNavigateToWorkflow,
-  onNavigateToFaq
+  onNavigateToFaq,
+  isLoggedIn,
 }) => {
   return (
     <div className="max-w-6xl mx-auto px-4 py-8 space-y-12">
@@ -57,7 +57,7 @@ export const PartyIntroMission: React.FC<Props> = ({
             </h4>
             <p className="text-xs text-stone-600 leading-relaxed">
               {lang === 'hi'
-                ? 'मुस्लिम स्टूडेंट्स फेडरेशन (MSF) के माध्यम से पोस्ट-मैट्रिक छात्रवृत्तियों की बहाली, सरकारी कॉलेजों में आधुनिक डिजिटल पुस्तकालय और हर पिछड़े ब्लॉक में उच्च शिक्षा की सुलभता।'
+                ? 'मुस्लिम यूथ लीग (MYL) के माध्यम से छात्रवृत्ति जानकारी, सरकारी कॉलेजों में आधुनिक डिजिटल पुस्तकालय और हर पिछड़े ब्लॉक में उच्च शिक्षा की सुलभता।'
                 : 'Championing full scholarship disbursal for minority and backward class students, subsidized campus housing, and modern study centers in rural tehsils.'}
             </p>
           </div>
@@ -118,9 +118,13 @@ export const PartyIntroMission: React.FC<Props> = ({
               : 'Enter the Field with Verified Facts & Ideological Confidence'}
           </h3>
           <p className="text-emerald-100 text-xs sm:text-sm mt-2 max-w-2xl leading-relaxed">
-            {lang === 'hi'
-              ? 'जब आप उत्तर प्रदेश के कॉलेजों या गांवों में युवाओं से मिलें, तो हमारा 4-चरणीय फील्ड वर्कफ़्लो खोलें या अक्सर पूछे जाने वाले सवालों (FAQ) से हर भ्रांति का शांत व दस्तावेजी जवाब दें।'
-              : 'Use the Cadre Outreach Workflow and Myth-Busting FAQ to effectively communicate the 1948 legacy, secular stance, and tangible youth programs like Life Lift.'}
+            {isLoggedIn
+              ? (lang === 'hi'
+                ? 'कार्यकर्ता मार्गदर्शिका और FAQ का उपयोग कर 1948 की विरासत, धर्मनिरपेक्षता और युवा कार्यक्रमों के बारे में दस्तावेज़-आधारित जानकारी साझा करें।'
+                : 'Use the cadre guide and FAQ to share documented information about the 1948 legacy, secularism, and youth programs.')
+              : (lang === 'hi'
+                ? 'कैडर वर्कफ़्लो और सार्वजनिक FAQ में संगठन परिचय, स्रोत-आधारित उत्तर और सदस्यता प्रक्रिया देखें।'
+                : 'Explore the Cadre Workflow and public FAQ for the organization overview, source-led answers, and membership process.')}
           </p>
         </div>
 
@@ -129,7 +133,7 @@ export const PartyIntroMission: React.FC<Props> = ({
             onClick={onNavigateToWorkflow}
             className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-lg transition-colors cursor-pointer"
           >
-            {lang === 'hi' ? 'कार्यकर्ता वर्कफ़्लो खोलें' : 'Open Cadre Workflow'}
+            {lang === 'hi' ? 'कैडर वर्कफ़्लो' : 'Cadre Workflow'}
           </button>
           <button
             onClick={onNavigateToFaq}

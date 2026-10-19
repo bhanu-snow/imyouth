@@ -105,27 +105,27 @@ export const AuthRoleSwitcher: React.FC<Props> = ({
             )}
           </div>
 
-          {/* Quick link to Role Management Page */}
           <div className="space-y-1">
-            <button
-              type="button"
-              onClick={() => {
-                setDropdownOpen(false);
-                onNavigateRoleManagement();
-              }}
-              className="w-full text-left p-2.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-950 font-bold rounded-xl flex items-center justify-between transition-colors cursor-pointer"
-            >
-              <div className="flex items-center gap-2">
-                <Settings className="w-4 h-4 text-emerald-700" />
-                <span>
-                  {currentUser.role === 'superadmin' 
-                    ? (lang === 'hi' ? 'भूमिका व पासवर्ड प्रबंधन' : 'Role & Security Desk') 
-                    : (lang === 'hi' ? 'मेरा पासवर्ड व खाता' : 'My Account & Password')}
-                </span>
-              </div>
-              <span className="text-[10px] bg-emerald-200 text-emerald-900 px-1.5 py-0.5 rounded font-bold">OPEN</span>
-            </button>
-
+            {currentUser.role === 'superadmin' ? (
+              <button
+                type="button"
+                onClick={() => {
+                  setDropdownOpen(false);
+                  onNavigateRoleManagement();
+                }}
+                className="w-full text-left p-2.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-950 font-bold rounded-xl flex items-center justify-between transition-colors cursor-pointer"
+              >
+                <div className="flex items-center gap-2">
+                  <Settings className="w-4 h-4 text-emerald-700" />
+                  <span>{lang === 'hi' ? 'भूमिका व सुरक्षा प्रबंधन' : 'Role & Security Desk'}</span>
+                </div>
+                <span className="text-[10px] bg-emerald-200 text-emerald-900 px-1.5 py-0.5 rounded font-bold">OPEN</span>
+              </button>
+            ) : (
+              <p className="rounded-xl border border-stone-100 bg-stone-50 px-3 py-2 text-[11px] text-stone-600">
+                {lang === 'hi' ? 'पासवर्ड Supabase Auth द्वारा प्रबंधित हैं।' : 'Passwords are managed by Supabase Auth.'}
+              </p>
+            )}
             <button
               type="button"
               onClick={() => {
